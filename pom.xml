@@ -80,8 +80,22 @@
         <module>modules/clustering</module>
         <module>modules/corba</module>
         <module>modules/osgi</module>
-        <module>modules/transport/local</module>
+        <module>modules/transport/base</module>
+	<module>modules/transport/local</module>
         <module>modules/transport/http</module>
+        <module>modules/transport/tcp</module>
+        <module>modules/transport/udp</module>
+        <module>modules/transport/xmpp</module>
+        <module>modules/transport/mail</module>
+        <module>modules/transport/jms</module>
+        <module>modules/transport/rabbitmq</module>
+        <module>modules/transport/sms</module>
+        <module>modules/transport/testkit</module>
+        <module>orbit/axis2</module>
+        <module>orbit/axis2-client</module>
+        <module>orbit/axis2-jaxbri</module>
+        <module>orbit/axis2-jibx</module>
+        <module>orbit/axis2-json</module>
     </modules>
     <pluginRepositories>
 	<pluginRepository> 
@@ -542,19 +556,31 @@
             <organization>Software AG</organization>
         </contributor>
     </contributors>
-<distributionManagement>
+
+    <repositories>
+    	<repository>
+	    <id>wso2-nexus</id>
+	    <name>WSO2 internal Repository</name>
+	    <url>http://maven.wso2.org/nexus/content/groups/wso2-public/</url>
+	    <releases>
+		<enabled>true</enabled>
+		<updatePolicy>daily</updatePolicy>
+		<checksumPolicy>ignore</checksumPolicy>
+	    </releases>
+	</repository>
+    </repositories>
+    <distributionManagement>
         <repository>
             <id>wso2-maven2-repository</id>
             <name>WSO2 Maven2 Repository</name>
             <url>scp://dist.wso2.org/home/httpd/dist.wso2.org/maven2/</url>
         </repository>
-<!--
+
         <snapshotRepository>
             <id>wso2-maven2-snapshot-repository</id>
             <name>WSO2 Maven2 Snapshot Repository</name>
             <url>scp://dist.wso2.org/home/httpd/dist.wso2.org/snapshots/maven2/</url>
         </snapshotRepository>
--->
     </distributionManagement>
 
     <properties>

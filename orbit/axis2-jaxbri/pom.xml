@@ -19,23 +19,42 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <parent>
-        <groupId>org.wso2.carbon</groupId>
-        <artifactId>carbon-kernel-dependents</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
-    </parent>
-
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.axis2.wso2</groupId>
     <artifactId>axis2-jaxbri</artifactId>
     <packaging>bundle</packaging>
     <name>axis2.jaxbri.wso2</name>
-    <version>${orbit.version.axis2}</version>
+    <version>1.6.1.wso2v11-SNAPSHOT</version>
     <description>
         org.wso2.carbon.axis2.jaxbri. This bundle will export packages for Axis2-jibx.
     </description>
     <url>http://wso2.org</url>
+
+    <repositories>
+        <repository>
+            <id>wso2-nexus</id>
+            <name>WSO2 internal Repository</name>
+            <url>http://maven.wso2.org/nexus/content/groups/wso2-public/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+                <checksumPolicy>ignore</checksumPolicy>
+            </releases>
+        </repository>
+    </repositories>
+    <distributionManagement>
+        <repository>
+            <id>wso2-maven2-repository</id>
+            <name>WSO2 Maven2 Repository</name>
+            <url>scp://dist.wso2.org/home/httpd/dist.wso2.org/maven2/</url>
+        </repository>
+
+        <snapshotRepository>
+            <id>wso2-maven2-snapshot-repository</id>
+            <name>WSO2 Maven2 Snapshot Repository</name>
+            <url>scp://dist.wso2.org/home/httpd/dist.wso2.org/snapshots/maven2/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <dependencies>
         <dependency>
@@ -73,7 +92,7 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                
+                <version>1.4.0</version> 
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
@@ -89,4 +108,9 @@
             </plugin>
         </plugins>
     </build>
+    <properties>
+        <orbit.version.axis2>1.6.1.wso2v11-SNAPSHOT</orbit.version.axis2>
+        <version.axis2>1.6.1-wso2v11-SNAPSHOT</version.axis2>
+        <exp.pkg.version.axis2>1.6.1.wso2v11-SNAPSHOT</exp.pkg.version.axis2>
+    </properties>
 </project>

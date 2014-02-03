@@ -19,13 +19,6 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <parent>
-        <groupId>org.wso2.carbon</groupId>
-        <artifactId>carbon-kernel-dependents</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
-	<relativePath>../../pom.xml</relativePath>
-    </parent>
-
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.axis2.wso2</groupId>
     <artifactId>axis2-client</artifactId>
@@ -34,11 +27,36 @@
     <description>
         A single JAR file containing all the client side libraries
     </description>
-    <version>${orbit.version.axis2}</version>
+    <version>1.6.1.wso2v11-SNAPSHOT</version>
     <url>http://wso2.org</url>
 
-    <dependencies>
+    <repositories>
+        <repository>
+            <id>wso2-nexus</id>
+            <name>WSO2 internal Repository</name>
+            <url>http://maven.wso2.org/nexus/content/groups/wso2-public/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+                <checksumPolicy>ignore</checksumPolicy>
+            </releases>
+        </repository>
+    </repositories>
+    <distributionManagement>
+        <repository>
+            <id>wso2-maven2-repository</id>
+            <name>WSO2 Maven2 Repository</name>
+            <url>scp://dist.wso2.org/home/httpd/dist.wso2.org/maven2/</url>
+        </repository>
 
+        <snapshotRepository>
+            <id>wso2-maven2-snapshot-repository</id>
+            <name>WSO2 Maven2 Snapshot Repository</name>
+            <url>scp://dist.wso2.org/home/httpd/dist.wso2.org/snapshots/maven2/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <dependencies>
         <dependency>
             <groupId>org.apache.ws.commons.schema.wso2</groupId>
             <artifactId>XmlSchema</artifactId>
@@ -269,6 +287,7 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
+		<version>1.4.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
@@ -309,7 +328,19 @@
     </build>
 
     <properties>
-	<transport.version>1.1.0-wso2v9</transport.version>
+        <orbit.version.axis2>1.6.1.wso2v11-SNAPSHOT</orbit.version.axis2>
+        <version.axis2>1.6.1-wso2v11-SNAPSHOT</version.axis2>
+        <transport.version>1.6.1-wso2v11-SNAPSHOT</transport.version>
+        <version.apache.felix.framework>1.4.0</version.apache.felix.framework>
         <xmlbeans.version>2.3.0</xmlbeans.version>
+        <orbit.version.neethi>2.0.4.wso2v4</orbit.version.neethi>
+        <exp.pkg.version.axis2>1.6.1.wso2v11-SNAPSHOT</exp.pkg.version.axis2>
+        <imp.pkg.version.axiom>[1.2.11.wso2v5-SNAPSHOT, 1.3.0)</imp.pkg.version.axiom>
+	<exp.pkg.version.neethi>2.0.4.wso2v4</exp.pkg.version.neethi>
+        <imp.pkg.version.neethi>[2.0.4.wso2v4, 3.0.0)</imp.pkg.version.neethi>
+        <imp.pkg.version.javax.servlet>[2.6.0, 3.0.0)</imp.pkg.version.javax.servlet>
+	<securevault.version>1.0.0</securevault.version>
+	<orbit.version.commons.fileuploader>1.2.0.wso2v1</orbit.version.commons.fileuploader>
+	<orbit.version.spring>3.1.0.wso2v1</orbit.version.spring>
     </properties>
 </project>
