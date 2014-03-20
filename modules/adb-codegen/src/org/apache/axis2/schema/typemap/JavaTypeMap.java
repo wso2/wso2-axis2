@@ -91,6 +91,9 @@ public class JavaTypeMap implements TypeMap {
         addTypemapping(SchemaConstants.XSD_ANYTYPE,
                 Object.class.getName());
 
+        addTypemapping(SchemaConstants.XSD_ANYSIMPLETYPE,
+                Object.class.getName());
+
         //Qname maps to  jax rpc QName class
         addTypemapping(SchemaConstants.XSD_QNAME,
                 javax.xml.namespace.QName.class.getName());
