@@ -185,7 +185,7 @@ public class RabbitMQMessageSender {
         builder.replyTo(message.getReplyTo());
         builder.correlationId(message.getCorrelationId());
         builder.contentEncoding(message.getContentEncoding());
-        Map<String, Object> headers = new HashMap<String, Object>();
+        Map<String, Object> headers = message.getHeaders();
         headers.put(RabbitMQConstants.SOAP_ACTION, message.getSoapAction());
         builder.headers(headers);
         return builder;

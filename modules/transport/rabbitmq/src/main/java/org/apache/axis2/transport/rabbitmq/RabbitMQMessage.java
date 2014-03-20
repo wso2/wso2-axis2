@@ -44,6 +44,7 @@ public class RabbitMQMessage {
         this.contentType = (String) msgCtx.getProperty(RabbitMQConstants.CONTENT_TYPE);
         this.correlationId = (String) msgCtx.getProperty(RabbitMQConstants.CORRELATION_ID);
         this.contentEncoding = (String) msgCtx.getProperty(RabbitMQConstants.CONTENT_ENCODING);
+        this.headers = (Map<String, Object>) msgCtx.getProperty(MessageContext.TRANSPORT_HEADERS);
     }
 
     public byte[] getBody() {

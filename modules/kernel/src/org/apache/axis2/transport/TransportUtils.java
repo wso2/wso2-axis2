@@ -169,6 +169,14 @@ public class TransportUtils {
                                                   InputStream inStream) throws AxisFault, XMLStreamException {
         OMElement documentElement = null;
         String type = null;
+        if (contentType == null) {
+            //read default content type form axis2 configuration
+            Parameter cType = msgContext.getConfigurationContext().getAxisConfiguration().getParameter(
+                    Constants.Configuration.DEFAULT_CONTENT_TYPE);
+            if (cType != null && cType.getValue() != null) {
+                contentType = cType.getValue().toString();
+            }
+        }
         if (contentType != null) {
             type = getContentType(contentType, msgContext);
             Builder builder = MessageProcessorSelector.getMessageBuilder(type, msgContext);
