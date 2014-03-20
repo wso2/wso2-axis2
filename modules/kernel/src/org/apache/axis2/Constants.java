@@ -462,5 +462,7 @@ public class Constants extends org.apache.axis2.namespace.Constants {
         public static final String ENABLE_CHILD_FIRST_CLASS_LOADING="EnableChildFirstClassLoading";
 
         public static final String APPLICATION_XML_BUILDER_ALLOW_DTD="ApplicationXMLBuilder.allowDTD";
+
+        public static final String DEFAULT_CONTENT_TYPE = "defaultContentType";
     }
 }

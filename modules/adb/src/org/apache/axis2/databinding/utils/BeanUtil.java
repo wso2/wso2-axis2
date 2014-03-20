@@ -29,14 +29,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
@@ -57,7 +50,7 @@ import org.apache.axis2.util.StreamWrapper;
 
 public class BeanUtil {
     private static int nsCount = 1;
-
+		private static Map<String, BeanInfo> beanInfoMap = new WeakHashMap<String, BeanInfo>();
     /**
      * To Serilize Bean object this method is used, this will create an object array using given
      * bean object
@@ -69,9 +62,8 @@ public class BeanUtil {
                                                 boolean processingDocLitBare) {
 
         Class beanClass = beanObject.getClass();
-        List<Object> propertyQnameValueList = getPropertyQnameList(beanObject,
-                                                           beanClass, beanName, typeTable, qualified, processingDocLitBare);
-
+        List<Object> propertyQnameValueList = getPropertyQnameList(beanObject,beanClass, beanName, typeTable, qualified, processingDocLitBare);
+       
         ArrayList<QName> objectAttributes = new ArrayList<QName>();
 
         if ((typeTable != null)) {
@@ -96,7 +88,7 @@ public class BeanUtil {
     }
 
 
-    private static BeanInfo getBeanInfo(Class beanClass, Class beanSuperclass) throws IntrospectionException {
+   /* private static BeanInfo getBeanInfo(Class beanClass, Class beanSuperclass) throws IntrospectionException {
         BeanInfo beanInfo; 
         try {
             if (beanSuperclass != null)
@@ -109,6 +101,33 @@ public class BeanUtil {
         }
 
          
+        return beanInfo;
+    }
+
+    private static BeanInfo getBeanInfo(Class beanClass) throws IntrospectionException {
+        return getBeanInfo(beanClass, null);
+    }*/
+    
+    private static BeanInfo getBeanInfo(Class beanClass, Class beanSuperclass) throws IntrospectionException {
+        String beanInfoKey;
+        if (beanSuperclass != null)
+            beanInfoKey = beanClass.getName().concat("|").concat(beanSuperclass.getName());
+        else
+            beanInfoKey = beanClass.getName();
+
+        BeanInfo beanInfo = beanInfoMap.get(beanInfoKey);
+        if (beanInfo == null) {
+            try {
+                if (beanSuperclass != null)
+                    beanInfo = Introspector.getBeanInfo(beanClass, beanSuperclass);
+                else
+                    beanInfo = Introspector.getBeanInfo(beanClass);
+            }
+            catch (IntrospectionException e) {
+                throw e;
+            }
+            beanInfoMap.put(beanInfoKey, beanInfo);
+        }
         return beanInfo;
     }
 

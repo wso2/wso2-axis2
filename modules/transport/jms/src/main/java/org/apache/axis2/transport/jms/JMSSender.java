@@ -307,10 +307,11 @@ public class JMSSender extends AbstractTransportSender implements ManagementSupp
                 }
 
             } else {
-                log.warn("Did not receive a JMS response within " +
-                    timeout + " ms to destination : " + replyDestination +
-                    " with JMS correlation ID : " + correlationId);
-                metrics.incrementTimeoutsReceiving();
+            	                   
+            	metrics.incrementFaultsReceiving();
+            	handleException("Did not receive a JMS response within " + timeout +
+            	                " ms to destination : " + replyDestination +
+            	                " with JMS correlation ID : " + correlationId);
             }
 
         } catch (JMSException e) {

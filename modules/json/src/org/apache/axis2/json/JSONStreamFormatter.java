@@ -52,7 +52,13 @@ public class JSONStreamFormatter extends AbstractJSONMessageFormatter {
             }
         } else if (msgCtxt.getProperty("JSON_STREAM") != null) {
             try {
-                IOUtils.copy((InputStream) msgCtxt.getProperty("JSON_STREAM"), out, false);
+                InputStream is = (InputStream) msgCtxt.getProperty("JSON_STREAM");
+                IOUtils.copy(is, out, false);
+                if (preserve) {
+                    if (is.markSupported()) {
+                        is.reset();
+                    }
+                }
             } catch (IOException e) {
                 throw AxisFault.makeFault(e);
             }
