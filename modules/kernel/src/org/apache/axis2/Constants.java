@@ -352,6 +352,7 @@ public class Constants extends org.apache.axis2.namespace.Constants {
         public static final String HTTP_METHOD = "HTTP_METHOD";
         public static final String HTTP_METHOD_POST = "POST";
         public static final String HTTP_METHOD_HEAD="HEAD";
+        public static final String HTTP_METHOD_PATCH = "PATCH";
 
         public static final String CONTENT_TYPE = "ContentType";
 
