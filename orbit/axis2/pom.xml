@@ -41,7 +41,31 @@
                 <checksumPolicy>ignore</checksumPolicy>
             </releases>
         </repository>
+        <repository>
+            <id>wso2.releases</id>
+            <name>WSO2 internal Repository</name>
+            <url>http://maven.wso2.org/nexus/content/repositories/releases/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+                <checksumPolicy>ignore</checksumPolicy>
+            </releases>
+        </repository>
+
+        <repository>
+            <id>wso2.snapshots</id>
+            <name>WSO2 Snapshot Repository</name>
+            <url>http://maven.wso2.org/nexus/content/repositories/snapshots/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
     </repositories>
+
     <distributionManagement>
         <repository>
             <id>wso2-maven2-repository</id>
@@ -525,7 +549,7 @@
                             javax.mail.*; version="1.4.0",
                             javax.wsdl.*; version="1.6.2",
                             javax.xml.bind.*;version="2.1.0";resolution:=optional,
-                            org.apache.catalina.tribes; version=6.0.16,
+                            org.apache.catalina.tribes; version=6.0.16;resolution:=optional,
                             *;resolution:=optional
                         </Import-Package>
                         <Private-Package>org.wso2.carbon.axis2.internal</Private-Package>
