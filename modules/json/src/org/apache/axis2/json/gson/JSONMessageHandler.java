@@ -23,12 +23,14 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.engine.MessageReceiver;
 import org.apache.axis2.handlers.AbstractHandler;
 import org.apache.axis2.json.gson.rpc.JsonInOnlyRPCMessageReceiver;
 import org.apache.axis2.json.gson.rpc.JsonRpcMessageReceiver;
 import org.apache.axis2.json.gson.factory.JsonConstant;
 import org.apache.axis2.wsdl.WSDLConstants;
+import org.apache.log4j.Logger;
 import org.apache.ws.commons.schema.XmlSchema;
 
 import javax.xml.namespace.QName;
@@ -36,6 +38,7 @@ import java.util.List;
 
 
 public class JSONMessageHandler extends AbstractHandler {
+    Logger log = Logger.getLogger(JSONMessageHandler.class);
     /**
      * This method will be called on each registered handler when a message
      * needs to be processed.  If the message processing is paused by the
@@ -58,28 +61,36 @@ public class JSONMessageHandler extends AbstractHandler {
      */
 
     public InvocationResponse invoke(MessageContext msgContext) throws AxisFault {
-        MessageReceiver messageReceiver = msgContext.getAxisOperation().getMessageReceiver();
-        if (messageReceiver instanceof JsonRpcMessageReceiver || messageReceiver instanceof JsonInOnlyRPCMessageReceiver) {
-            // do not need to parse XMLSchema list, as  this message receiver will not use GsonXMLStreamReader  to read the inputStream.
-        } else {
-            // Sever expect XML message
-            Object tempObj = msgContext.getProperty(JsonConstant.IS_JSON_STREAM);
-            if (tempObj != null) {
-                // server has received a json stream and we need process it.
-                boolean isJSON = Boolean.valueOf(tempObj.toString());
-                Object o = msgContext.getProperty(JsonConstant.GSON_XML_STREAM_READER);
-                if (o != null) {
-                    GsonXMLStreamReader gsonXMLStreamReader = (GsonXMLStreamReader) o;
-                    QName elementQname = msgContext.getAxisOperation().getMessage(WSDLConstants.MESSAGE_LABEL_IN_VALUE).getElementQName();
-                    List<XmlSchema> schemas = msgContext.getAxisService().getSchema();
-                    gsonXMLStreamReader.initXmlStreamReader(elementQname, schemas, msgContext.getConfigurationContext());
-                    StAXOMBuilder stAXOMBuilder = new StAXOMBuilder(gsonXMLStreamReader);
-                    OMElement omElement = stAXOMBuilder.getDocumentElement();
-                    msgContext.getEnvelope().getBody().addChild(omElement);
-                } else {
-                    throw new AxisFault("GsonXMLStreamReader should not be null");
+        AxisOperation axisOperation = msgContext.getAxisOperation();
+        if (axisOperation != null) {
+            MessageReceiver messageReceiver = axisOperation.getMessageReceiver();
+            if (messageReceiver instanceof JsonRpcMessageReceiver || messageReceiver instanceof JsonInOnlyRPCMessageReceiver) {
+                // do not need to parse XMLSchema list, as  this message receiver will not use GsonXMLStreamReader  to read the inputStream.
+            } else {
+                // Sever expect XML message
+                Object tempObj = msgContext.getProperty(JsonConstant.IS_JSON_STREAM);
+                if (tempObj != null) {
+                    // server has received a json stream and we need process it.
+                    boolean isJSON = Boolean.valueOf(tempObj.toString());
+                    Object o = msgContext.getProperty(JsonConstant.GSON_XML_STREAM_READER);
+                    if (o != null) {
+                        GsonXMLStreamReader gsonXMLStreamReader = (GsonXMLStreamReader) o;
+                        QName elementQname = msgContext.getAxisOperation().getMessage(WSDLConstants.MESSAGE_LABEL_IN_VALUE).getElementQName();
+                        List<XmlSchema> schemas = msgContext.getAxisService().getSchema();
+                        gsonXMLStreamReader.initXmlStreamReader(elementQname, schemas, msgContext.getConfigurationContext());
+                        StAXOMBuilder stAXOMBuilder = new StAXOMBuilder(gsonXMLStreamReader);
+                        OMElement omElement = stAXOMBuilder.getDocumentElement();
+                        msgContext.getEnvelope().getBody().addChild(omElement);
+                    } else {
+                        throw new AxisFault("GsonXMLStreamReader should not be null");
+                    }
                 }
             }
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Axis operation is null");
+            }
+            // message hasn't been dispatched to operation, ignore it
         }
         return InvocationResponse.CONTINUE;
     }
