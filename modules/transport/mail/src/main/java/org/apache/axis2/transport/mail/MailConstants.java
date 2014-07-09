@@ -61,6 +61,7 @@ public class MailConstants {
     public static final String TRANSPORT_FORMAT_TEXT = "Text";
     public static final String TRANSPORT_FORMAT_MP   = "Multipart";
     public static final String TRANSPORT_MAIL_BODY_WHEN_ATTACHED = "transport.mail.bodyWhenAttached";
+    public static final String TRANSPORT_MAIL_BODY_MIME_WHEN_ATTACHED = "transport.mail.bodyMimeWhenAttached";
     public static final String TRANSPORT_FORMAT_ATTACHMENT   = "Attachment";
     public static final String TRANSPORT_FORMAT_ATTACHMENT_FILE   = "AttachmentFile";
 
