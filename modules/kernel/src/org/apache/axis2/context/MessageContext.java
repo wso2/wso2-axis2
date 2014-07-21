@@ -1016,6 +1016,9 @@ public class MessageContext extends AbstractContext
     public Map<String, Object> getProperties() {
         final Map<String, Object> resultMap = new HashMap<String, Object>();
 
+        // Add my own options
+        resultMap.putAll(super.getProperties());
+        
         // My own context hierarchy may not all be present. So look for whatever
         // nearest level is present and add the properties
         // We have to access the contexts in reverse order, in order to allow
