@@ -28,27 +28,35 @@ import org.apache.axis2.Constants;
 import org.apache.axis2.builder.Builder;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.json.gson.factory.JsonConstant;
+import org.apache.log4j.Logger;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 
 public class JsonBuilder implements Builder {
+    Logger log = Logger.getLogger(JsonBuilder.class);
     public OMElement processDocument(InputStream inputStream, String s, MessageContext messageContext) throws AxisFault {
         messageContext.setProperty(JsonConstant.IS_JSON_STREAM , true);
         JsonReader jsonReader;
         String charSetEncoding=null;
-           try {
-               charSetEncoding = (String) messageContext.getProperty(Constants.Configuration.CHARACTER_SET_ENCODING);
-               jsonReader = new JsonReader(new InputStreamReader(inputStream , charSetEncoding));
-               GsonXMLStreamReader gsonXMLStreamReader = new GsonXMLStreamReader(jsonReader);
-               messageContext.setProperty(JsonConstant.GSON_XML_STREAM_READER , gsonXMLStreamReader);
-               // dummy envelop
-               SOAPFactory soapFactory = OMAbstractFactory.getSOAP11Factory();
-               return soapFactory.getDefaultEnvelope();
-           } catch (UnsupportedEncodingException e) {
-               throw new AxisFault(charSetEncoding + " encoding is may not supported by json inputStream ", e);
-           }
+        if (inputStream != null) {
+            try {
+                charSetEncoding = (String) messageContext.getProperty(Constants.Configuration.CHARACTER_SET_ENCODING);
+                jsonReader = new JsonReader(new InputStreamReader(inputStream, charSetEncoding));
+                GsonXMLStreamReader gsonXMLStreamReader = new GsonXMLStreamReader(jsonReader);
+                messageContext.setProperty(JsonConstant.GSON_XML_STREAM_READER, gsonXMLStreamReader);
+            } catch (UnsupportedEncodingException e) {
+                throw new AxisFault(charSetEncoding + " encoding is may not supported by json inputStream ", e);
+            }
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Inputstream is null, This is possible with GET request");
+            }
+        }
+        // dummy envelop
+        SOAPFactory soapFactory = OMAbstractFactory.getSOAP11Factory();
+        return soapFactory.getDefaultEnvelope();
     }
 
 }

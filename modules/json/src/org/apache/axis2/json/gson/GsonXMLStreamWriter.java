@@ -680,7 +680,7 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
             String valueType = peek.getValueType();
             if (valueType.equals("string")) {
                 jsonWriter.value(text);
-            } else if (valueType.equals("int")) {
+            } else if (valueType.equals("int") || valueType.equals("integer")) {
                 Number num = new Integer(text);
                 jsonWriter.value(num);
             } else if (valueType.equals("long")) {
