@@ -504,7 +504,8 @@ public class HTTPConstants {
     public static final String COOKIE_STRING = "Cookie";
     public static final String HTTP_METHOD_GET = "GET";
     public static final String HTTP_METHOD_POST = "POST";
-
+    //Codes for non retry behavior
+    public static final String NON_ERROR_HTTP_STATUS_CODES = "non.error.http.status.codes";
     // FIXME: the comment below is incorrect (or at least misleading)
     //        since Constants.Configuration.CONTENT_TYPE has a different value!!!
     /**
