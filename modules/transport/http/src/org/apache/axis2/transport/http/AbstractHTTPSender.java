@@ -166,19 +166,9 @@ public abstract class AbstractHTTPSender {
         // Process old style headers first
         Header[] cookieHeaders = method.getResponseHeaders(HTTPConstants.HEADER_SET_COOKIE);
         String customCoookiId = (String) msgContext.getProperty(Constants.CUSTOM_COOKIE_ID);
-        for (int i = 0; i < cookieHeaders.length; i++) {
-            HeaderElement[] elements = cookieHeaders[i].getElements();
-            for (int e = 0; e < elements.length; e++) {
-                HeaderElement element = elements[e];
-                if (Constants.SESSION_COOKIE.equalsIgnoreCase(element.getName()) ||
-                        Constants.SESSION_COOKIE_JSESSIONID.equalsIgnoreCase(element.getName())) {
-                    sessionCookie = processCookieHeader(element);
-                }
-                if (customCoookiId != null && customCoookiId.equalsIgnoreCase(element.getName())) {
-                    sessionCookie = processCookieHeader(element);
-                }
-            }
-        }
+        // process all the cookieHeaders, when load balancer is fronted it may require some cookies to function.
+        sessionCookie = processCookieHeaders(cookieHeaders);
+
         // Overwrite old style cookies with new style ones if present
         cookieHeaders = method.getResponseHeaders(HTTPConstants.HEADER_SET_COOKIE2);
         for (int i = 0; i < cookieHeaders.length; i++) {
@@ -195,7 +185,7 @@ public abstract class AbstractHTTPSender {
             }
         }
 
-        if (sessionCookie != null) {
+        if (sessionCookie != null && !sessionCookie.isEmpty()) {
             msgContext.getServiceContext().setProperty(HTTPConstants.COOKIE_STRING, sessionCookie);
         }
     }
@@ -206,6 +196,24 @@ public abstract class AbstractHTTPSender {
         for (int j = 0; parameters != null && j < parameters.length; j++) {
             NameValuePair parameter = parameters[j];
             cookie = cookie + "; " + parameter.getName() + "=" + parameter.getValue();
+        }
+        return cookie;
+    }
+
+    private String processCookieHeaders(Header[] headers) {
+        String cookie = "";
+        for (Header header : headers) {
+            if (!cookie.equals("")) {
+                cookie = cookie + ";";
+            }
+            HeaderElement[] elements = header.getElements();
+            for (HeaderElement element : elements) {
+                cookie = cookie + element.getName() + "=" + element.getValue();
+                NameValuePair[] parameters = element.getParameters();
+                for (NameValuePair parameter : parameters) {
+                    cookie = cookie + "; " + parameter.getName() + "=" + parameter.getValue();
+                }
+            }
         }
         return cookie;
     }
