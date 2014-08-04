@@ -87,6 +87,7 @@ public class XmlNodeGenerator {
         XmlNode xmlNode;
         QName schemaTypeName = element.getSchemaTypeName();
         XmlSchemaType schemaType = element.getSchemaType();
+        QName refName = element.getRefName();
         if (schemaTypeName != null) {
             xmlNode = new XmlNode(element.getName(), targetNamespace, false, (element.getMaxOccurs() != 1), schemaTypeName.getLocalPart());
             parentNode.addChildToList(xmlNode);
@@ -107,9 +108,39 @@ public class XmlNodeGenerator {
             xmlNode = new XmlNode(element.getName(), targetNamespace, false, (element.getMaxOccurs() != 1), schemaType.getQName().getLocalPart());
             parentNode.addChildToList(xmlNode);
             processSchemaType(schemaType, xmlNode, schema);
+        }else if (refName != null) {
+            xmlNode = new XmlNode(refName.getLocalPart(), targetNamespace, false, (element.getMaxOccurs() != 1), refName.getLocalPart());
+            parentNode.addChildToList(xmlNode);
+            if (("http://www.w3.org/2001/XMLSchema").equals(refName.getNamespaceURI())) {
+            } else {
+                XmlSchema schemaOfElement;
+                // see whether Schema type is in the same schema
+                XmlSchemaElement childSchemaEl = schema.getElementByName(refName.getLocalPart());
+                XmlSchemaType childSchemaType;
+                if (childSchemaEl == null) {
+                    schemaOfElement = getXmlSchema(refName);
+                    childSchemaEl = schemaOfElement.getElementByName(refName.getLocalPart());
+                } else {
+                    schemaOfElement = schema;
+                }
+                childSchemaType = this.getSchemaTypeOfElement(schemaOfElement, childSchemaEl);
+                processSchemaType(childSchemaType, xmlNode, schemaOfElement);
+            }
         }
     }
 
+    private XmlSchemaType getSchemaTypeOfElement(XmlSchema schema, XmlSchemaElement element) {
+        XmlSchemaType type = element.getSchemaType();
+        if (type == null) {
+            QName typeName = element.getSchemaTypeName();
+            type = schema.getTypeByName(typeName.getLocalPart());
+            if (type == null) {
+                schema = getXmlSchema(typeName);
+                type = schema.getTypeByName(typeName.getLocalPart());
+            }
+        }
+        return type;
+    }
 
     private void processSchemaType(XmlSchemaType xmlSchemaType , XmlNode parentNode , XmlSchema schema) {
         if (xmlSchemaType instanceof XmlSchemaComplexType) {
