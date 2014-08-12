@@ -91,24 +91,19 @@ public class JMSOutTransportInfo implements OutTransportInfo {
     JMSOutTransportInfo(String targetEPR) {
 
         this.targetEPR = targetEPR;
-        if (!targetEPR.startsWith(JMSConstants.JMS_PREFIX)) {
-            handleException("Invalid prefix for a JMS EPR : " + targetEPR);
-
-        } else {
-            properties = BaseUtils.getEPRProperties(targetEPR);
-            String destinationType = properties.get(JMSConstants.PARAM_DEST_TYPE);
-            if (destinationType != null) {
-                setDestinationType(destinationType);
-            }
-
-            String replyDestinationType = properties.get(JMSConstants.PARAM_REPLY_DEST_TYPE);
-            if (replyDestinationType != null) {
-                setReplyDestinationType(replyDestinationType);
-            }
-
-            replyDestinationName = properties.get(JMSConstants.PARAM_REPLY_DESTINATION);
-            contentTypeProperty = properties.get(JMSConstants.CONTENT_TYPE_PROPERTY_PARAM);
+        properties = BaseUtils.getEPRProperties(targetEPR);
+        String destinationType = properties.get(JMSConstants.PARAM_DEST_TYPE);
+        if (destinationType != null) {
+            setDestinationType(destinationType);
         }
+
+        String replyDestinationType = properties.get(JMSConstants.PARAM_REPLY_DEST_TYPE);
+        if (replyDestinationType != null) {
+            setReplyDestinationType(replyDestinationType);
+        }
+
+        replyDestinationName = properties.get(JMSConstants.PARAM_REPLY_DESTINATION);
+        contentTypeProperty = properties.get(JMSConstants.CONTENT_TYPE_PROPERTY_PARAM);
     }
 
     /**
