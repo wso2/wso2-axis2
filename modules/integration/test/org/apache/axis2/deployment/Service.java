@@ -19,13 +19,20 @@
 
 package org.apache.axis2.deployment;
 
-import org.apache.axis2.Constants;
-import org.apache.axis2.integration.LocalTestCase;
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.ServiceContext;
+import org.apache.axis2.service.Lifecycle;
 
-public class LifecycleTest extends LocalTestCase {
+public class Service implements Lifecycle {
 
-    public void testServiceObjectLifecycle() throws Exception {
-        deployClassAsService("lifecycle", Service.class, Constants.SCOPE_APPLICATION);
-        assertTrue("init() not called!", Service.initCalled);
+    static boolean initCalled, destroyCalled;
+
+    public void init(ServiceContext context) throws AxisFault {
+        initCalled = true;
     }
+
+    public void destroy(ServiceContext context) {
+        destroyCalled = true;
+    }
+
 }
