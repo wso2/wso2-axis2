@@ -41,6 +41,7 @@ import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.Set;
 
 public class HTTPSender extends AbstractHTTPSender {
@@ -268,6 +269,18 @@ public class HTTPSender extends AbstractHTTPSender {
         HTTPStatusCodeFamily family = getHTTPStatusCodeFamily(statusCode);
         log.trace("Handling response - " + statusCode);
         Set<Integer>nonErrorCodes = (Set<Integer>) msgContext.getProperty(HTTPConstants.NON_ERROR_HTTP_STATUS_CODES);    
+        Set<Integer> errorCodes = new HashSet<Integer>();
+        String strRetryErrorCodes = (String) msgContext.getProperty(HTTPConstants.ERROR_HTTP_STATUS_CODES); // Fixing
+                                                                                                // ESBJAVA-3178
+        if (strRetryErrorCodes != null && !strRetryErrorCodes.trim().equals("")) {
+            for (String strRetryErrorCode : strRetryErrorCodes.split(",")) {
+                try {
+                    errorCodes.add(Integer.valueOf(strRetryErrorCode));
+                } catch (NumberFormatException e) {
+                    log.warn(strRetryErrorCode + " is not a valid status code");
+                }
+            }
+        }       
         if (statusCode == HttpStatus.SC_ACCEPTED) {
         	/* When an HTTP 202 Accepted code has been received, this will be the case of an execution 
         	 * of an in-only operation. In such a scenario, the HTTP response headers should be returned,
@@ -279,8 +292,8 @@ public class HTTPSender extends AbstractHTTPSender {
             // Save the HttpMethod so that we can release the connection when cleaning up
             msgContext.setProperty(HTTPConstants.HTTP_METHOD, method);
             processResponse(method, msgContext);
-        } else if (statusCode == HttpStatus.SC_INTERNAL_SERVER_ERROR ||
-                statusCode == HttpStatus.SC_BAD_REQUEST) {
+        } else if (!errorCodes.contains(statusCode)
+                && (statusCode == HttpStatus.SC_INTERNAL_SERVER_ERROR || statusCode == HttpStatus.SC_BAD_REQUEST)) {
             // Save the HttpMethod so that we can release the connection when cleaning up
             msgContext.setProperty(HTTPConstants.HTTP_METHOD, method);
             Header contenttypeHeader =

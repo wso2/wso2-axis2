@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
 import java.util.Iterator;
 
 public class JSONBuilder implements Builder {
@@ -63,9 +64,17 @@ public class JSONBuilder implements Builder {
         }
         StringBuilder stringBuilder = new StringBuilder(FiveKB);
         insertRoot(stringBuilder);
+        String charset = (String) messageContext.getProperty(org.apache.axis2.Constants.Configuration.CHARACTER_SET_ENCODING);
         if (messageContext.getProperty(JSON_STREAM) != null) {
-            BufferedReader buf = new BufferedReader(
-                    new InputStreamReader((InputStream) messageContext.getProperty(JSON_STREAM)));
+            BufferedReader buf;
+            try {
+                buf = new BufferedReader(new InputStreamReader(
+                        (InputStream) messageContext.getProperty(JSON_STREAM),
+                        (charset == null || charset.isEmpty()) ? Charset.defaultCharset().name()
+                                : charset));
+            } catch (Exception e) {
+                throw AxisFault.makeFault(e);
+            }
             String line;
             try {
                 while ((line = buf.readLine()) != null) {

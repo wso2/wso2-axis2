@@ -48,6 +48,7 @@ import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Iterator;
 
 /**
@@ -140,7 +141,9 @@ public abstract class AbstractJSONMessageFormatter implements MessageFormatter {
     private XMLStreamWriter getJSONWriter(OutputStream outStream, OMOutputFormat format)
             throws AxisFault {
         try {
-            return getJSONWriter(new OutputStreamWriter(outStream, format.getCharSetEncoding()));
+            return getJSONWriter(new OutputStreamWriter(outStream,
+                    (format == null || format.getCharSetEncoding() == null) ? Charset
+                            .defaultCharset().name() : format.getCharSetEncoding()));
         } catch (UnsupportedEncodingException ex) {
             throw AxisFault.makeFault(ex);
         }
