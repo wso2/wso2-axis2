@@ -25,6 +25,7 @@ import junit.framework.TestCase;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMOutputFormat;
+import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
@@ -32,9 +33,12 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.format.PlainTextFormatter;
 import org.apache.axis2.transport.base.BaseConstants;
 
+import javax.xml.stream.XMLStreamException;
+
 public class PlainTextFormatterTest extends TestCase {
 	private static final String testString = "\u00e0 peine arriv\u00e9s nous entr\u00e2mes dans sa chambre";
-	
+    private static final String testElementString = "<echo xmlns=\"www.test.com\"><a>Hi! This is a sample Request.</a></echo>";
+
 	private MessageContext createMessageContext(String textPayload) throws AxisFault {
 		MessageContext messageContext = new MessageContext();
 		SOAPFactory factory = OMAbstractFactory.getSOAP11Factory();
@@ -78,4 +82,43 @@ public class PlainTextFormatterTest extends TestCase {
 	public void testWriteToLatin1() throws Exception {
 		testWriteTo("ISO-8859-1");
 	}
+
+    private MessageContext createElementMessageContextElement(String textPayload) throws AxisFault {
+
+        try {
+            MessageContext messageContext = new MessageContext();
+            SOAPFactory factory = OMAbstractFactory.getSOAP11Factory();
+            SOAPEnvelope envelope = factory.getDefaultEnvelope();
+            OMElement textWrapper = factory.createOMElement(BaseConstants.DEFAULT_TEXT_WRAPPER);
+            OMElement payload = AXIOMUtil.stringToOM(textPayload);
+            textWrapper.addChild(payload);
+            envelope.getBody().addChild(textWrapper);
+            messageContext.setEnvelope(envelope);
+            return messageContext;
+        } catch (XMLStreamException e) {
+            // This is highly unlikely to happen
+            return null;
+        }
+    }
+
+    private void testElementGetBytes(String encoding) throws Exception {
+        MessageContext messageContext = createElementMessageContextElement(testElementString);
+        if (messageContext != null) {
+            OMOutputFormat format = new OMOutputFormat();
+            format.setCharSetEncoding(encoding);
+            byte[] bytes = new PlainTextFormatter().getBytes(messageContext, format);
+            assertEquals(testElementString, new String(bytes, encoding));
+        }
+        else {
+            assertTrue(false);
+        }
+    }
+
+    public void testElementGetBytesUTF8() throws Exception {
+        testElementGetBytes("UTF-8");
+    }
+
+    public void testElementGetBytesLatin1() throws Exception {
+        testElementGetBytes("ISO-8859-1");
+    }
 }
