@@ -178,8 +178,8 @@ public class JMSMessageSender {
             }
 
         } catch (JMSException e) {
-            log.error("Error sending message with MessageContext ID : " +
-                msgCtx.getMessageID() + " to destination : " + destination, e);
+            handleException("Error sending message with MessageContext ID : " +
+                    msgCtx.getMessageID() + " to destination : " + destination, e);
 
         } finally {
 

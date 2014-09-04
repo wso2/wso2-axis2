@@ -46,15 +46,17 @@ public class PlainTextFormatter implements MessageFormatterEx {
     }
 
     public void writeTo(MessageContext messageContext, OMOutputFormat format, OutputStream outputStream, boolean preserve) throws AxisFault {
+        // preserve boolean is not used because new implementation doesn't need it. However, it's there to
+        // to have backward compatibility.
         OMElement textElt = messageContext.getEnvelope().getBody().getFirstElement();
         if (BaseConstants.DEFAULT_TEXT_WRAPPER.equals(textElt.getQName())) {
             try {
                 Writer out = new OutputStreamWriter(outputStream, format.getCharSetEncoding());
-                ElementHelper.writeTextTo(textElt, out, preserve);
+                out.write(textElt.getFirstElement() == null ? textElt.getText() : textElt.getFirstElement().toString());
                 out.flush();
             } catch (IOException e) {
                 throw new AxisFault("Error writing text message to stream", e);
-            } catch (XMLStreamException e) {
+            } catch (Exception e) {
                 throw new AxisFault("Error extracting the text payload from the message", e);
             }
         }
