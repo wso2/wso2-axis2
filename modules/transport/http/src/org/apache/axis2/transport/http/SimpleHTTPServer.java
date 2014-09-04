@@ -105,8 +105,10 @@ public class SimpleHTTPServer implements TransportListener {
             this.trpInDesc = transprtIn;
 
             Parameter param = transprtIn.getParameter(PARAM_PORT);
+            String portOffset = System.getProperty("portOffset");
             if (param != null) {
-                this.port = Integer.parseInt((String) param.getValue());
+                this.port = (portOffset == null) ? Integer.parseInt((String) param.getValue()) :
+                        Integer.parseInt((String) param.getValue()) + Integer.parseInt(portOffset);
             }
 
             if (httpFactory == null) {
