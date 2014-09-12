@@ -182,9 +182,11 @@ public class JMSSender extends AbstractTransportSender implements ManagementSupp
         Destination replyDestination = jmsOut.getReplyDestination();
 
         // if this is a synchronous out-in, prepare to listen on the response destination
+        String replyDestName;
+
         if (waitForResponse) {
 
-            String replyDestName = (String) msgCtx.getProperty(JMSConstants.JMS_REPLY_TO);
+            replyDestName = (String) msgCtx.getProperty(JMSConstants.JMS_REPLY_TO);
             if (replyDestName == null && jmsConnectionFactory != null) {
                 if (jmsOut != null && jmsOut.getReplyDestinationName() != null) {
                     replyDestName = jmsOut.getReplyDestinationName();
@@ -208,6 +210,25 @@ public class JMSSender extends AbstractTransportSender implements ManagementSupp
             }
             replyDestination = JMSUtils.setReplyDestination(
                 replyDestination, messageSender.getSession(), message);
+
+            //If the JMS_REPLY_TO property is set, the property value is set as a JMS header
+        } else if ((replyDestName = (String) msgCtx.getProperty(JMSConstants.JMS_REPLY_TO)) != null) {
+
+            String replyDestinationType = (String) msgCtx.getProperty(JMSConstants.JMS_REPLY_TO_TYPE);
+            Destination tempDestination = null;
+
+            try {
+                if (replyDestinationType == null || "queue".equals(replyDestinationType)) {
+                    tempDestination = messageSender.getSession().createQueue(replyDestName);
+
+                } else if ("topic".equals(replyDestinationType)) {
+                    tempDestination = messageSender.getSession().createTopic(replyDestName);
+                }
+                message.setJMSReplyTo(tempDestination);
+
+            } catch (JMSException e) {
+                handleException("Error setting the JMSReplyTo Header", e);
+            }
         }
 
         try {
