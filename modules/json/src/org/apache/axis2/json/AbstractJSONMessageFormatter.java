@@ -190,6 +190,10 @@ public abstract class AbstractJSONMessageFormatter implements MessageFormatter {
 
                 out.write(jsonToWrite.getBytes());
             } else {
+                // On Http Delete JSON fails, CARBON-14946
+                if (element == null) {
+                    return;
+                }
                 XMLStreamWriter jsonWriter = getJSONWriter(out, format);
                 //element.serializeAndConsume(jsonWriter);
                 Iterator elems = msgCtxt.getEnvelope().getBody().getChildElements();
