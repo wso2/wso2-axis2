@@ -167,7 +167,10 @@ public class ServiceTaskManager {
                 while (isActive()) {
 
                     try {
-                        channel.txSelect();
+						if (!channel.isOpen()) {
+							channel = queueingConsumer.getChannel();
+						}
+						channel.txSelect();
                     } catch (IOException e) {
                         log.error("Error while starting transaction", e);
                         continue;
@@ -308,8 +311,11 @@ public class ServiceTaskManager {
                 message.setContentEncoding(properties.getContentEncoding());
                 message.setCorrelationId(properties.getCorrelationId());
                 if (headers != null) {
-                    message.setHeaders(headers);
-                    message.setSoapAction(headers.get(RabbitMQConstants.SOAP_ACTION).toString());
+					message.setHeaders(headers);
+					if (headers.get(RabbitMQConstants.SOAP_ACTION) != null) {
+						message.setSoapAction(headers.get(
+								RabbitMQConstants.SOAP_ACTION).toString());
+					}
                 }
             }
             return message;
