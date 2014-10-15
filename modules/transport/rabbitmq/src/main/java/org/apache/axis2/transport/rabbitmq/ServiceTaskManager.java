@@ -1,17 +1,19 @@
 /*
- * Copyright (c) 2013, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.apache.axis2.transport.rabbitmq;
@@ -35,7 +37,7 @@ import java.util.Map;
 
 
 /**
- * Each service will have one ServiceTaskManager instance that will create, manage and also destroy
+ * Each service will have one ServiceTaskManager instance that will send, manage and also destroy
  * idle tasks created for it, for message receipt. It uses the MessageListenerTask to poll for the
  * RabbitMQ AMQP Listening destination and consume messages. The consumed messages is build and sent to
  * axis2 engine for processing
@@ -134,7 +136,7 @@ public class ServiceTaskManager {
         private volatile boolean connected = false;
 
         /**
-         * As soon as we create a new polling task, add it to the STM for control later
+         * As soon as we send a new polling task, add it to the STM for control later
          */
         MessageListenerTask() {
             synchronized (pollingTasks) {
@@ -158,14 +160,13 @@ public class ServiceTaskManager {
             activeTaskCount++;
             try {
                 connection = getConnection();
-                if (channel == null) {
+                if (channel == null || !channel.isOpen()){
                     channel = connection.createChannel();
                 }
 
                 QueueingConsumer queueingConsumer = createQueueConsumer(channel);
 
                 while (isActive()) {
-
                     try {
 						if (!channel.isOpen()) {
 							channel = queueingConsumer.getChannel();
@@ -211,8 +212,8 @@ public class ServiceTaskManager {
                     }
                 }
 
-            } catch (IOException e) {
-                handleException("Error while reciving message from queue", e);
+            } catch (Exception e) {
+                handleException("Error while receiving message from queue", e);
             } finally {
                 closeConnection();
                 workerState = STATE_STOPPED;
@@ -227,56 +228,103 @@ public class ServiceTaskManager {
          * Create a queue consumer using the properties form transport listener configuration
          *
          * @return the queue consumer
-         * @throws IOException on error
+         * @throws IOException
+         *         on error
          */
         private QueueingConsumer createQueueConsumer(Channel channel) throws IOException {
             QueueingConsumer consumer = null;
+            //try {
+
+            String queueName = rabbitMQProperties.get(RabbitMQConstants.QUEUE_NAME);
+            String routeKey = rabbitMQProperties.get(RabbitMQConstants.QUEUE_ROUTING_KEY);
+            String exchangeName = rabbitMQProperties.get(RabbitMQConstants.EXCHANGE_NAME);
+            String autoAckStringValue = rabbitMQProperties.get(RabbitMQConstants.QUEUE_AUTO_ACK);
+            if (autoAckStringValue != null) {
+                autoAck = Boolean.parseBoolean(autoAckStringValue);
+            }
+            //If no queue name is specified then service name will be used as queue name
+            if (queueName == null || queueName.equals("")) {
+                queueName = serviceName;
+                log.warn("No queue name is specified for " + serviceName + ". " +
+                         "Service name will be used as queue name");
+            }
+
+            if (routeKey == null) {
+                log.info(
+                        "rabbitmq.queue.routing.key property not found.Using queue name as the " +
+                        "routing key..");
+                routeKey = queueName;
+            }
+
+            Boolean queueAvailable = false;
             try {
+                //check availability of the named queue
+                //if an error is encountered, including if the queue does not exist and if the
+                // queue is exclusively owned by another connection
+                channel.queueDeclarePassive(queueName);
+                queueAvailable = true;
 
-                String queueName = rabbitMQProperties.get(RabbitMQConstants.QUEUE_NAME);
-                String exchangeName = rabbitMQProperties.get(RabbitMQConstants.EXCHANGE_NAME);
-                String autoAckStringValue = rabbitMQProperties.get(RabbitMQConstants.QUEUE_AUTO_ACK);
-                if (autoAckStringValue != null) {
-                    autoAck = Boolean.parseBoolean(autoAckStringValue);
+            } catch (java.io.IOException e) {
+                log.info("Queue :" + queueName + " not found.Declaring queue.");
+            }
+
+            if (!queueAvailable) {
+                if (!channel.isOpen()) {
+                    channel = connection.createChannel();
                 }
-                //If no queue name is specified then service name will be used as queue name
-                if (queueName == null || queueName.equals("")) {
-                    queueName = serviceName;
-                    log.warn("No queue name is specified for " + serviceName + ". " +
-                             "Service name will be used as queue name");
+
+            }
+
+            consumer = new QueueingConsumer(channel);
+
+            if (exchangeName != null && !exchangeName.equals("")) {
+                Boolean exchangeAvailable = false;
+                try {
+                    //check availability of the named exchange
+                    //Throws:java.io.IOException - the server will raise a 404 channel exception
+                    // if the named exchange does not exists.
+                    channel.exchangeDeclarePassive(exchangeName);
+                    exchangeAvailable = true;
+                } catch (java.io.IOException e) {
+                    log.info("Exchange :" + exchangeName + " not found.Declaring exchange.");
                 }
 
-                channel.queueDeclare(queueName,
-                        RabbitMQUtils.isDurableQueue(rabbitMQProperties),
-                        RabbitMQUtils.isExclusiveQueue(rabbitMQProperties),
-                        RabbitMQUtils.isAutoDeleteQueue(rabbitMQProperties), null);
-                consumer = new QueueingConsumer(channel);
+                String exchangeType = rabbitMQProperties.get(RabbitMQConstants.EXCHANGE_TYPE);
 
-                if (exchangeName != null && !exchangeName.equals("")) {
-                    String exchangerType = rabbitMQProperties.get(RabbitMQConstants.EXCHANGE_TYPE);
-                    if (exchangerType != null) {
-                        String durable = rabbitMQProperties.get(RabbitMQConstants.EXCHANGE_DURABLE);
-                        if (durable != null) {
-                            channel.exchangeDeclare(exchangeName, exchangerType, Boolean.parseBoolean(durable));
+                if (!channel.isOpen()) {
+                    channel = connection.createChannel();
+                }
+
+                if (!exchangeAvailable) {
+                    try {
+                        if (exchangeType != null) {
+                            String durable = rabbitMQProperties
+                                    .get(RabbitMQConstants.EXCHANGE_DURABLE);
+                            if (durable != null) {
+                                channel.exchangeDeclare(exchangeName, exchangeType,
+                                                        Boolean.parseBoolean(durable));
+                            } else {
+                                channel.exchangeDeclare(exchangeName, exchangeType, true);
+                            }
                         } else {
-                            channel.exchangeDeclare(exchangeName, exchangerType, true);
+                            channel.exchangeDeclare(exchangeName, "direct", true);
                         }
-                    } else {
-                        channel.exchangeDeclare(exchangeName, "direct", true);
+                    } catch (java.io.IOException e) {
+                        handleException(
+                                "Error occured while declaring the exchange: " + exchangeName, e);
+
                     }
 
-                    channel.queueBind(queueName, exchangeName, queueName);
                 }
 
-                String consumerTagString = rabbitMQProperties.get(RabbitMQConstants.CONSUMER_TAG);
-                if (consumerTagString != null) {
-                    channel.basicConsume(queueName, autoAck, consumerTagString, consumer);
-                } else {
-                    channel.basicConsume(queueName, autoAck, consumer);
-                }
+                channel.queueBind(queueName, exchangeName, routeKey);
+            }
 
-            } catch (IOException e) {
-                handleException("Error while creating consumer", e);
+            String consumerTagString = rabbitMQProperties.get(RabbitMQConstants.CONSUMER_TAG);
+            if (consumerTagString != null) {
+                channel.basicConsume(queueName, autoAck, consumerTagString, consumer);
+            } else {
+                channel.basicConsume(queueName, autoAck, consumer);
             }
 
 
@@ -313,8 +361,9 @@ public class ServiceTaskManager {
                 if (headers != null) {
 					message.setHeaders(headers);
 					if (headers.get(RabbitMQConstants.SOAP_ACTION) != null) {
-						message.setSoapAction(headers.get(
-								RabbitMQConstants.SOAP_ACTION).toString());
+                             message.setSoapAction(headers.get(
+                                     RabbitMQConstants.SOAP_ACTION).toString());
+
 					}
                 }
             }
