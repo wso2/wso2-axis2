@@ -1,17 +1,19 @@
 /*
- * Copyright (c) 2013, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.apache.axis2.transport.rabbitmq;
@@ -78,6 +80,10 @@ public class ConnectionFactory {
         log.info("AMQP ConnectionFactory : " + name + " initialized");
     }
 
+    /**
+     * Create a rabbit mq connection
+     * @return  a connection to the server
+     */
     public Connection createConnection() {
         Connection connection = null;
         try {
@@ -88,6 +94,11 @@ public class ConnectionFactory {
         return connection;
     }
 
+    /**
+     * Create a connection from pool
+     * @return  a connection to the server
+     * @throws IOException
+     */
     public Connection getConnectionPool() throws IOException {
         if (connection == null) {
             connection = connectionFactory.newConnection(es);
@@ -95,23 +106,43 @@ public class ConnectionFactory {
         return connection;
     }
 
+    /**
+     * get connection factory name
+     * @return connection factory name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Set connection factory name
+     * @param name name to set for the connection Factory
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Catch an exception an throw a AxisRabbitMQException with message
+     * @param msg message to set for the exception
+     * @param e throwable to set
+     */
     private void handleException(String msg, Exception e) {
         log.error(msg, e);
         throw new AxisRabbitMQException(msg, e);
     }
 
+    /**
+     * Get all rabbit mq parameters
+     * @return a map of parameters
+     */
     public Map<String, String> getParameters() {
         return parameters;
     }
 
+    /**
+     * Initialize connection factory
+     */
     private void initConnectionFactory() {
         connectionFactory = new com.rabbitmq.client.ConnectionFactory();
         String hostName = parameters.get(RabbitMQConstants.SERVER_HOST_NAME);
