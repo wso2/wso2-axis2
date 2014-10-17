@@ -2883,14 +2883,19 @@ public class AxisService extends AxisDescription {
         if (s != null) {
             String schemaLocation = xmlSchemaExternal.getSchemaLocation();
 
-            String newscheamlocation = customSchemaNamePrefix == null ?
-                    // use the default mode
-                    (this.getServiceEPR() + "?xsd=" + getScheamLocationWithDot(
-                            sourceURIToNewLocationMap, s))
-                    :
-                    // custom prefix is present - add the custom prefix
-                    (customSchemaNamePrefix + getScheamLocationWithDot(
-                            sourceURIToNewLocationMap, s));
+            String newscheamlocation;
+            // use the default mode
+            if (customSchemaNamePrefix == null)
+                newscheamlocation = (this.getServiceEPR() + "?xsd=" + getScheamLocationWithDot(
+                        sourceURIToNewLocationMap, s));
+                // use the full service url as the customNamePrefix
+            else if (customSchemaNamePrefix.equalsIgnoreCase("fullschemaurl"))
+                newscheamlocation = (this.getEndpointURL() + "?xsd=" + getScheamLocationWithDot(
+                        sourceURIToNewLocationMap, s));
+                // custom prefix is present - add the custom prefix
+            else
+                newscheamlocation = (customSchemaNamePrefix + getScheamLocationWithDot(
+                        sourceURIToNewLocationMap, s));
             xmlSchemaExternal.setSchemaLocation(newscheamlocation);
             importedScheams.put(schemaLocation, newscheamlocation);
         }
