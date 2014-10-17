@@ -816,12 +816,40 @@ public abstract class DeploymentEngine implements DeploymentConstants {
         }
     }
 
+    /**
+     * Sort the deployable artifacts, s.t original order (metafiles first, then artifacts) is preserved.
+     * Thus, supporting Ghost Deployment of the artifacts properly.
+     * <p/>
+     * Take the first file in each category (metafiles,artifacts etc), & take its file path without the file name to
+     * identify which category it belongs.
+     * Then,count all the files belonging to that category, & sort it within the list.
+     * The final list will have the original order of categories, with only files inside each category sorted.
+     */
     private void sortWSToDeploy() {
-        Collections.sort(wsToDeploy, new Comparator<DeploymentFileData>() {
-            public int compare(DeploymentFileData o1, DeploymentFileData o2) {
-                return o1.getFile().getName().compareTo(o2.getFile().getName());
+        int artifactsCount = 0;
+        final int listSize = wsToDeploy.size();
+
+        while (artifactsCount < listSize) {
+            DeploymentFileData tempDeployableArtifact = (DeploymentFileData) wsToDeploy.get(artifactsCount);
+            String tempFilePathWithoutFileName = tempDeployableArtifact.getFile().getParent();
+            int startIndex = artifactsCount;
+            //get the count of artifacts belonging to each category
+            for (ListIterator<Object> it = wsToDeploy.listIterator(startIndex); it.hasNext(); ) {
+                DeploymentFileData deployableArtifact = (DeploymentFileData) it.next();
+                String filePathWithoutFileName = deployableArtifact.getFile().getParent();
+                if (tempFilePathWithoutFileName.equals(filePathWithoutFileName)) {
+                    artifactsCount++;
+                } else {
+                    break;
+                }
             }
-        });
+            //sort artifacts belonging to each category, within the list itself.
+            Collections.sort(wsToDeploy.subList(startIndex, artifactsCount), new Comparator<DeploymentFileData>() {
+                public int compare(DeploymentFileData deploymentFileData1, DeploymentFileData deploymentFileData2) {
+                    return deploymentFileData1.getFile().getName().compareTo(deploymentFileData2.getFile().getName());
+                }
+            });
+        }
     }
 
     /**
