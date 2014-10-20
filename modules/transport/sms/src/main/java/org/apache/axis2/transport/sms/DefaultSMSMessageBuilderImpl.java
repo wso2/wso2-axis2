@@ -18,29 +18,26 @@
  */
 package org.apache.axis2.transport.sms;
 
-import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.AbstractContext;
-import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.axis2.description.*;
-import org.apache.axis2.AxisFault;
-import org.apache.axis2.Constants;
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.util.MultipleEntryHashMap;
-import org.apache.axis2.wsdl.WSDLConstants;
+import org.apache.axiom.om.*;
+import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
-import org.apache.axiom.soap.SOAPBody;
-import org.apache.axiom.om.*;
-import org.apache.ws.commons.schema.*;
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.description.*;
+import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ws.commons.schema.*;
 
-import javax.xml.namespace.QName;
 import javax.activation.DataHandler;
+import javax.xml.namespace.QName;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.HashMap;
 
 /**
  * Builds the MessageContext for the from the incoming SMS
@@ -98,6 +95,7 @@ public class DefaultSMSMessageBuilderImpl implements SMSMessageBuilder {
                     messageContext.setEnvelope(soapEnvelope);
                     TransportInDescription in = configurationContext.getAxisConfiguration().getTransportIn("sms");
                     TransportOutDescription out = configurationContext.getAxisConfiguration().getTransportOut("sms");
+                    messageContext.setIncomingTransportName("sms");
                     messageContext.setProperty(SMSTransportConstents.SEND_TO , sender);
                     messageContext.setProperty(SMSTransportConstents.DESTINATION , receiver);
                     messageContext.setTransportIn(in);
