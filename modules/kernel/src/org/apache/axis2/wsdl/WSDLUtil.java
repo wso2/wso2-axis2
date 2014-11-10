@@ -110,7 +110,7 @@ public class WSDLUtil {
                 regex = regex.append("/").append(param);
             }
         }
-        return regex.toString();
+        return regex.append("/").toString();
     }
 
 }

@@ -158,9 +158,10 @@ public class HTTPLocationBasedDispatcher extends AbstractDispatcher {
 
         Collection httpLocations = httpLocationTable.keySet();
         Iterator iter = httpLocations.iterator();
+        String pathToMatch = requestPath.concat("/");
         while (iter.hasNext()) {
             Pattern location = (Pattern) iter.next();
-            Matcher matcher = location.matcher(requestPath);
+            Matcher matcher = location.matcher(pathToMatch);
             if (matcher.find()) {
                 return (AxisOperation) httpLocationTable.get(location);
             }
