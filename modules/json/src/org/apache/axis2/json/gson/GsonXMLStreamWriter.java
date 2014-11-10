@@ -493,7 +493,7 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
             try {
                 jsonWriter.nullValue();
             } catch (IOException e) {
-                throw new XMLStreamException("JsonWriter throw an exception");
+                throw new XMLStreamException("Failed to write attribute, 'nullValue'.", e);
             }
         }
     }
