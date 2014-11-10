@@ -488,8 +488,8 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      */
 
     public void writeAttribute(String prefix, String namespaceURI, String localName, String value) throws XMLStreamException {
-        if (namespaceURI.equals("http://www.w3.org/2001/XMLSchema-instance") && localName.equals("nil")
-                && value.equals("true")) {
+        if ("http://www.w3.org/2001/XMLSchema-instance".equals(namespaceURI) && "nil".equals(localName)
+                && "true".equals(value)) {
             try {
                 jsonWriter.nullValue();
             } catch (IOException e) {
