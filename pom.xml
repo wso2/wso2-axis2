@@ -82,9 +82,9 @@
         <module>modules/jaxbri</module>
         <module>modules/metadata</module>
         <module>modules/saaj</module>
-        <module>modules/jaxws</module>
+        <!--module>modules/jaxws</module>
         <module>modules/jaxws-mar</module>
-        <module>modules/jaxws-integration</module>
+        <module>modules/jaxws-integration</module-->
         <module>modules/clustering</module>
         <module>modules/corba</module>
         <module>modules/osgi</module>
@@ -113,14 +113,8 @@
 	    <layout>default</layout> 
 	</pluginRepository>
     </pluginRepositories>
-    <profiles>
+    <!--profiles>
         <profile>
-            <!-- This profile needs to be activated when doing the release:prepare
-                 (by adding -Peverything) to make sure that the release plugin updates
-                 the version numbers of all relevant submodules. It must contain
-                 all modules not built by default, i.e. the set of modules used
-                 by this profile must be the union of the module sets of all
-                 other profiles. -->
             <id>everything</id>
             <modules>
                 <module>modules/distribution</module>
@@ -143,8 +137,6 @@
                                 </goals>
                                 <configuration>
                                     <rules>
-                                        <!-- We need Maven 2.1 because the prepare-package phase
-                                             doesn't exist in Maven 2.0 -->
                                         <requireMavenVersion>
                                             <version>2.1.0</version>
                                         </requireMavenVersion>
@@ -174,7 +166,7 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <!--plugin>
+                    <plugin>
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <executions>
                             <execution>
@@ -185,7 +177,7 @@
                                 </goals>
                             </execution>
                         </executions>
-                    </plugin-->
+                    </plugin>
                     <plugin>
                         <artifactId>maven-site-plugin</artifactId>
                         <executions>
@@ -201,9 +193,6 @@
                         <artifactId>maven-assembly-plugin</artifactId>
                         <executions>
                             <execution>
-                                <!-- Override the execution defined in org.apache:apache
-                                     so that the source-release assembly is not built.
-                                     We define our own source distribution in modules/distribution. -->
                                 <id>source-release-assembly</id>
                                 <configuration>
                                     <phase>package</phase>
@@ -227,8 +216,6 @@
                             </execution>
                             <execution>
                                 <id>prepare-dists</id>
-                                <!-- Must be done in the install phase after the checksum and signature for
-                                     the docs distribution has been generated. -->
                                 <phase>install</phase>
                                 <goals>
                                     <goal>single</goal>
@@ -237,7 +224,6 @@
                                     <descriptors>
                                         <descriptor>src/main/assembly/dists.xml</descriptor>
                                     </descriptors>
-                                    <!-- We can only prepare the distributions if they have been signed -->
                                     <skipAssembly>${gpg.skip}</skipAssembly>
                                 </configuration>
                             </execution>
@@ -252,7 +238,7 @@
                 </plugins>
             </build>
         </profile>
-    </profiles>
+    </profiles-->
     <mailingLists>
         <mailingList>
             <name>Axis2 Developer List</name>

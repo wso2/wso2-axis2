@@ -301,7 +301,7 @@
             </exclusions>
         </dependency>
 
-        <dependency>
+        <!--dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-jaxws</artifactId>
             <version>${version.axis2}</version>
@@ -336,7 +336,7 @@
                     <artifactId>commons-io</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
+        </dependency-->
 
         <dependency>
             <groupId>org.apache.axis2</groupId>
