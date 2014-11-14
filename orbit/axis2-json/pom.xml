@@ -43,12 +43,16 @@
         </repository>
     </repositories>
     <distributionManagement>
-        <repository>
+        <!--repository>
             <id>wso2-maven2-repository</id>
             <name>WSO2 Maven2 Repository</name>
             <url>scp://dist.wso2.org/home/httpd/dist.wso2.org/maven2/</url>
+        </repository-->
+        <repository>
+            <id>nexus-releases</id>
+            <name>WSO2 Nexus Release Repository</name>
+            <url>http://maven.wso2.org/nexus/service/local/staging/deploy/maven2/</url>
         </repository>
-
         <snapshotRepository>
             <id>wso2-maven2-snapshot-repository</id>
             <name>WSO2 Maven2 Snapshot Repository</name>
@@ -107,8 +111,7 @@
         </plugins>
     </build>
     <properties>
-        <orbit.version.axis2>1.6.1.wso2v11-SNAPSHOT</orbit.version.axis2>
         <version.axis2>1.6.1-wso2v11-SNAPSHOT</version.axis2>
-        <exp.pkg.version.axis2>1.6.1.wso2v11-SNAPSHOT</exp.pkg.version.axis2>
+        <exp.pkg.version.axis2>1.6.1.wso2v11</exp.pkg.version.axis2>
     </properties>
 </project>

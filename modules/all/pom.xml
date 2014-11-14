@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.apache.axis2</groupId>
         <artifactId>axis2-parent</artifactId>
-        <version>1.6.1-wso2v11-SNAPSHOT</version>
+        <version>1.6.1-wso2v11</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
@@ -170,11 +170,11 @@
 
     </dependencies>
 
-    <scm>
+    <!--scm>
         <connection>scm:svn:http://svn.apache.org/repos/asf/axis/axis2/java/core/trunk/modules/all</connection>
         <developerConnection>scm:svn:https://svn.apache.org/repos/asf/axis/axis2/java/core/trunk/modules/all</developerConnection>
         <url>http://svn.apache.org/viewvc/axis/axis2/java/core/trunk/modules/all</url>
-    </scm>
+    </scm-->
     <build>
         <plugins>
             <plugin>

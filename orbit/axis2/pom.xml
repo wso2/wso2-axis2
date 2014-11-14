@@ -67,12 +67,16 @@
     </repositories>
 
     <distributionManagement>
-        <repository>
+        <!--repository>
             <id>wso2-maven2-repository</id>
             <name>WSO2 Maven2 Repository</name>
             <url>scp://dist.wso2.org/home/httpd/dist.wso2.org/maven2/</url>
+        </repository-->
+        <repository>
+            <id>nexus-releases</id>
+            <name>WSO2 Nexus Release Repository</name>
+            <url>http://maven.wso2.org/nexus/service/local/staging/deploy/maven2/</url>
         </repository>
-
         <snapshotRepository>
             <id>wso2-maven2-snapshot-repository</id>
             <name>WSO2 Maven2 Snapshot Repository</name>
@@ -359,7 +363,7 @@
             </exclusions>
         </dependency>
 
-        <dependency>
+        <!--dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-transport-base</artifactId>
             <version>${transport.version}</version>
@@ -374,7 +378,7 @@
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
+        </dependency-->
 
         <dependency>
             <groupId>org.apache.axis2</groupId>
@@ -396,7 +400,7 @@
             <optional>true</optional>
         </dependency>
 
-        <dependency>
+        <!--dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-transport-mail</artifactId>
             <version>${transport.version}</version>
@@ -458,7 +462,7 @@
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
+        </dependency-->
 
         <dependency>
             <groupId>org.apache.axis2</groupId>
@@ -565,16 +569,15 @@
     </build>
 
     <properties>
-        <orbit.version.axis2>1.6.1.wso2v11-SNAPSHOT</orbit.version.axis2>
-	<version.axis2>1.6.1-wso2v11-SNAPSHOT</version.axis2>
-	<transport.version>1.6.1-wso2v11-SNAPSHOT</transport.version>
+        <version.axis2>1.6.1-wso2v11-SNAPSHOT</version.axis2>
+        <transport.version>1.6.1-wso2v11-SNAPSHOT</transport.version>
         <version.apache.felix.framework>1.4.0</version.apache.felix.framework>
-	<xmlbeans.version>2.3.0</xmlbeans.version>
-	<orbit.version.neethi>2.0.4.wso2v4</orbit.version.neethi>
-        <exp.pkg.version.axis2>1.6.1.wso2v11-SNAPSHOT</exp.pkg.version.axis2>
-	<imp.pkg.version.axiom>[1.2.11.wso2v5-SNAPSHOT, 1.3.0)</imp.pkg.version.axiom>
-	<imp.pkg.version.neethi>[2.0.4.wso2v4, 3.0.0)</imp.pkg.version.neethi>
-	<imp.pkg.version.javax.servlet>[2.6.0, 3.0.0)</imp.pkg.version.javax.servlet>
+        <xmlbeans.version>2.3.0</xmlbeans.version>
+        <orbit.version.neethi>2.0.4.wso2v4</orbit.version.neethi>
+        <exp.pkg.version.axis2>1.6.1.wso2v11</exp.pkg.version.axis2>
+        <imp.pkg.version.axiom>[1.2.11.wso2v5, 1.3.0)</imp.pkg.version.axiom>
+        <imp.pkg.version.neethi>[2.0.4.wso2v4, 3.0.0)</imp.pkg.version.neethi>
+        <imp.pkg.version.javax.servlet>[2.6.0, 3.0.0)</imp.pkg.version.javax.servlet>
     </properties>
 
 </project>

@@ -45,11 +45,11 @@
             <scope>compile</scope>
         </dependency>
     </dependencies>
-    <scm>
+    <!--scm>
         <connection>scm:svn:http://svn.apache.org/repos/asf/axis/axis2/java/core/branches/1_6/modules/testutils</connection>
         <developerConnection>scm:svn:https://svn.apache.org/repos/asf/axis/axis2/java/core/branches/1_6/modules/testutils</developerConnection>
         <url>http://svn.apache.org/viewvc/axis/axis2/java/core/branches/1_6/modules/testutils</url>
-    </scm>
+    </scm-->
     <build>
         <plugins>
             <plugin>

@@ -41,11 +41,11 @@
             <artifactId>neethi</artifactId>
         </dependency>
     </dependencies>
-    <scm>
+    <!--scm>
         <connection>scm:svn:http://svn.apache.org/repos/asf/axis/axis2/java/core/branches/1_6/modules/mtompolicy</connection>
         <developerConnection>scm:svn:https://svn.apache.org/repos/asf/axis/axis2/java/core/branches/1_6/modules/mtompolicy</developerConnection>
         <url>http://svn.apache.org/viewvc/axis/axis2/java/core/branches/1_6/modules/mtompolicy</url>
-    </scm>
+    </scm-->
     <build>
         <sourceDirectory>src</sourceDirectory>
         <resources>

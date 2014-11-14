@@ -33,11 +33,11 @@
     <packaging>bundle</packaging>
     <name>Apache Axis2 - OSGi Integration</name>
     <description>Apache Axis2 OSGi Integration</description>
-    <scm>
+    <!--scm>
         <connection>scm:svn:http://svn.apache.org/repos/asf/axis/axis2/java/core/branches/1_6/modules/osgi</connection>
         <developerConnection>scm:svn:https://svn.apache.org/repos/asf/axis/axis2/java/core/branches/1_6/modules/osgi</developerConnection>
         <url>http://svn.apache.org/viewvc/axis/axis2/java/core/branches/1_6/modules/osgi</url>
-    </scm>
+    </scm-->
     <build>
         <sourceDirectory>src</sourceDirectory>
         <resources>

@@ -19,7 +19,9 @@
   ~ under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <groupId>org.apache</groupId>
         <artifactId>apache</artifactId>
@@ -61,14 +63,14 @@
         patterns.
     </description>
     <url>http://axis.apache.org/axis2/java/core/</url>
-    <issueManagement>
+    <!--issueManagement>
         <system>jira</system>
         <url>http://issues.apache.org/jira/browse/AXIS2</url>
-    </issueManagement>
+    </issueManagement-->
     <properties>
         <neethi.version>2.0.4</neethi.version>
         <woden.version>1.0M9</woden.version>
-        <axiom.version>1.2.11-wso2v5-SNAPSHOT</axiom.version>
+        <axiom.version>1.2.11-wso2v5</axiom.version>
         <xmlschema.version>1.4.7-wso2v3</xmlschema.version>
         <ant.version>1.7.0</ant.version>
         <antlr.version>2.7.7</antlr.version>
@@ -438,7 +440,7 @@
              by default) and nothing else. We had troubles with other repositories in
              the past. Therefore configuring additional repositories here should be
              considered very carefully. -->
-       <repository>
+        <repository>
             <id>wso2-nexus</id>
             <name>WSO2 internal Repository</name>
             <url>http://maven.wso2.org/nexus/content/groups/wso2-public/</url>
@@ -448,7 +450,7 @@
                 <checksumPolicy>ignore</checksumPolicy>
             </releases>
         </repository>
-        
+
         <repository>
             <id>wso2.releases</id>
             <name>WSO2 internal Repository</name>
@@ -459,7 +461,7 @@
                 <checksumPolicy>ignore</checksumPolicy>
             </releases>
         </repository>
-        
+
         <repository>
             <id>wso2.snapshots</id>
             <name>Apache Snapshot Repository</name>
@@ -499,7 +501,7 @@
                 <enabled>false</enabled>
             </releases>
         </pluginRepository>
-        
+
         <pluginRepository>
             <id>wso2.releases</id>
             <name>WSO2 internal Repository</name>
@@ -510,7 +512,7 @@
                 <checksumPolicy>ignore</checksumPolicy>
             </releases>
         </pluginRepository>
-        
+
         <pluginRepository>
             <id>wso2.snapshots</id>
             <name>Apache Snapshot Repository</name>
@@ -523,13 +525,13 @@
                 <enabled>false</enabled>
             </releases>
         </pluginRepository>
-        
-	    <pluginRepository> 
+
+        <pluginRepository>
             <id>repository.dev.java.net-maven2</id>
-	        <name>Java.net Repository for Maven</name> 
-	        <url>http://download.java.net/maven/2/</url> 
-	        <layout>default</layout> 
-	    </pluginRepository>
+            <name>Java.net Repository for Maven</name>
+            <url>http://download.java.net/maven/2/</url>
+            <layout>default</layout>
+        </pluginRepository>
     </pluginRepositories>
 
     <dependencyManagement>
@@ -801,7 +803,7 @@
                 <artifactId>junit</artifactId>
                 <version>${junit.version}</version>
             </dependency>
-	    <dependency>
+            <dependency>
                 <groupId>org.aspectj</groupId>
                 <artifactId>aspectjrt</artifactId>
                 <version>1.6.1</version>
@@ -1023,32 +1025,36 @@
             </dependencies>
         </profile>
     </profiles>
-    <scm>
+    <!--scm>
         <connection>scm:svn:http://svn.apache.org/repos/asf/axis/axis2/java/core/branches/1_6/modules/parent</connection>
         <developerConnection>scm:svn:https://svn.apache.org/repos/asf/axis/axis2/java/core/branches/1_6/modules/parent</developerConnection>
         <url>http://svn.apache.org/viewvc/axis/axis2/java/core/branches/1_6/modules/parent</url>
-    </scm>
+    </scm-->
     <distributionManagement>
-	<repository>
+        <!--repository>
             <id>wso2.releases</id>
             <name>WSO2 internal Repository</name>
-            <url>http://maven.wso2.org/nexus/content/repositories/releases/</url>            
+            <url>http://maven.wso2.org/nexus/content/repositories/releases/</url>
+        </repository-->
+        <repository>
+            <id>nexus-releases</id>
+            <name>WSO2 Nexus Release Repository</name>
+            <url>http://maven.wso2.org/nexus/service/local/staging/deploy/maven2/</url>
         </repository>
-        
         <snapshotRepository>
             <id>wso2.snapshots</id>
             <name>Apache Snapshot Repository</name>
-            <url>http://maven.wso2.org/nexus/content/repositories/snapshots/</url>            
+            <url>http://maven.wso2.org/nexus/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
     <build>
-	<extensions>
-		 <extension>
-        		<groupId>org.apache.maven.wagon</groupId>
-        		<artifactId>wagon-ssh</artifactId>
-        		<version>2.1</version>
-      		 </extension>
-	</extensions>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh</artifactId>
+                <version>2.1</version>
+            </extension>
+        </extensions>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -1133,7 +1139,7 @@
                     <artifactId>maven-bundle-plugin</artifactId>
                     <version>2.1.0</version>
                 </plugin>
-                
+
                 <!-- Use 1.5.2 versions of the aar and mar plugins in order to avoid
                      the chicken and egg problem. -->
                 <plugin>
@@ -1146,7 +1152,7 @@
                     <artifactId>axis2-mar-maven-plugin</artifactId>
                     <version>1.5.2</version>
                 </plugin>
-                
+
                 <!-- No chicken and egg problem here because the plugin doesn't expose
                      any extension. We can always use the version from the current build. -->
                 <plugin>
@@ -1157,18 +1163,18 @@
             </plugins>
         </pluginManagement>
         <plugins>
-	    <plugin> 
-		<groupId>org.jvnet.maven.incrementalbuild</groupId> 
-		<artifactId>incremental-build-plugin</artifactId>
-		<version>1.3</version>
-		<executions> 
-		    <execution> 
-		        <goals> 
-			    <goal>incremental-build</goal>
-			</goals>
-		    </execution> 
-		</executions> 
-	    </plugin>
+            <plugin>
+                <groupId>org.jvnet.maven.incrementalbuild</groupId>
+                <artifactId>incremental-build-plugin</artifactId>
+                <version>1.3</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>incremental-build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <inherited>true</inherited>
@@ -1189,6 +1195,23 @@
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.8.2</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <reporting>
@@ -1200,7 +1223,7 @@
                      use an empty reportSet -->
                 <reportSets>
                     <reportSet>
-                        <reports />
+                        <reports/>
                     </reportSet>
                 </reportSets>
             </plugin>

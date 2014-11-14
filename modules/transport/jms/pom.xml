@@ -36,11 +36,11 @@
     <description>Apache Axis2 - JMS Transport</description>
     <packaging>bundle</packaging>
 
-    <scm>
+    <!--scm>
         <connection>scm:svn:http://svn.apache.org/repos/asf/axis/axis2/java/transports/trunk/modules/jms</connection>
         <developerConnection>scm:svn:https://svn.apache.org/repos/asf/axis/axis2/java/transports/trunk/modules/jms</developerConnection>
         <url>http://svn.apache.org/viewvc/axis/axis2/java/transports/trunk/modules/jms</url>
-    </scm>
+    </scm-->
 
     <build>
         <plugins>

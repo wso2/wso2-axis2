@@ -49,11 +49,11 @@
             <artifactId>ant-launcher</artifactId>
         </dependency>
     </dependencies>
-    <scm>
+    <!--scm>
         <connection>scm:svn:http://svn.apache.org/repos/asf/axis/axis2/java/core/branches/1_6/modules/xmlbeans</connection>
         <developerConnection>scm:svn:https://svn.apache.org/repos/asf/axis/axis2/java/core/branches/1_6/modules/xmlbeans</developerConnection>
         <url>http://svn.apache.org/viewvc/axis/axis2/java/core/branches/1_6/modules/xmlbeans</url>
-    </scm>
+    </scm-->
     <build>
         <resources>
             <resource>

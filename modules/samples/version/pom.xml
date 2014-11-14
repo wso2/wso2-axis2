@@ -28,11 +28,11 @@
     <artifactId>version</artifactId>
     <packaging>aar</packaging>
     <name>Apache Axis2 - Version Service</name>
-    <scm>
+    <!--scm>
         <connection>scm:svn:http://svn.apache.org/repos/asf/axis/axis2/java/core/branches/1_6/modules/samples/version</connection>
         <developerConnection>scm:svn:https://svn.apache.org/repos/asf/axis/axis2/java/core/branches/1_6/modules/samples/version</developerConnection>
         <url>http://svn.apache.org/viewvc/axis/axis2/java/core/branches/1_6/modules/samples/version</url>
-    </scm>
+    </scm-->
     <build>
         <sourceDirectory>src</sourceDirectory>
         <plugins>

@@ -30,11 +30,11 @@
     <artifactId>axis2-saaj</artifactId>
     <name>Apache Axis2 - SAAJ</name>
     <description>Axis2 SAAJ implementation</description>
-    <scm>
+    <!--scm>
         <connection>scm:svn:http://svn.apache.org/repos/asf/axis/axis2/java/core/branches/1_6/modules/saaj</connection>
         <developerConnection>scm:svn:https://svn.apache.org/repos/asf/axis/axis2/java/core/branches/1_6/modules/saaj</developerConnection>
         <url>http://svn.apache.org/viewvc/axis/axis2/java/core/branches/1_6/modules/saaj</url>
-    </scm>
+    </scm-->
     <dependencies>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>

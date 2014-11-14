@@ -33,11 +33,11 @@
     <description>This inclues all the available transports in Axis2</description>
     <packaging>bundle</packaging>
 
-    <scm>
+    <!--scm>
         <connection>scm:svn:http://svn.apache.org/repos/asf/axis/axis2/java/transports/trunk/modules/tcp</connection>
         <developerConnection>scm:svn:https://svn.apache.org/repos/asf/axis/axis2/java/transports/trunk/modules/tcp</developerConnection>
         <url>http://svn.apache.org/viewvc/axis/axis2/java/transports/trunk/modules/tcp</url>
-    </scm>
+    </scm-->
 
     <build>
         <sourceDirectory>src</sourceDirectory>

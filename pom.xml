@@ -33,10 +33,18 @@
     <name>Apache Axis2 - Root</name>
     <inceptionYear>2004</inceptionYear>
     <url>http://axis.apache.org/axis2/java/core/</url>
-    <issueManagement>
+
+    <scm>
+        <connection>scm:git:https://github.com/wso2/wso2-axis2.git</connection>
+        <developerConnection>scm:git:https://github.com/wso2/wso2-axis2.git</developerConnection>
+        <url>https://github.com/wso2/wso2-axis2.git</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <!--issueManagement>
         <system>jira</system>
         <url>http://issues.apache.org/jira/browse/AXIS2</url>
-    </issueManagement>
+    </issueManagement-->
     <modules>
         <module>modules/resource-bundle</module> <!-- Must be first in the list! -->
         <module>modules/adb</module>
@@ -80,9 +88,9 @@
         <module>modules/clustering</module>
         <module>modules/corba</module>
         <module>modules/osgi</module>
-        <module>modules/transport/base</module>
 	<module>modules/transport/local</module>
         <module>modules/transport/http</module>
+        <!--module>modules/transport/base</module>
         <module>modules/transport/tcp</module>
         <module>modules/transport/udp</module>
         <module>modules/transport/xmpp</module>
@@ -90,7 +98,7 @@
         <module>modules/transport/jms</module>
         <module>modules/transport/rabbitmq</module>
         <module>modules/transport/sms</module>
-        <module>modules/transport/testkit</module>
+        <module>modules/transport/testkit</module-->
         <module>orbit/axis2</module>
         <module>orbit/axis2-client</module>
         <module>orbit/axis2-jaxbri</module>
@@ -166,11 +174,8 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <plugin>
+                    <!--plugin>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <!-- Configure an additional execution. The configuration
-                             is the same as the one specified together with the execution
-                             in the pre-site phase.  -->
                         <executions>
                             <execution>
                                 <id>distribution-javadoc</id>
@@ -180,7 +185,7 @@
                                 </goals>
                             </execution>
                         </executions>
-                    </plugin>
+                    </plugin-->
                     <plugin>
                         <artifactId>maven-site-plugin</artifactId>
                         <executions>
@@ -558,16 +563,16 @@
     </contributors>
 
     <repositories>
-    	<repository>
-	    <id>wso2-nexus</id>
-	    <name>WSO2 internal Repository</name>
-	    <url>http://maven.wso2.org/nexus/content/groups/wso2-public/</url>
-	    <releases>
-		<enabled>true</enabled>
-		<updatePolicy>daily</updatePolicy>
-		<checksumPolicy>ignore</checksumPolicy>
-	    </releases>
-	</repository>
+        <repository>
+            <id>wso2-nexus</id>
+            <name>WSO2 internal Repository</name>
+            <url>http://maven.wso2.org/nexus/content/groups/wso2-public/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+                <checksumPolicy>ignore</checksumPolicy>
+            </releases>
+        </repository>
         <repository>
             <id>wso2.releases</id>
             <name>WSO2 internal Repository</name>
@@ -578,7 +583,6 @@
                 <checksumPolicy>ignore</checksumPolicy>
             </releases>
         </repository>
-
         <repository>
             <id>wso2.snapshots</id>
             <name>WSO2 Snapshot Repository</name>
@@ -594,16 +598,21 @@
     </repositories>
 
     <distributionManagement>
-      <repository>
-        <id>wso2.releases</id>
-        <name>WSO2 Release Distribution Repository</name>
-        <url>http://maven.wso2.org/nexus/content/repositories/releases/</url>
-      </repository>
-      <snapshotRepository>
-        <id>wso2.snapshots</id>
-        <name>Internal Releases</name>
-        <url>http://maven.wso2.org/nexus/content/repositories/snapshots/</url>
-     </snapshotRepository>   
+        <!--repository>
+          <id>wso2.releases</id>
+          <name>WSO2 Release Distribution Repository</name>
+          <url>http://maven.wso2.org/nexus/content/repositories/releases/</url>
+        </repository-->
+        <repository>
+            <id>nexus-releases</id>
+            <name>WSO2 Nexus Release Repository</name>
+            <url>http://maven.wso2.org/nexus/service/local/staging/deploy/maven2/</url>
+        </repository>
+        <snapshotRepository>
+            <id>wso2.snapshots</id>
+            <name>Internal Releases</name>
+            <url>http://maven.wso2.org/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
     </distributionManagement>
 
     <properties>
@@ -611,6 +620,7 @@
              we can't use the project.version variable directly because of the dot. See
              http://maven.apache.org/plugins/maven-site-plugin/examples/creating-content.html -->
         <axis2_version>${project.version}</axis2_version>
+        <project.scm.id>scm-server</project.scm.id>
     </properties>
     <build>
         <!-- Note: the pluginManagement in axis2-parent doesn't apply here; we
@@ -624,7 +634,7 @@
     	</extensions>
         <pluginManagement>
             <plugins>
-                <plugin>
+                <!--plugin>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>2.7</version>
                     <configuration>
@@ -637,25 +647,10 @@
                             <link>http://jaxen.codehaus.org/apidocs/</link>
                         </links>
                     </configuration>
-                </plugin>
+                </plugin-->
                 <plugin>
                     <artifactId>maven-assembly-plugin</artifactId>
                     <version>2.2</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-release-plugin</artifactId>
-                    <!-- Note: 2.0 seems to have issues with the calculation of the tag path -->
-                    <version>2.0-beta-9</version>
-                    <configuration>
-                        <autoVersionSubmodules>true</autoVersionSubmodules>
-                        <!-- "clean verify" fails because for OSGi bundles, there
-                             is a mismatch between the type of the dependency (jar)
-                             and the actual packaging (bundle) and Maven resolves
-                             the dependency from the local repository instead of the
-                             reactor. -->
-                        <preparationGoals>clean install</preparationGoals>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <artifactId>maven-site-plugin</artifactId>
@@ -715,7 +710,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
+            <!--plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <executions>
                     <execution>
@@ -726,6 +721,26 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+		<configuration>
+                    <preparationGoals>clean install</preparationGoals>
+                </configuration>
+                <version>2.5.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.8.2</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
             </plugin>
         </plugins>
     </build>

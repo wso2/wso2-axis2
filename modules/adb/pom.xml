@@ -31,11 +31,11 @@
     <artifactId>axis2-adb</artifactId>
     <name>Apache Axis2 - Data Binding</name>
     <description>Axis2 Data Binding module</description>
-    <scm>
+    <!--scm>
         <connection>scm:svn:http://svn.apache.org/repos/asf/axis/axis2/java/core/branches/1_6/modules/adb</connection>
         <developerConnection>scm:svn:https://svn.apache.org/repos/asf/axis/axis2/java/core/branches/1_6/modules/adb</developerConnection>
         <url>http://svn.apache.org/viewvc/axis/axis2/java/core/branches/1_6/modules/adb</url>
-    </scm>
+    </scm-->
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

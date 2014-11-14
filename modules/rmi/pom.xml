@@ -27,14 +27,14 @@
     <parent>
         <groupId>org.apache.axis2</groupId>
         <artifactId>axis2-parent</artifactId>
-        <version>1.6.1-wso2v11-SNAPSHOT</version>
+        <version>1.6.1-wso2v11</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
     <artifactId>axis2-rmi</artifactId>
     <name>Apache Axis2 - Remote Method Invocation</name>
     <description>Axis2 Remote Method Invocation</description>
-    <scm>
+    <!--scm>
         <connection>
             scm:svn:http://svn.apache.org/repos/asf/webservices/axis2/trunk/java/modules/rmi
         </connection>
@@ -42,7 +42,7 @@
             scm:svn:https://svn.apache.org/repos/asf/webservices/axis2/trunk/java/modules/rmi
         </developerConnection>
         <url>http://svn.apache.org/viewvc/webservices/axis2/trunk/java/modules/rmi</url>
-    </scm>
+    </scm-->
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

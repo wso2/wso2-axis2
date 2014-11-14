@@ -32,11 +32,11 @@
     <name>Apache Axis2 - Transport - testkit</name>
     <description>Framework to build test suites for Axis2 transports</description>
 
-    <scm>
+    <!--scm>
         <connection>scm:svn:http://svn.apache.org/repos/asf/axis/axis2/java/transports/trunk/modules/testkit</connection>
         <developerConnection>scm:svn:https://svn.apache.org/repos/asf/axis/axis2/java/transports/trunk/modules/testkit</developerConnection>
         <url>http://svn.apache.org/viewvc/axis/axis2/java/transports/trunk/modules/testkit</url>
-    </scm>
+    </scm-->
     
     <dependencies>
         <dependency>
