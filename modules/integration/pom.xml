@@ -81,7 +81,7 @@
             <artifactId>axis2-jaxbri</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
+        <!--dependency>
             <groupId>org.apache.axis2</groupId>
             <version>${project.version}</version>
             <artifactId>axis2-jaxws</artifactId>
@@ -90,7 +90,7 @@
             <groupId>org.apache.axis2</groupId>
             <version>${project.version}</version>
             <artifactId>axis2-jaxws-integration</artifactId>
-        </dependency>
+        </dependency-->
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <version>${project.version}</version>
