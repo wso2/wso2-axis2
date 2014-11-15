@@ -82,6 +82,7 @@
         <module>modules/clustering</module>
         <module>modules/corba</module>
         <module>modules/osgi</module>
+        <module>modules/transport/base</module>
         <module>modules/transport/local</module>
         <module>modules/transport/http</module>
         <module>orbit/axis2</module>
