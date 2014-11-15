@@ -46,7 +46,8 @@
         <url>http://issues.apache.org/jira/browse/AXIS2</url>
     </issueManagement-->
     <modules>
-        <module>modules/resource-bundle</module> <!-- Must be first in the list! -->
+        <module>modules/resource-bundle</module>
+        <!-- Must be first in the list! -->
         <module>modules/adb</module>
         <module>modules/adb-codegen</module>
         <module>modules/addressing</module>
@@ -69,36 +70,20 @@
         <module>modules/testutils</module>
         <module>modules/tool/axis2-aar-maven-plugin</module>
         <module>modules/tool/axis2-ant-plugin</module>
-        <!--module>modules/tool/axis2-eclipse-codegen-plugin</module>
-        <module>modules/tool/axis2-eclipse-service-plugin</module>
-        <module>modules/tool/axis2-idea-plugin</module-->
         <module>modules/tool/axis2-java2wsdl-maven-plugin</module>
         <module>modules/tool/axis2-mar-maven-plugin</module>
         <module>modules/tool/axis2-repo-maven-plugin</module>
         <module>modules/tool/axis2-wsdl2code-maven-plugin</module>
-        <!-- <module>modules/webapp</module> -->
         <module>modules/xmlbeans</module>
         <module>modules/scripting</module>
         <module>modules/jaxbri</module>
         <module>modules/metadata</module>
         <module>modules/saaj</module>
-        <!--module>modules/jaxws</module>
-        <module>modules/jaxws-mar</module>
-        <module>modules/jaxws-integration</module-->
         <module>modules/clustering</module>
         <module>modules/corba</module>
         <module>modules/osgi</module>
-	<module>modules/transport/local</module>
+        <module>modules/transport/local</module>
         <module>modules/transport/http</module>
-        <!--module>modules/transport/base</module>
-        <module>modules/transport/tcp</module>
-        <module>modules/transport/udp</module>
-        <module>modules/transport/xmpp</module>
-        <module>modules/transport/mail</module>
-        <module>modules/transport/jms</module>
-        <module>modules/transport/rabbitmq</module>
-        <module>modules/transport/sms</module>
-        <module>modules/transport/testkit</module-->
         <module>orbit/axis2</module>
         <module>orbit/axis2-client</module>
         <module>orbit/axis2-jaxbri</module>
@@ -106,12 +91,12 @@
         <module>orbit/axis2-json</module>
     </modules>
     <pluginRepositories>
-	<pluginRepository> 
+        <pluginRepository>
             <id>repository.dev.java.net-maven2</id>
-	    <name>Java.net Repository for Maven</name> 
-	    <url>http://download.java.net/maven/2/</url> 
-	    <layout>default</layout> 
-	</pluginRepository>
+            <name>Java.net Repository for Maven</name>
+            <url>http://download.java.net/maven/2/</url>
+            <layout>default</layout>
+        </pluginRepository>
     </pluginRepositories>
     <!--profiles>
         <profile>
