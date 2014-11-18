@@ -62,15 +62,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.ws.commons.schema.wso2</groupId>
+            <groupId>org.apache.ws.commons.schema</groupId>
             <artifactId>XmlSchema</artifactId>
-            <version>1.4.7.wso2v2</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.ws.commons.schema</groupId>
-                    <artifactId>XmlSchema</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>1.4.7.wso2v3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs.wso2</groupId>
