@@ -47,7 +47,7 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.ws.commons.schema</groupId>
+            <groupId>org.apache.ws.commons.schema.wso2</groupId>
             <artifactId>XmlSchema</artifactId>
         </dependency>
         <dependency>

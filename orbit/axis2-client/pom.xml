@@ -75,7 +75,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.ws.commons.schema</groupId>
+            <groupId>org.apache.ws.commons.schema.wso2</groupId>
             <artifactId>XmlSchema</artifactId>
             <version>1.4.7.wso2v3-SNAPSHOT</version>
         </dependency>
@@ -150,7 +150,7 @@
                     <artifactId>wsdl4j</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.apache.ws.commons.schema</groupId>
+                    <groupId>org.apache.ws.commons.schema.wso2</groupId>
                     <artifactId>XmlSchema</artifactId>
                 </exclusion>
                 <exclusion>

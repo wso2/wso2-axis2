@@ -153,7 +153,7 @@
                     <artifactId>geronimo-jta_1.1_spec</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.apache.ws.commons.schema</groupId>
+                    <groupId>org.apache.ws.commons.schema.wso2</groupId>
                     <artifactId>XmlSchema</artifactId>
                 </exclusion>
             </exclusions>
@@ -224,7 +224,7 @@
                     <artifactId>commons-cli</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.apache.ws.commons.schema</groupId>
+                    <groupId>org.apache.ws.commons.schema.wso2</groupId>
                     <artifactId>XmlSchema</artifactId>
                 </exclusion>
             </exclusions>
@@ -357,7 +357,7 @@
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.apache.ws.commons.schema</groupId>
+                    <groupId>org.apache.ws.commons.schema.wso2</groupId>
                     <artifactId>XmlSchema</artifactId>
                 </exclusion>
             </exclusions>

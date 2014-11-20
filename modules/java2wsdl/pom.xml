@@ -58,7 +58,7 @@
 
         <!--added this to support to keep WSDL information in AxisService-->
         <dependency>
-            <groupId>org.apache.ws.commons.schema</groupId>
+            <groupId>org.apache.ws.commons.schema.wso2</groupId>
             <artifactId>XmlSchema</artifactId>
         </dependency>
         <dependency>
