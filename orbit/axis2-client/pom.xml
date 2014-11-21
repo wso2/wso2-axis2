@@ -25,7 +25,7 @@
     <description>
         A single JAR file containing all the client side libraries
     </description>
-    <version>1.6.1.wso2v11</version>
+    <version>1.6.1.wso2v12-SNAPSHOT</version>
     <url>http://wso2.org</url>
 
     <repositories>
@@ -337,8 +337,8 @@
     </build>
 
     <properties>
-        <orbit.version.axis2>1.6.1.wso2v11</orbit.version.axis2>
-        <version.axis2>1.6.1-wso2v11</version.axis2>
+        <orbit.version.axis2>1.6.1.wso2v12-SNAPSHOT</orbit.version.axis2>
+        <version.axis2>1.6.1-wso2v12-SNAPSHOT</version.axis2>
         <transport.version>1.6.1-wso2v11-SNAPSHOT</transport.version>
         <version.apache.felix.framework>1.4.0</version.apache.felix.framework>
         <xmlbeans.version>2.3.0</xmlbeans.version>
