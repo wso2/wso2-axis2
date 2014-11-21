@@ -15,7 +15,9 @@
  ~ specific language governing permissions and limitations
  ~ under the License.
  -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.axis2.wso2</groupId>
@@ -25,7 +27,7 @@
     <description>
         org.wso2.carbon.axis2. This bundle will export packages for Axis2 WS engine.
     </description>
-    <version>1.6.1.wso2v12-SNAPSHOT</version>
+    <version>1.6.1.wso2v11-SNAPSHOT</version>
     <url>http://wso2.org</url>
 
     <repositories>
@@ -567,8 +569,8 @@
     </build>
 
     <properties>
-        <version.axis2>1.6.1-wso2v12-SNAPSHOT</version.axis2>
-        <transport.version>1.6.1-wso2v12-SNAPSHOT</transport.version>
+        <version.axis2>1.6.1-wso2v11-SNAPSHOT</version.axis2>
+        <transport.version>1.6.1-wso2v11-SNAPSHOT</transport.version>
         <version.apache.felix.framework>1.4.0</version.apache.felix.framework>
         <xmlbeans.version>2.3.0</xmlbeans.version>
         <orbit.version.neethi>2.0.4.wso2v4</orbit.version.neethi>
