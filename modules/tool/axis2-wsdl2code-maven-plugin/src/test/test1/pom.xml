@@ -23,14 +23,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.axis2.maven2</groupId>
     <artifactId>axis2-wsdl2code-maven-plugin-test1</artifactId>
-    <version>1.6.1-wso2v11-SNAPSHOT</version>
+    <version>1.6.1-wso2v11</version>
     <name>Test 1 of the axis2-wsdl2code-maven-plugin</name>
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.axis2</groupId>
                 <artifactId>axis2-wsdl2code-maven-plugin</artifactId>
-                <version>1.6.1-wso2v11-SNAPSHOT</version>
+                <version>1.6.1-wso2v11</version>
                 <configuration>
                     <generateServerSide>true</generateServerSide>
                     <generateServerSideInterface>true</generateServerSideInterface>

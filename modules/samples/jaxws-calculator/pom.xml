@@ -23,7 +23,7 @@
     <groupId>org.apache.axis2.samples</groupId>
     <artifactId>jaxws-calculator</artifactId>
     <packaging>jar</packaging>
-    <version>1.6.1-wso2v11-SNAPSHOT</version>
+    <version>1.6.1-wso2v11</version>
     <name>JAXWS Calculator Service</name>
     <build>
         <sourceDirectory>src</sourceDirectory>
