@@ -38,6 +38,7 @@ public class HTTPConstants {
     public static final String MEDIA_TYPE_APPLICATION_SOAP_XML = "application/soap+xml";
     public static final String MEDIA_TYPE_APPLICATION_ECHO_XML = "application/echo+xml";
     public static final String MEDIA_TYPE_APPLICATION_JSON = "application/json";
+    public static final String MEDIA_TYPE_APPLICATION_JWT= "application/jwt";
 
     /**
      * Field REQUEST_URI
