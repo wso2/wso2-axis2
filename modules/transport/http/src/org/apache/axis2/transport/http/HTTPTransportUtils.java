@@ -278,7 +278,8 @@ public class HTTPTransportUtils {
                (contentType.indexOf(HTTPConstants.MEDIA_TYPE_APPLICATION_XML) > -1 ||
                 contentType.indexOf(HTTPConstants.MEDIA_TYPE_X_WWW_FORM) > -1 ||
                 contentType.indexOf(HTTPConstants.MEDIA_TYPE_MULTIPART_FORM_DATA) > -1 ||
-                contentType.indexOf(HTTPConstants.MEDIA_TYPE_APPLICATION_JSON) > -1);
+                contentType.indexOf(HTTPConstants.MEDIA_TYPE_APPLICATION_JSON) > -1 ||
+                contentType.indexOf(HTTPConstants.MEDIA_TYPE_APPLICATION_JWT) > -1);
     }
     
     public static EndpointReference[] getEPRsForService(ConfigurationContext configurationContext,
