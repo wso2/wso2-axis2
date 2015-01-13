@@ -26,6 +26,8 @@ import org.apache.axis2.json.gson.factory.JsonConstant;
 import org.apache.axis2.json.gson.factory.JsonObject;
 import org.apache.axis2.json.gson.factory.XmlNode;
 import org.apache.axis2.json.gson.factory.XmlNodeGenerator;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.ws.commons.schema.XmlSchema;
 
 import javax.xml.namespace.NamespaceContext;
@@ -208,6 +210,11 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
             if (miniStack.isEmpty()) {
                 if (!queue.isEmpty()) {
                     JsonObject queObj = queue.peek();
+                    if (!queObj.getName().equals(localName) && queObj.getMinOccurs() == 0
+                            && (stack.isEmpty() || !stack.peek().getName().equals(localName))){
+                        queue.poll();
+                        queObj = queue.peek();
+                    }
                     if (queObj.getName().equals(localName)) {
                         if (flushObject != null) {
                             if (topNestedArrayObj != null && flushObject.getType() == JSONType.NESTED_ARRAY
