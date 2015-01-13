@@ -675,10 +675,14 @@ public abstract class AbstractHTTPSender {
 
                     boolean headerAdded = false;
                     for (Header header : headers) {
-                        if (header.getName() != null &&                                 
-                                header.getName().equals(((Map.Entry) headerEntry).getKey())) {
-                            headerAdded = true;
-                            break;
+                        if (header.getName() != null) {
+                            Object headerKey = ((Map.Entry) headerEntry).getKey();
+                            if (headerKey instanceof String && header.getName().equalsIgnoreCase((String) headerKey)) {
+                                // According to RFC2626 http headers are case insensitive.
+                                // So need to ignore case
+                                headerAdded = true;
+                                break;
+                            }
                         }
                     }
 
