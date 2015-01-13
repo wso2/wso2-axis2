@@ -90,6 +90,7 @@ public class XmlNodeGenerator {
         QName refName = element.getRefName();
         if (schemaTypeName != null) {
             xmlNode = new XmlNode(element.getName(), targetNamespace, false, (element.getMaxOccurs() != 1), schemaTypeName.getLocalPart());
+            xmlNode.setMinOccurs(element.getMinOccurs());
             parentNode.addChildToList(xmlNode);
             if (("http://www.w3.org/2001/XMLSchema").equals(schemaTypeName.getNamespaceURI())) {
             } else {
@@ -106,6 +107,7 @@ public class XmlNodeGenerator {
             }
         }else if (schemaType != null) {
             xmlNode = new XmlNode(element.getName(), targetNamespace, false, (element.getMaxOccurs() != 1), schemaType.getQName().getLocalPart());
+            xmlNode.setMinOccurs(element.getMinOccurs());
             parentNode.addChildToList(xmlNode);
             processSchemaType(schemaType, xmlNode, schema);
         }else if (refName != null) {
@@ -175,17 +177,25 @@ public class XmlNodeGenerator {
     private void generateQueue(XmlNode node) {
         if (node.isArray()) {
             if (node.getChildrenList().size() > 0) {
-                queue.add(new JsonObject(node.getName(), JSONType.NESTED_ARRAY, node.getValueType() , node.getNamespaceUri()));
+                JsonObject obj = new JsonObject(node.getName(), JSONType.NESTED_ARRAY, node.getValueType() , node.getNamespaceUri());
+                obj.setMinOccurs(node.getMinOccurs());
+                queue.add(obj);
                 processXmlNodeChildren(node.getChildrenList());
             } else {
-                queue.add(new JsonObject(node.getName(), JSONType.ARRAY , node.getValueType() , node.getNamespaceUri()));
+                JsonObject obj = new JsonObject(node.getName(), JSONType.ARRAY , node.getValueType() , node.getNamespaceUri());
+                obj.setMinOccurs(node.getMinOccurs());
+                queue.add(obj);
             }
         } else {
             if (node.getChildrenList().size() > 0) {
-                queue.add(new JsonObject(node.getName(), JSONType.NESTED_OBJECT, node.getValueType() , node.getNamespaceUri()));
+                JsonObject obj = new JsonObject(node.getName(), JSONType.NESTED_OBJECT, node.getValueType() , node.getNamespaceUri());
+                obj.setMinOccurs(node.getMinOccurs());
+                queue.add(obj);
                 processXmlNodeChildren(node.getChildrenList());
             } else {
-                queue.add(new JsonObject(node.getName(), JSONType.OBJECT , node.getValueType() , node.getNamespaceUri()));
+                JsonObject obj = new JsonObject(node.getName(), JSONType.OBJECT , node.getValueType() , node.getNamespaceUri());
+                obj.setMinOccurs(node.getMinOccurs());
+                queue.add(obj);
             }
         }
     }

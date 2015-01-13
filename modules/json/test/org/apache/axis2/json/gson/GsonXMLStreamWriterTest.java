@@ -68,6 +68,26 @@ public class GsonXMLStreamWriterTest {
         String actualString = baos.toString();
         outputStreamWriter.close();
         Assert.assertEquals(jsonString, actualString);
+
+
+        //test for when we have elements which may or may not included in the output
+        //for those kinds of elements, wsdl file includes attribute "minOccurs"
+        //so if "minOccurs" is 0 then that element may not be in the output xml document.
+        //so those kinds of outputs should be converted to json successfully
+        //this is the test for that
+        ByteArrayOutputStream baosFormo = new ByteArrayOutputStream();
+        OutputStreamWriter outputStreamWriterFormo = new OutputStreamWriter(baosFormo, "UTF-8");
+        JsonWriter jsonWriterFormo = new JsonWriter(outputStreamWriterFormo);
+
+        GsonXMLStreamWriter gsonXMLStreamWriterFormo = new GsonXMLStreamWriter(jsonWriterFormo, elementQName, schemaList, configCtxt);
+        OMElement omElementFormo = getResponseOMElementFormo();
+        gsonXMLStreamWriterFormo.writeStartDocument();
+        omElementFormo.serialize(gsonXMLStreamWriterFormo);
+        gsonXMLStreamWriterFormo.writeEndDocument();
+
+        String actualStringFormo = baosFormo.toString();
+        outputStreamWriterFormo.close();
+        Assert.assertEquals("{\"response\":{\"return\":{\"age\":\"35\",\"gender\":\"female\"}}}", actualStringFormo);
     }
 
 
@@ -84,6 +104,22 @@ public class GsonXMLStreamWriterTest {
         OMElement gender = omFactory.createOMElement("gender", ns);
         gender.setText("female");
         ret.addChild(name);
+        ret.addChild(age);
+        ret.addChild(gender);
+        response.addChild(ret);
+        return response;
+    }
+
+    private OMElement getResponseOMElementFormo() {
+        OMFactory omFactory = OMAbstractFactory.getOMFactory();
+        OMNamespace ns = omFactory.createOMNamespace("", "");
+
+        OMElement response = omFactory.createOMElement("response", ns);
+        OMElement ret = omFactory.createOMElement("return", ns);
+        OMElement age = omFactory.createOMElement("age", ns);
+        age.setText("35");
+        OMElement gender = omFactory.createOMElement("gender", ns);
+        gender.setText("female");
         ret.addChild(age);
         ret.addChild(gender);
         response.addChild(ret);
