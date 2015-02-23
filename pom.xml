@@ -55,7 +55,7 @@
         <module>modules/fastinfoset</module>
         <module>modules/integration</module>
         <module>modules/java2wsdl</module>
-        <module>modules/jibx</module>
+        <!-- <module>modules/jibx</module> -->
         <module>modules/json</module>
         <module>modules/kernel</module>
         <module>modules/mex</module>
@@ -81,7 +81,7 @@
         <module>modules/saaj</module>
         <module>modules/clustering</module>
         <module>modules/corba</module>
-        <module>modules/osgi</module>
+        <!-- <module>modules/osgi</module> -->
         <module>modules/transport/base</module>
         <module>modules/transport/local</module>
         <module>modules/transport/http</module>
