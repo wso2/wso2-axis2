@@ -88,7 +88,9 @@
         <module>orbit/axis2</module>
         <module>orbit/axis2-client</module>
         <module>orbit/axis2-jaxbri</module>
+<!--
         <module>orbit/axis2-jibx</module>
+-->
         <module>orbit/axis2-json</module>
     </modules>
     <pluginRepositories>
