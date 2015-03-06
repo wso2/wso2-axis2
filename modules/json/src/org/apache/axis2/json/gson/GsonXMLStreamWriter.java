@@ -39,9 +39,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Stack;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 
 public class GsonXMLStreamWriter implements XMLStreamWriter {
+
+    private static final Log log = LogFactory.getLog(GsonXMLStreamWriter.class);
 
     private JsonWriter jsonWriter;
 
@@ -94,10 +98,42 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
 
     public GsonXMLStreamWriter(JsonWriter jsonWriter, QName elementQName, List<XmlSchema> xmlSchemaList,
                                ConfigurationContext context) {
+        processSchemaUpdates(elementQName, xmlSchemaList, context);
         this.jsonWriter = jsonWriter;
         this.elementQName = elementQName;
         this.xmlSchemaList = xmlSchemaList;
         this.configContext = context;
+    }
+
+    private void processSchemaUpdates(QName elementQname, List<XmlSchema> xmlSchemaList, ConfigurationContext configContext) {
+        Object ob = configContext.getProperty(JsonConstant.CURRENT_XML_SCHEMA);
+        if (ob != null) {
+            Map<QName, XmlSchema> schemaMap = (Map<QName, XmlSchema>) ob;
+            if (schemaMap != null) {
+                XmlSchema currentXmlSchema = schemaMap.get(elementQname);
+                for (XmlSchema xmlSchema : xmlSchemaList) {
+                    if (xmlSchema.getTargetNamespace().equals(elementQname.getNamespaceURI())) {
+                        if (currentXmlSchema != xmlSchema) {
+                            schemaMap.put(elementQname, xmlSchema);
+                            configContext.setProperty(JsonConstant.XMLNODES, null);
+                            if (log.isDebugEnabled()) {
+                                log.debug("Updating message schema. [Current:" + currentXmlSchema + ", New:" + xmlSchema + "]");
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        } else {
+            Map<QName, XmlSchema> schemaMap = new HashMap<QName, XmlSchema>();
+            for (XmlSchema xmlSchema : xmlSchemaList) {
+                if (xmlSchema.getTargetNamespace().equals(elementQname.getNamespaceURI())) {
+                    schemaMap.put(elementQname, xmlSchema);
+                    configContext.setProperty(JsonConstant.CURRENT_XML_SCHEMA, schemaMap);
+                    break;
+                }
+            }
+        }
     }
 
     private void process() throws IOException {
