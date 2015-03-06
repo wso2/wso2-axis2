@@ -82,7 +82,9 @@ public class JSONMessageHandler extends AbstractHandler {
                         OMElement omElement = stAXOMBuilder.getDocumentElement();
                         msgContext.getEnvelope().getBody().addChild(omElement);
                     } else {
-                        throw new AxisFault("GsonXMLStreamReader should not be null");
+                        if (log.isDebugEnabled()) {
+                            log.debug( "GsonXMLStreamReader is null, This is possible with GET request");
+                        }
                     }
                 }
             }
