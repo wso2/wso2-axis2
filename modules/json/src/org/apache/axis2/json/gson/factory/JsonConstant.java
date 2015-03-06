@@ -34,6 +34,7 @@ public class JsonConstant {
 
     public static final String XMLNODES = "xmlnodes";
 
+    public static final String CURRENT_XML_SCHEMA = "CurrentXmlSchema";
 
 //    error messages
 
