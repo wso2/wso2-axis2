@@ -156,9 +156,9 @@
     </dependencies>
     <profiles>
 	<profile>
-            <id>java18</id>
+            <id>java-1.7-and-1.8</id>
             <activation>
-                <jdk>1.8</jdk>
+                <jdk>[1.7,1.9)</jdk>
             </activation>
             <build>
                 <plugins>
@@ -171,8 +171,8 @@
                        Should be removed if possible -->
                             <forkMode>pertest</forkMode>
                             <argLine>-Xms256m -Xmx512m</argLine>
-                            <!-- Enable the next 2 lines if you want to attach a debugger
-                         <argLine>-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5006</argLine>-->
+                            <!-- Enable the next 2 lines if you want to attach a debugger -->
+                            <!--<argLine>-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005</argLine>-->
                             <includes>
                                 <include>**/*Test.java</include>
                             </includes>
@@ -287,8 +287,6 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <inherited>true</inherited>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.6</target>
                     <!-- There is a lot of generated code to compile; use fork mode
                          to avoid out of memory issues: -->
                     <fork>true</fork>
