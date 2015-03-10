@@ -30,6 +30,7 @@ public class XmlNode {
     private List<XmlNode> childrenList = new ArrayList<XmlNode>();
     private String valueType;
     private String namespaceUri;
+    private long minOccurs;
 
     public XmlNode(String name,String namespaceUri, boolean attribute, boolean array , String valueType) {
         this.name = name;
@@ -67,5 +68,13 @@ public class XmlNode {
 
     public String getNamespaceUri() {
         return namespaceUri;
+    }
+
+    public void setMinOccurs(long minOccurs) {
+        this.minOccurs = minOccurs;
+    }
+
+    public long getMinOccurs() {
+        return minOccurs;
     }
 }

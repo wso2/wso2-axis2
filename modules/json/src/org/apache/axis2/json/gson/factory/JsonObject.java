@@ -25,6 +25,7 @@ public class JsonObject {
     private JSONType type;
     private String valueType;
     private String namespaceUri;
+    private long minOccurs;
 
     public JsonObject(String name, JSONType type, String valueType , String namespaceUri) {
         this.name = name;
@@ -47,5 +48,13 @@ public class JsonObject {
 
     public String getNamespaceUri() {
         return namespaceUri;
+    }
+
+    public void setMinOccurs(long minOccurs) {
+        this.minOccurs = minOccurs;
+    }
+
+    public long getMinOccurs() {
+        return minOccurs;
     }
 }
