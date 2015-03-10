@@ -41,8 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Stack;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 
 public class GsonXMLStreamWriter implements XMLStreamWriter {
@@ -97,6 +95,21 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      */
     private Map<String, String> uriPrefixMap = new HashMap<String, String>();
 
+    /**
+     * Holds if the next element could have a min occurrence value 0
+     */
+    private boolean potentialEmpty = false;
+
+    /**
+     * Holds the element which could be having 0 time occurrence
+     */
+    private JsonObject potentialEmptyElement = null;
+
+    /**
+     * Holds whether any empty elements present.
+     */
+    private boolean emptyObjectExists = false;
+
 
     public GsonXMLStreamWriter(JsonWriter jsonWriter, QName elementQName, List<XmlSchema> xmlSchemaList,
                                ConfigurationContext context) {
@@ -107,7 +120,8 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
         this.configContext = context;
     }
 
-    private void processSchemaUpdates(QName elementQname, List<XmlSchema> xmlSchemaList, ConfigurationContext configContext) {
+    private void processSchemaUpdates(QName elementQname, List<XmlSchema> xmlSchemaList,
+                                      ConfigurationContext configContext) {
         Object ob = configContext.getProperty(JsonConstant.CURRENT_XML_SCHEMA);
         if (ob != null) {
             Map<QName, XmlSchema> schemaMap = (Map<QName, XmlSchema>) ob;
@@ -119,7 +133,8 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
                             schemaMap.put(elementQname, xmlSchema);
                             configContext.setProperty(JsonConstant.XMLNODES, null);
                             if (log.isDebugEnabled()) {
-                                log.debug("Updating message schema. [Current:" + currentXmlSchema + ", New:" + xmlSchema + "]");
+                                log.debug("Updating message schema. [Current:" + currentXmlSchema + ", New:" +
+                                          xmlSchema + "]");
                             }
                         }
                         break;
@@ -206,7 +221,7 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
 
     private JsonObject popStack() {
         if (topNestedArrayObj == null || stack.peek().getType() == JSONType.NESTED_OBJECT
-                || stack.peek().getType() == JSONType.NESTED_ARRAY) {
+            || stack.peek().getType() == JSONType.NESTED_ARRAY) {
             return stack.pop();
         } else {
             processedJsonObjects.push(stack.peek());
@@ -230,7 +245,6 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      *
      * @param localName local name of the tag, may not be null
      * @throws javax.xml.stream.XMLStreamException
-     *
      */
 
     public void writeStartElement(String localName) throws XMLStreamException {
@@ -246,15 +260,20 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
             if (miniStack.isEmpty()) {
                 if (!queue.isEmpty()) {
                     JsonObject queObj = queue.peek();
+                    //if suspected element is not empty
+                    if (potentialEmpty && potentialEmptyElement == queObj) {
+                        potentialEmpty = false;
+                        potentialEmptyElement = null;
+                    }
                     if (!queObj.getName().equals(localName) && queObj.getMinOccurs() == 0
-                            && (stack.isEmpty() || !stack.peek().getName().equals(localName))){
+                        && (stack.isEmpty() || !stack.peek().getName().equals(localName))) {
                         queue.poll();
                         queObj = queue.peek();
                     }
                     if (queObj.getName().equals(localName)) {
                         if (flushObject != null) {
                             if (topNestedArrayObj != null && flushObject.getType() == JSONType.NESTED_ARRAY
-                                    && flushObject.getName().equals(topNestedArrayObj.getName())) {
+                                && flushObject.getName().equals(topNestedArrayObj.getName())) {
                                 topNestedArrayObj = null;
                                 processedJsonObjects.clear();
                             }
@@ -264,11 +283,19 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
                         }
 
                         if (topNestedArrayObj != null && (queObj.getType() == JSONType.NESTED_ARRAY ||
-                                queObj.getType() == JSONType.NESTED_OBJECT)) {
+                                                          queObj.getType() == JSONType.NESTED_OBJECT)) {
                             processedJsonObjects.push(queObj);
                         }
                         writeStartJson(queObj);
                         stack.push(queue.poll());
+
+                        JsonObject nextObj = queue.peek();
+                        //Checks the child of the element is empty
+                        if (nextObj != null && nextObj.getMinOccurs() == 0) {
+                            potentialEmpty = true;
+                            potentialEmptyElement = nextObj;
+                        }
+
                     } else if (!stack.isEmpty()) {
                         stackObj = stack.peek();
                         if (stackObj.getName().equals(localName)) {
@@ -308,7 +335,7 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
                         flushObject = null;
                     }
                     if (topNestedArrayObj != null && (queObj.getType() == JSONType.NESTED_OBJECT
-                            || queObj.getType() == JSONType.NESTED_ARRAY)) {
+                                                      || queObj.getType() == JSONType.NESTED_ARRAY)) {
                         processedJsonObjects.push(queObj);
                     }
                     writeStartJson(queObj);
@@ -337,9 +364,8 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      *
      * @param namespaceURI the namespaceURI of the prefix to use, may not be null
      * @param localName    local name of the tag, may not be null
-     * @throws javax.xml.stream.XMLStreamException
-     *          if the namespace URI has not been bound to a prefix and
-     *          javax.xml.stream.isRepairingNamespaces has not been set to true
+     * @throws javax.xml.stream.XMLStreamException if the namespace URI has not been bound to a prefix and
+     *                                             javax.xml.stream.isRepairingNamespaces has not been set to true
      */
 
     public void writeStartElement(String namespaceURI, String localName) throws XMLStreamException {
@@ -353,7 +379,6 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      * @param prefix       the prefix of the tag, may not be null
      * @param namespaceURI the uri to bind the prefix to, may not be null
      * @throws javax.xml.stream.XMLStreamException
-     *
      */
 
     public void writeStartElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
@@ -365,9 +390,8 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      *
      * @param namespaceURI the uri to bind the tag to, may not be null
      * @param localName    local name of the tag, may not be null
-     * @throws javax.xml.stream.XMLStreamException
-     *          if the namespace URI has not been bound to a prefix and
-     *          javax.xml.stream.isRepairingNamespaces has not been set to true
+     * @throws javax.xml.stream.XMLStreamException if the namespace URI has not been bound to a prefix and
+     *                                             javax.xml.stream.isRepairingNamespaces has not been set to true
      */
 
     public void writeEmptyElement(String namespaceURI, String localName) throws XMLStreamException {
@@ -381,7 +405,6 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      * @param localName    local name of the tag, may not be null
      * @param namespaceURI the uri to bind the tag to, may not be null
      * @throws javax.xml.stream.XMLStreamException
-     *
      */
 
     public void writeEmptyElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
@@ -393,7 +416,6 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      *
      * @param localName local name of the tag, may not be null
      * @throws javax.xml.stream.XMLStreamException
-     *
      */
 
     public void writeEmptyElement(String localName) throws XMLStreamException {
@@ -406,7 +428,6 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      * of the event.
      *
      * @throws javax.xml.stream.XMLStreamException
-     *
      */
 
     public void writeEndElement() throws XMLStreamException {
@@ -419,9 +440,13 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
         }
         JsonObject stackObj = null;
         try {
+            //If the suspected element is empty
+            if (potentialEmpty) {
+                emptyObjectExists = true;
+            }
             if (flushObject != null) {
                 if (topNestedArrayObj != null && flushObject.getType() == JSONType.NESTED_ARRAY &&
-                        flushObject.equals(topNestedArrayObj.getName())) {
+                    flushObject.equals(topNestedArrayObj.getName())) {
                     topNestedArrayObj = null;
                     processedJsonObjects.clear();
                 }
@@ -449,7 +474,6 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      * Closes any start tags and writes corresponding end tags.
      *
      * @throws javax.xml.stream.XMLStreamException
-     *
      */
 
     public void writeEndDocument() throws XMLStreamException {
@@ -460,6 +484,12 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
                 throw new XMLStreamException("Error occours while write first begin object ");
             }
         }
+
+        //Since empty objects presents with the stream
+        if (emptyObjectExists) {
+            queue.clear();
+        }
+
         if (queue.isEmpty() && stack.isEmpty()) {
             try {
                 if (flushObject != null) {
@@ -481,7 +511,6 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      * writer.  This must not close the underlying output stream.
      *
      * @throws javax.xml.stream.XMLStreamException
-     *
      */
 
     public void close() throws XMLStreamException {
@@ -496,9 +525,8 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      * Write any cached data to the underlying output mechanism.
      *
      * @throws javax.xml.stream.XMLStreamException
-     *
      */
-    
+
     public void flush() throws XMLStreamException {
     }
 
@@ -508,9 +536,8 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      *
      * @param localName the local name of the attribute
      * @param value     the value of the attribute
-     * @throws IllegalStateException if the current state does not allow Attribute writing
+     * @throws IllegalStateException               if the current state does not allow Attribute writing
      * @throws javax.xml.stream.XMLStreamException
-     *
      */
 
     public void writeAttribute(String localName, String value) throws XMLStreamException {
@@ -524,15 +551,15 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      * @param namespaceURI the uri of the prefix for this attribute
      * @param localName    the local name of the attribute
      * @param value        the value of the attribute
-     * @throws IllegalStateException if the current state does not allow Attribute writing
-     * @throws javax.xml.stream.XMLStreamException
-     *                               if the namespace URI has not been bound to a prefix and
-     *                               javax.xml.stream.isRepairingNamespaces has not been set to true
+     * @throws IllegalStateException               if the current state does not allow Attribute writing
+     * @throws javax.xml.stream.XMLStreamException if the namespace URI has not been bound to a prefix and
+     *                                             javax.xml.stream.isRepairingNamespaces has not been set to true
      */
 
-    public void writeAttribute(String prefix, String namespaceURI, String localName, String value) throws XMLStreamException {
+    public void writeAttribute(String prefix, String namespaceURI, String localName, String value)
+            throws XMLStreamException {
         if ("http://www.w3.org/2001/XMLSchema-instance".equals(namespaceURI) && "nil".equals(localName)
-                && "true".equals(value)) {
+            && "true".equals(value)) {
             try {
                 jsonWriter.nullValue();
             } catch (IOException e) {
@@ -547,10 +574,9 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      * @param namespaceURI the uri of the prefix for this attribute
      * @param localName    the local name of the attribute
      * @param value        the value of the attribute
-     * @throws IllegalStateException if the current state does not allow Attribute writing
-     * @throws javax.xml.stream.XMLStreamException
-     *                               if the namespace URI has not been bound to a prefix and
-     *                               javax.xml.stream.isRepairingNamespaces has not been set to true
+     * @throws IllegalStateException               if the current state does not allow Attribute writing
+     * @throws javax.xml.stream.XMLStreamException if the namespace URI has not been bound to a prefix and
+     *                                             javax.xml.stream.isRepairingNamespaces has not been set to true
      */
 
     public void writeAttribute(String namespaceURI, String localName, String value) throws XMLStreamException {
@@ -564,9 +590,8 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      *
      * @param prefix       the prefix to bind this namespace to
      * @param namespaceURI the uri to bind the prefix to
-     * @throws IllegalStateException if the current state does not allow Namespace writing
+     * @throws IllegalStateException               if the current state does not allow Namespace writing
      * @throws javax.xml.stream.XMLStreamException
-     *
      */
 
     public void writeNamespace(String prefix, String namespaceURI) throws XMLStreamException {
@@ -576,9 +601,8 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      * Writes the default namespace to the stream
      *
      * @param namespaceURI the uri to bind the default namespace to
-     * @throws IllegalStateException if the current state does not allow Namespace writing
+     * @throws IllegalStateException               if the current state does not allow Namespace writing
      * @throws javax.xml.stream.XMLStreamException
-     *
      */
 
     public void writeDefaultNamespace(String namespaceURI) throws XMLStreamException {
@@ -590,7 +614,6 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      *
      * @param data the data contained in the comment, may be null
      * @throws javax.xml.stream.XMLStreamException
-     *
      */
 
     public void writeComment(String data) throws XMLStreamException {
@@ -602,7 +625,6 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      *
      * @param target the target of the processing instruction, may not be null
      * @throws javax.xml.stream.XMLStreamException
-     *
      */
 
     public void writeProcessingInstruction(String target) throws XMLStreamException {
@@ -615,7 +637,6 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      * @param target the target of the processing instruction, may not be null
      * @param data   the data contained in the processing instruction, may not be null
      * @throws javax.xml.stream.XMLStreamException
-     *
      */
 
     public void writeProcessingInstruction(String target, String data) throws XMLStreamException {
@@ -627,7 +648,6 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      *
      * @param data the data contained in the CData Section, may not be null
      * @throws javax.xml.stream.XMLStreamException
-     *
      */
 
     public void writeCData(String data) throws XMLStreamException {
@@ -640,7 +660,6 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      *
      * @param dtd the DTD to be written
      * @throws javax.xml.stream.XMLStreamException
-     *
      */
 
     public void writeDTD(String dtd) throws XMLStreamException {
@@ -652,7 +671,6 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      *
      * @param name the name of the entity
      * @throws javax.xml.stream.XMLStreamException
-     *
      */
 
     public void writeEntityRef(String name) throws XMLStreamException {
@@ -663,7 +681,6 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      * Write the XML Declaration. Defaults the XML version to 1.0, and the encoding to utf-8
      *
      * @throws javax.xml.stream.XMLStreamException
-     *
      */
 
     public void writeStartDocument() throws XMLStreamException {
@@ -681,7 +698,6 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      *
      * @param version version of the xml document
      * @throws javax.xml.stream.XMLStreamException
-     *
      */
 
     public void writeStartDocument(String version) throws XMLStreamException {
@@ -696,9 +712,8 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      *
      * @param encoding encoding of the xml declaration
      * @param version  version of the xml document
-     * @throws javax.xml.stream.XMLStreamException
-     *          If given encoding does not match encoding
-     *          of the underlying stream
+     * @throws javax.xml.stream.XMLStreamException If given encoding does not match encoding
+     *                                             of the underlying stream
      */
 
     public void writeStartDocument(String encoding, String version) throws XMLStreamException {
@@ -714,7 +729,6 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      *
      * @param text the value to write
      * @throws javax.xml.stream.XMLStreamException
-     *
      */
 
     public void writeCharacters(String text) throws XMLStreamException {
@@ -754,7 +768,6 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      * @param start the starting position in the array
      * @param len   the number of characters to write
      * @throws javax.xml.stream.XMLStreamException
-     *
      */
 
     public void writeCharacters(char[] text, int start, int len) throws XMLStreamException {
@@ -766,7 +779,6 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      *
      * @return the prefix or null
      * @throws javax.xml.stream.XMLStreamException
-     *
      */
 
     public String getPrefix(String uri) throws XMLStreamException {
@@ -782,7 +794,6 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      * @param prefix the prefix to bind to the uri, may not be null
      * @param uri    the uri to bind to the prefix, may be null
      * @throws javax.xml.stream.XMLStreamException
-     *
      */
 
     public void setPrefix(String prefix, String uri) throws XMLStreamException {
@@ -798,11 +809,20 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      *
      * @param uri the uri to bind to the default namespace, may be null
      * @throws javax.xml.stream.XMLStreamException
-     *
      */
 
     public void setDefaultNamespace(String uri) throws XMLStreamException {
         //do nothing. 
+    }
+
+    /**
+     * Returns the current namespace context.
+     *
+     * @return the current NamespaceContext
+     */
+
+    public NamespaceContext getNamespaceContext() {
+        return new GsonNamespaceConext();
     }
 
     /**
@@ -819,21 +839,10 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
      *
      * @param context the namespace context to use for this writer, may not be null
      * @throws javax.xml.stream.XMLStreamException
-     *
      */
 
     public void setNamespaceContext(NamespaceContext context) throws XMLStreamException {
         throw new UnsupportedOperationException("Method is not implemented");
-    }
-
-    /**
-     * Returns the current namespace context.
-     *
-     * @return the current NamespaceContext
-     */
-
-    public NamespaceContext getNamespaceContext() {
-        return new GsonNamespaceConext();
     }
 
     /**
