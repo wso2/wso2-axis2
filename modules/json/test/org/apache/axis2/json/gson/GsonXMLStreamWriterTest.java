@@ -88,8 +88,24 @@ public class GsonXMLStreamWriterTest {
         String actualStringFormo = baosFormo.toString();
         outputStreamWriterFormo.close();
         Assert.assertEquals("{\"response\":{\"return\":{\"age\":\"35\",\"gender\":\"female\"}}}", actualStringFormo);
-    }
 
+
+        //test for when we have elements which may or may not included in the output
+        //and no other elements are present; also above minOccurs is too exists
+        ByteArrayOutputStream baosEmptyChild = new ByteArrayOutputStream();
+        OutputStreamWriter outputStreamWriterEC = new OutputStreamWriter(baosEmptyChild, "UTF-8");
+        JsonWriter jsonWriterEC = new JsonWriter(outputStreamWriterEC);
+
+        GsonXMLStreamWriter gsonXMLStreamWriterEC = new GsonXMLStreamWriter(jsonWriterEC, elementQName, schemaList, configCtxt);
+        OMElement omElementEC = getResponseOMElementEmptyChild();
+        gsonXMLStreamWriterEC.writeStartDocument();
+        omElementEC.serialize(gsonXMLStreamWriterEC);
+        gsonXMLStreamWriterEC.writeEndDocument();
+
+        String actualStringEC = baosEmptyChild.toString();
+        outputStreamWriterFormo.close();
+        Assert.assertEquals("{\"response\":{\"return\":{}}}", actualStringEC);
+    }
 
     private OMElement getResponseOMElement() {
         OMFactory omFactory = OMAbstractFactory.getOMFactory();
@@ -122,6 +138,16 @@ public class GsonXMLStreamWriterTest {
         gender.setText("female");
         ret.addChild(age);
         ret.addChild(gender);
+        response.addChild(ret);
+        return response;
+    }
+
+    private OMElement getResponseOMElementEmptyChild() {
+        OMFactory omFactory = OMAbstractFactory.getOMFactory();
+        OMNamespace ns = omFactory.createOMNamespace("", "");
+
+        OMElement response = omFactory.createOMElement("response", ns);
+        OMElement ret = omFactory.createOMElement("return", ns);
         response.addChild(ret);
         return response;
     }
