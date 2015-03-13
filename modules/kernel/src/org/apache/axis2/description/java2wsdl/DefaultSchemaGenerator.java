@@ -809,8 +809,9 @@ public class DefaultSchemaGenerator implements Java2WSDLConstants, SchemaGenerat
         String propertyName;
         Class<?> type;
         boolean isArrayType = true;
-        if (genericType instanceof GenericArrayType) {
-            Class<?> simpleType = (Class<?>) ((GenericArrayType) genericType).getGenericComponentType();
+        // This fix is for java7 onwards, refer CARBON-15182
+        if ((genericType instanceof Class<?>) && (((Class<?>) genericType).isArray())) {
+            Class<?> simpleType = ((Class<?>) genericType).getComponentType();
             propertyName = simpleType.getName();
             // this is a doble array element
             String simpleTypeName = "";
@@ -1050,9 +1051,10 @@ public class DefaultSchemaGenerator implements Java2WSDLConstants, SchemaGenerat
 
 
         Class<?> type;
-        if (genericType instanceof GenericArrayType) {
+        // This fix is for java7 onwards, refer CARBON-15182
+        if ((genericType instanceof Class<?>) && (((Class<?>) genericType).isArray())) {
             // this is a double array element
-            Class<?> simpleType = (Class<?>) ((GenericArrayType) genericType).getGenericComponentType();
+            Class<?> simpleType = ((Class<?>) genericType).getComponentType();
             String simpleTypeName = "";
             while (simpleType.isArray()) {
                 simpleTypeName += "ArrayOf";
