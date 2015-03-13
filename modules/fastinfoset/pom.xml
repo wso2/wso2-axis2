@@ -166,10 +166,6 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <inherited>true</inherited>
-                <configuration>
-                    <source>1.5</source>
-                    <target>1.6</target>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.axis2</groupId>

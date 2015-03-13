@@ -145,6 +145,7 @@
         <dependency>
             <groupId>xmlunit</groupId>
             <artifactId>xmlunit</artifactId>
+            <version>1.6</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -154,10 +155,10 @@
         </dependency>
     </dependencies>
     <profiles>
-        <profile>
-            <id>java15</id>
+	<profile>
+            <id>java-1.7-and-1.8</id>
             <activation>
-                <jdk>1.5</jdk>
+                <jdk>[1.7,1.9)</jdk>
             </activation>
             <build>
                 <plugins>
@@ -170,55 +171,8 @@
                        Should be removed if possible -->
                             <forkMode>pertest</forkMode>
                             <argLine>-Xms256m -Xmx512m</argLine>
-                            <!-- Enable the next 2 lines if you want to attach a debugger
-                         <argLine>-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5006</argLine>-->
-                            <includes>
-                                <include>**/*Test.java</include>
-                            </includes>
-                            <excludes>
-                                <exclude>**/*Abstract*.java</exclude>
-                                <exclude>**/*Util*.java</exclude>
-                                <exclude>**/*InteropStubTest.java</exclude>
-                                <exclude>**/*ServiceGroupContextTest.java</exclude>
-                                <exclude>**/*EchoRawSwAFileInputTest.java</exclude>
-                                <exclude>**org/apache/axis2/soap12testing/soap12testsuite/*.java</exclude>
-                                <exclude>**/ScenarioST1Test.java</exclude>
-                                <exclude>**/samples/wsdl/perf2/*.java</exclude>
-                            </excludes>
-                            <systemProperties>
-                                <property>
-                                    <name>build.repository</name>
-                                    <value>./target/test-classes</value>
-                                </property>
-                                <!-- Prevent Mac OS X from showing an icon in the dock during the test run -->
-                                <property>
-                                    <name>java.awt.headless</name>
-                                    <value>true</value>
-                                </property>
-                            </systemProperties>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>java16</id>
-            <activation>
-                <jdk>1.6</jdk>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <inherited>true</inherited>
-                        <configuration>
-                            <!-- The pertest forkMode is not ideal but seems to be necessary
-                       because the test server doesn't shut down properly :-(
-                       Should be removed if possible -->
-                            <forkMode>pertest</forkMode>
-                            <argLine>-Xms256m -Xmx512m</argLine>
-                            <!-- Enable the next 2 lines if you want to attach a debugger
-                         <argLine>-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5006</argLine>-->
+                            <!-- Enable the next 2 lines if you want to attach a debugger -->
+                            <!--<argLine>-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005</argLine>-->
                             <includes>
                                 <include>**/*Test.java</include>
                             </includes>
@@ -250,6 +204,8 @@
                 </plugins>
             </build>
         </profile>
+
+
         <profile>
             <id>enterprise</id>
             <build>
@@ -331,8 +287,6 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <inherited>true</inherited>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.6</target>
                     <!-- There is a lot of generated code to compile; use fork mode
                          to avoid out of memory issues: -->
                     <fork>true</fork>

@@ -31,7 +31,6 @@ import org.apache.axis2.description.AxisMessage;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisOperationFactory;
 import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.WSDL2Constants;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.MessageReceiver;
 import org.apache.axis2.json.gson.factory.JsonConstant;
@@ -44,6 +43,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Ignore;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
@@ -162,6 +162,7 @@ public class JSONMessageHandlerTest {
         Assert.assertEquals(false, gsonStreamReader.isProcessed());
     }
 
+    @Ignore("Ignored, as JSONMessageHandler is updated to not to throw an Exception when GsonXMLStreamReader is null")
     @Test
     public void testInvokeWithNullGsonXMLStreamReader() throws Exception {
         messageContext.setProperty(JsonConstant.IS_JSON_STREAM, true);

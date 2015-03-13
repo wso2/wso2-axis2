@@ -97,12 +97,44 @@ public class GsonXMLStreamReader implements XMLStreamReader {
     }
 
     public void initXmlStreamReader(QName elementQname, List<XmlSchema> xmlSchemaList, ConfigurationContext configContext) {
+        processSchemaUpdates(elementQname, xmlSchemaList, configContext);
         this.elementQname = elementQname;
         this.xmlSchemaList = xmlSchemaList;
         this.configContext = configContext;
         process();
         isProcessed = true;
 
+    }
+
+    private void processSchemaUpdates(QName elementQname, List<XmlSchema> xmlSchemaList, ConfigurationContext configContext) {
+        Object ob = configContext.getProperty(JsonConstant.CURRENT_XML_SCHEMA);
+        if (ob != null) {
+            Map<QName, XmlSchema> schemaMap = (Map<QName, XmlSchema>) ob;
+            if (schemaMap != null) {
+                XmlSchema currentXmlSchema = schemaMap.get(elementQname);
+                for (XmlSchema xmlSchema : xmlSchemaList) {
+                    if (xmlSchema.getTargetNamespace().equals(elementQname.getNamespaceURI())) {
+                        if (currentXmlSchema != xmlSchema) {
+                            schemaMap.put(elementQname, xmlSchema);
+                            configContext.setProperty(JsonConstant.XMLNODES, null);
+                            if (log.isDebugEnabled()) {
+                                log.debug("Updating message schema. [Current:" + currentXmlSchema + ", New:" + xmlSchema + "]");
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        } else {
+            Map<QName, XmlSchema> schemaMap = new HashMap<QName, XmlSchema>();
+            for (XmlSchema xmlSchema : xmlSchemaList) {
+                if (xmlSchema.getTargetNamespace().equals(elementQname.getNamespaceURI())) {
+                    schemaMap.put(elementQname, xmlSchema);
+                    configContext.setProperty(JsonConstant.CURRENT_XML_SCHEMA, schemaMap);
+                    break;
+                }
+            }
+        }
     }
 
     private void process() {

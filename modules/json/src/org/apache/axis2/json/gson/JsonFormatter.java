@@ -129,7 +129,15 @@ public class JsonFormatter implements MessageFormatter {
     }
 
     public String getContentType(MessageContext outMsgCtxt, OMOutputFormat omOutputFormat, String s) {
-        return (String)outMsgCtxt.getProperty(Constants.Configuration.CONTENT_TYPE);
+        String contentType = (String)outMsgCtxt.getProperty(Constants.Configuration.CONTENT_TYPE);
+        String encoding = omOutputFormat.getCharSetEncoding();
+        if (contentType == null) {
+            contentType = (String)outMsgCtxt.getProperty(Constants.Configuration.MESSAGE_TYPE);
+        }
+        if (encoding != null) {
+            contentType += "; charset=" + encoding;
+        }
+        return contentType;
     }
 
     public URL getTargetAddress(MessageContext messageContext, OMOutputFormat omOutputFormat, URL url) throws AxisFault {
