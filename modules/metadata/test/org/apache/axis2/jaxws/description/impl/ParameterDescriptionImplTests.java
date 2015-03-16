@@ -25,7 +25,11 @@ import org.apache.axis2.jaxws.description.ParameterDescription;
 import javax.xml.ws.Holder;
 import java.lang.reflect.Method;
 import java.util.List;
+import org.junit.FixMethodOrder;
+import org.junit.runners.MethodSorters;
 
+
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ParameterDescriptionImplTests extends TestCase {
 
     public void test1() {

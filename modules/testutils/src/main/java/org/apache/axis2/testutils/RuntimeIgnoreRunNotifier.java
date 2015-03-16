@@ -87,7 +87,7 @@ class RuntimeIgnoreRunNotifier extends RunNotifier {
     }
 
     @Override
-    public void testAborted(Description description, Throwable cause) {
-        target.testAborted(description, cause);
+    public void fireTestAssumptionFailed(Failure failure) {
+        target.fireTestAssumptionFailed(failure);
     }
 }
