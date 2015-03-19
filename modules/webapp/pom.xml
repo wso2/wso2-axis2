@@ -34,11 +34,11 @@
         <url>http://svn.apache.org/viewvc/axis/axis2/java/core/branches/1_6/modules/webapp</url>
     </scm-->
     <dependencies>
-        <dependency>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2-jibx</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.apache.axis2</groupId>-->
+            <!--<artifactId>axis2-jibx</artifactId>-->
+            <!--<version>${project.version}</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-java2wsdl</artifactId>

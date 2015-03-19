@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.axis2</groupId>
     <artifactId>axis2-parent</artifactId>
-    <version>1.6.1-wso2v12-SNAPSHOT</version>
+    <version>1.6.1-wso2v13-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Apache Axis2 - Parent</name>
     <inceptionYear>2004</inceptionYear>
@@ -68,7 +68,7 @@
     <properties>
         <neethi.version>2.0.4</neethi.version>
         <woden.version>1.0M9</woden.version>
-        <axiom.version>1.2.11-wso2v6-SNAPSHOT</axiom.version>
+        <axiom.version>1.2.11-wso2v6</axiom.version>
         <xmlschema.version>1.4.7.wso2v3</xmlschema.version>
         <ant.version>1.7.0</ant.version>
         <antlr.version>2.7.7</antlr.version>
