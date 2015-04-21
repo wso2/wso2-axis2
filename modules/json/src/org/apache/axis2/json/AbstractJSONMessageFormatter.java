@@ -105,7 +105,7 @@ public abstract class AbstractJSONMessageFormatter implements MessageFormatter {
                 jsonWriter = getJSONWriter(bytesOut, format);
                 //element.serializeAndConsume(jsonWriter);
                 Iterator elems = msgCtxt.getEnvelope().getBody().getChildElements();
-                serializeChildren(elems, jsonWriter);
+	            serializeChildren(elems, jsonWriter, false);
                 jsonWriter.writeEndDocument();
 
                 return bytesOut.toByteArray();
@@ -198,7 +198,7 @@ public abstract class AbstractJSONMessageFormatter implements MessageFormatter {
                 //element.serializeAndConsume(jsonWriter);
                 Iterator elems = msgCtxt.getEnvelope().getBody().getChildElements();
                 jsonWriter.writeStartDocument();
-                serializeChildren(elems, jsonWriter);
+	            serializeChildren(elems, jsonWriter, preserve);
                 jsonWriter.writeEndDocument();
             }
         } catch (IOException e) {
@@ -236,7 +236,7 @@ public abstract class AbstractJSONMessageFormatter implements MessageFormatter {
                     //dataOut.serializeAndConsume(jsonWriter);
                     Iterator elems = msgCtxt.getEnvelope().getBody().getChildElements();
                     jsonWriter.writeStartDocument();
-                    serializeChildren(elems, jsonWriter);
+	                serializeChildren(elems, jsonWriter, false);
                     jsonWriter.writeEndDocument();
                     jsonString = out.toString();
                 }
@@ -313,18 +313,19 @@ public abstract class AbstractJSONMessageFormatter implements MessageFormatter {
 	}
 
     /**
-     *
      * @param children  an Iterator to child elements.
      * @param jsonWriter
      * @throws XMLStreamException
      */
-    private void serializeChildren(Iterator children, XMLStreamWriter jsonWriter)
-            throws XMLStreamException {
-        OMElement child;
-        while (children.hasNext()) {
-            child = (OMElement) children.next();
-            child.serializeAndConsume(jsonWriter);
-            children.remove();
-        }
+    private void serializeChildren(Iterator children, XMLStreamWriter jsonWriter, boolean preserve)
+		    throws XMLStreamException {
+	    OMElement child;
+	    while (children.hasNext()) {
+		    child = (OMElement) children.next();
+		    child.serializeAndConsume(jsonWriter);
+		    if (!preserve) {
+			    children.remove();
+		    }
+	    }
     }
 }
