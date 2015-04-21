@@ -86,51 +86,51 @@ public abstract class AbstractJSONMessageFormatter implements MessageFormatter {
      */
 
     public byte[] getBytes(MessageContext msgCtxt, OMOutputFormat format) throws AxisFault {
-        OMElement element = msgCtxt.getEnvelope().getBody().getFirstElement();
-        //if the element is an OMSourcedElementImpl and it contains a JSONDataSource with
-        //correct convention, directly get the JSON string.
+	    OMElement element = msgCtxt.getEnvelope().getBody().getFirstElement();
+	    //if the element is an OMSourcedElementImpl and it contains a JSONDataSource with
+	    //correct convention, directly get the JSON string.
 
-        //remove indentation from XML message, else XML > JSON conversion will fail
-        reformatElement(msgCtxt.getEnvelope().getBody());
+	    //remove indentation from XML message, else XML > JSON conversion will fail
+	    reformatElement(msgCtxt.getEnvelope().getBody());
 
-        if (element instanceof OMSourcedElementImpl &&
-                getStringToWrite(((OMSourcedElementImpl)element).getDataSource()) != null) {
-            String jsonToWrite = getStringToWrite(((OMSourcedElementImpl)element).getDataSource());
-            return jsonToWrite.getBytes();
-            //otherwise serialize the OM by expanding the tree
-        } else {
-            XMLStreamWriter jsonWriter = null;
-            try {
-                ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
-                jsonWriter = getJSONWriter(bytesOut, format);
-                //element.serializeAndConsume(jsonWriter);
-                Iterator elems = msgCtxt.getEnvelope().getBody().getChildElements();
-	            serializeChildren(elems, jsonWriter, false);
-                jsonWriter.writeEndDocument();
+	    if (element instanceof OMSourcedElementImpl &&
+	        getStringToWrite(((OMSourcedElementImpl) element).getDataSource()) != null) {
+		    String jsonToWrite = getStringToWrite(((OMSourcedElementImpl) element).getDataSource());
+		    return jsonToWrite.getBytes();
+		    //otherwise serialize the OM by expanding the tree
+	    } else {
+		    XMLStreamWriter jsonWriter = null;
+		    try {
+			    ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
+			    jsonWriter = getJSONWriter(bytesOut, format);
+			    //element.serializeAndConsume(jsonWriter);
+			    Iterator elems = msgCtxt.getEnvelope().getBody().getChildElements();
+			    serializeChildren(elems, jsonWriter, false);
+			    jsonWriter.writeEndDocument();
 
-                return bytesOut.toByteArray();
+			    return bytesOut.toByteArray();
 
-            } catch (XMLStreamException e) {
-                throw AxisFault.makeFault(e);
-            } catch (FactoryConfigurationError e) {
-                throw AxisFault.makeFault(e);
-            } catch (IOException e) {
-                throw AxisFault.makeFault(e);
-            } catch (IllegalStateException e) {
-                throw new AxisFault(
-                        "Mapped formatted JSON with namespaces are not supported in Axis2. " +
-                                "Make sure that your request doesn't include namespaces or " +
-                                "use the Badgerfish convention");
-            } finally {
-                try {
-                    if (jsonWriter != null) {
-                        jsonWriter.close();
-                    }
-                } catch (XMLStreamException e) {
-                    //ignore
-                }
-            }
-        }
+		    } catch (XMLStreamException e) {
+			    throw AxisFault.makeFault(e);
+		    } catch (FactoryConfigurationError e) {
+			    throw AxisFault.makeFault(e);
+		    } catch (IOException e) {
+			    throw AxisFault.makeFault(e);
+		    } catch (IllegalStateException e) {
+			    throw new AxisFault(
+					    "Mapped formatted JSON with namespaces are not supported in Axis2. " +
+					    "Make sure that your request doesn't include namespaces or " +
+					    "use the Badgerfish convention");
+		    } finally {
+			    try {
+				    if (jsonWriter != null) {
+					    jsonWriter.close();
+				    }
+			    } catch (XMLStreamException e) {
+				    //ignore
+			    }
+		    }
+	    }
     }
 
     public String formatSOAPAction(MessageContext msgCtxt, OMOutputFormat format,
@@ -178,97 +178,96 @@ public abstract class AbstractJSONMessageFormatter implements MessageFormatter {
 
     public void writeTo(MessageContext msgCtxt, OMOutputFormat format,
                         OutputStream out, boolean preserve) throws AxisFault {
-        OMElement element = msgCtxt.getEnvelope().getBody().getFirstElement();
+	    OMElement element = msgCtxt.getEnvelope().getBody().getFirstElement();
 
-        //remove indentation from XML message, else XML > JSON conversion will fail
-        reformatElement(msgCtxt.getEnvelope().getBody());
-        try {
-            if (element instanceof OMSourcedElementImpl &&
-                    getStringToWrite(((OMSourcedElementImpl)element).getDataSource()) != null) {
-                String jsonToWrite =
-                        getStringToWrite(((OMSourcedElementImpl)element).getDataSource());
+	    //remove indentation from XML message, else XML > JSON conversion will fail
+	    reformatElement(msgCtxt.getEnvelope().getBody());
+	    try {
+		    if (element instanceof OMSourcedElementImpl &&
+		        getStringToWrite(((OMSourcedElementImpl) element).getDataSource()) != null) {
+			    String jsonToWrite =
+					    getStringToWrite(((OMSourcedElementImpl) element).getDataSource());
 
-                out.write(jsonToWrite.getBytes());
-            } else {
-                // On Http Delete JSON fails, CARBON-14946
-                if (element == null) {
-                    return;
-                }
-                XMLStreamWriter jsonWriter = getJSONWriter(out, format);
-                //element.serializeAndConsume(jsonWriter);
-                Iterator elems = msgCtxt.getEnvelope().getBody().getChildElements();
-                jsonWriter.writeStartDocument();
-	            serializeChildren(elems, jsonWriter, preserve);
-                jsonWriter.writeEndDocument();
-            }
-        } catch (IOException e) {
-            throw AxisFault.makeFault(e);
-        } catch (XMLStreamException e) {
-            throw AxisFault.makeFault(e);
-        } catch (IllegalStateException e) {
-            throw new AxisFault(
-                    "Mapped formatted JSON with namespaces are not supported in Axis2. " +
-                            "Make sure that your request doesn't include namespaces or " +
-                            "use the Badgerfish convention");
-        }
+			    out.write(jsonToWrite.getBytes());
+		    } else {
+			    // On Http Delete JSON fails, CARBON-14946
+			    if (element == null) {
+				    return;
+			    }
+			    XMLStreamWriter jsonWriter = getJSONWriter(out, format);
+			    //element.serializeAndConsume(jsonWriter);
+			    Iterator elems = msgCtxt.getEnvelope().getBody().getChildElements();
+			    jsonWriter.writeStartDocument();
+			    serializeChildren(elems, jsonWriter, preserve);
+			    jsonWriter.writeEndDocument();
+		    }
+	    } catch (IOException e) {
+		    throw AxisFault.makeFault(e);
+	    } catch (XMLStreamException e) {
+		    throw AxisFault.makeFault(e);
+	    } catch (IllegalStateException e) {
+		    throw new AxisFault(
+				    "Mapped formatted JSON with namespaces are not supported in Axis2. " +
+				    "Make sure that your request doesn't include namespaces or " +
+				    "use the Badgerfish convention");
+	    }
     }
 
-    public URL getTargetAddress(MessageContext msgCtxt, OMOutputFormat format, URL targetURL)
-            throws AxisFault {
+	public URL getTargetAddress(MessageContext msgCtxt, OMOutputFormat format, URL targetURL)
+			throws AxisFault {
 
-        String httpMethod =
-                (String)msgCtxt.getProperty(Constants.Configuration.HTTP_METHOD);
-        OMElement dataOut = msgCtxt.getEnvelope().getBody().getFirstElement();
-        reformatElement(msgCtxt.getEnvelope().getBody());
-        //if the http method is GET, send the json string as a parameter
-        if (dataOut != null && (httpMethod != null)
-                && Constants.Configuration.HTTP_METHOD_GET.equalsIgnoreCase(httpMethod)) {
-            XMLStreamWriter jsonWriter = null;
-            try {
-                String jsonString;
-                if (dataOut instanceof OMSourcedElementImpl && getStringToWrite(
-                        ((OMSourcedElementImpl) dataOut).getDataSource()) != null) {
-                    jsonString = getStringToWrite(((OMSourcedElementImpl)
-                            dataOut).getDataSource());
-                } else {
-                    StringWriter out = new StringWriter();
-                    jsonWriter = getJSONWriter(out);
-                    //dataOut.serializeAndConsume(jsonWriter);
-                    Iterator elems = msgCtxt.getEnvelope().getBody().getChildElements();
-                    jsonWriter.writeStartDocument();
-	                serializeChildren(elems, jsonWriter, false);
-                    jsonWriter.writeEndDocument();
-                    jsonString = out.toString();
-                }
-                jsonString = URIEncoderDecoder.quoteIllegal(jsonString,
-                        WSDL2Constants.LEGAL_CHARACTERS_IN_URL);
-                String param = "query=" + jsonString;
-                String returnURLFile = targetURL.getFile() + "?" + param;
+		String httpMethod =
+				(String) msgCtxt.getProperty(Constants.Configuration.HTTP_METHOD);
+		OMElement dataOut = msgCtxt.getEnvelope().getBody().getFirstElement();
+		reformatElement(msgCtxt.getEnvelope().getBody());
+		//if the http method is GET, send the json string as a parameter
+		if (dataOut != null && (httpMethod != null)
+		    && Constants.Configuration.HTTP_METHOD_GET.equalsIgnoreCase(httpMethod)) {
+			XMLStreamWriter jsonWriter = null;
+			try {
+				String jsonString;
+				if (dataOut instanceof OMSourcedElementImpl && getStringToWrite(
+						((OMSourcedElementImpl) dataOut).getDataSource()) != null) {
+					jsonString = getStringToWrite(((OMSourcedElementImpl)
+							dataOut).getDataSource());
+				} else {
+					StringWriter out = new StringWriter();
+					jsonWriter = getJSONWriter(out);
+					//dataOut.serializeAndConsume(jsonWriter);
+					Iterator elems = msgCtxt.getEnvelope().getBody().getChildElements();
+					jsonWriter.writeStartDocument();
+					serializeChildren(elems, jsonWriter, false);
+					jsonWriter.writeEndDocument();
+					jsonString = out.toString();
+				}
+				jsonString = URIEncoderDecoder.quoteIllegal(jsonString,
+				                                            WSDL2Constants.LEGAL_CHARACTERS_IN_URL);
+				String param = "query=" + jsonString;
+				String returnURLFile = targetURL.getFile() + "?" + param;
 
-
-                return new URL(targetURL.getProtocol(), targetURL.getHost(),
-                        targetURL.getPort(), returnURLFile);
-            } catch (MalformedURLException e) {
-                throw AxisFault.makeFault(e);
-            } catch (XMLStreamException e) {
-                throw AxisFault.makeFault(e);
-            } catch (UnsupportedEncodingException e) {
-                throw AxisFault.makeFault(e);
-            } catch (IOException e) {
-                throw AxisFault.makeFault(e);
-            } finally {
-                if (jsonWriter != null) {
-                    try {
-                        jsonWriter.close();
-                    } catch (XMLStreamException e) {
-                        //ignore
-                    }
-                }
-            }
-        } else {
-            return targetURL;
-        }
-    }
+				return new URL(targetURL.getProtocol(), targetURL.getHost(),
+				               targetURL.getPort(), returnURLFile);
+			} catch (MalformedURLException e) {
+				throw AxisFault.makeFault(e);
+			} catch (XMLStreamException e) {
+				throw AxisFault.makeFault(e);
+			} catch (UnsupportedEncodingException e) {
+				throw AxisFault.makeFault(e);
+			} catch (IOException e) {
+				throw AxisFault.makeFault(e);
+			} finally {
+				if (jsonWriter != null) {
+					try {
+						jsonWriter.close();
+					} catch (XMLStreamException e) {
+						//ignore
+					}
+				}
+			}
+		} else {
+			return targetURL;
+		}
+	}
 
     private void reformatElement(OMElement elem) {
 		removeIndentations(elem);
