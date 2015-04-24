@@ -697,14 +697,17 @@ public class GsonXMLStreamReader implements XMLStreamReader {
     private String nextValue() {
         try {
             tokenType = jsonReader.peek();
-
+            JsonObject peek = stackObj.peek();
+            String valueType = peek.getValueType();
+            if (!checkWhetherValueTypesMatch(tokenType, valueType)) {
+                log.error("Value type miss match, Expected value type - '" + valueType + "', but found - '" + tokenType.toString()+"'");
+                throw new IllegalStateException("Value type miss match, Expected value type - '" + valueType + "', but found - '" + tokenType.toString()+"'");
+            }
             if (tokenType == JsonToken.STRING) {
                 value = jsonReader.nextString();
             } else if (tokenType == JsonToken.BOOLEAN) {
                 value = String.valueOf(jsonReader.nextBoolean());
             } else if (tokenType == JsonToken.NUMBER) {
-                JsonObject peek = stackObj.peek();
-                String valueType = peek.getValueType();
                 if (valueType.equals("int")) {
                     value = String.valueOf(jsonReader.nextInt());
                 } else if (valueType.equals("long")) {
@@ -726,6 +729,26 @@ public class GsonXMLStreamReader implements XMLStreamReader {
             throw new RuntimeException("IO error while reading json stream");
         }
         return value;
+    }
+
+    /**
+     * this method is to check whether input json type matches with the types specified in the schema
+     *
+     * @param tokenType
+     * @param expectedType
+     * @return true if it matches false otherwise
+     */
+    private boolean checkWhetherValueTypesMatch(JsonToken tokenType, String expectedType) {
+        if (expectedType.equalsIgnoreCase(tokenType.toString())) {
+            return true;
+        } else if (tokenType == JsonToken.NULL) {
+            return true;
+        } else if (tokenType == JsonToken.NUMBER) {
+            if (expectedType.equals("int") || expectedType.equals("long") || expectedType.equals("double") || expectedType.equals("float")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void beginObject() throws IOException {
