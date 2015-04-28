@@ -30,7 +30,8 @@ import org.apache.axis2.json.gson.rpc.JsonInOnlyRPCMessageReceiver;
 import org.apache.axis2.json.gson.rpc.JsonRpcMessageReceiver;
 import org.apache.axis2.json.gson.factory.JsonConstant;
 import org.apache.axis2.wsdl.WSDLConstants;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.ws.commons.schema.XmlSchema;
 
 import javax.xml.namespace.QName;
@@ -38,7 +39,7 @@ import java.util.List;
 
 
 public class JSONMessageHandler extends AbstractHandler {
-    Logger log = Logger.getLogger(JSONMessageHandler.class);
+    private static final Log log = LogFactory.getLog(JSONMessageHandler.class);
     /**
      * This method will be called on each registered handler when a message
      * needs to be processed.  If the message processing is paused by the
