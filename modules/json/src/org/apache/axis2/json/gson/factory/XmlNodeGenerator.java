@@ -44,6 +44,7 @@ public class XmlNodeGenerator {
     private XmlNode mainXmlNode;
 
     Queue<JsonObject> queue = new LinkedList<JsonObject>();
+    List<JsonObject> schemaList = new LinkedList<JsonObject>();
 
     public XmlNodeGenerator(List<XmlSchema> xmlSchemaList, QName elementQname) {
         this.xmlSchemaList = xmlSchemaList;
@@ -57,8 +58,8 @@ public class XmlNodeGenerator {
         // get the operation schema and process.
         XmlSchema operationSchema = getXmlSchema(elementQname);
         XmlSchemaElement messageElement = operationSchema.getElementByName(elementQname.getLocalPart());
-        mainXmlNode = new XmlNode(elementQname.getLocalPart(), elementQname.getNamespaceURI() , false, (messageElement.getMaxOccurs() != 1) , "");
-
+        mainXmlNode = new XmlNode(elementQname.getLocalPart(), elementQname.getNamespaceURI(), false,
+                                  (messageElement.getMaxOccurs() != 1), "");
         QName messageSchemaTypeName = messageElement.getSchemaTypeName();
         XmlSchemaType schemaType;
         XmlSchema schemaOfType;
@@ -82,14 +83,15 @@ public class XmlNodeGenerator {
         }
     }
 
-    private void processElement(XmlSchemaElement element, XmlNode parentNode , XmlSchema schema) {
+    private void processElement(XmlSchemaElement element, XmlNode parentNode, XmlSchema schema) {
         String targetNamespace = schema.getTargetNamespace();
         XmlNode xmlNode;
         QName schemaTypeName = element.getSchemaTypeName();
         XmlSchemaType schemaType = element.getSchemaType();
         QName refName = element.getRefName();
         if (schemaTypeName != null) {
-            xmlNode = new XmlNode(element.getName(), targetNamespace, false, (element.getMaxOccurs() != 1), schemaTypeName.getLocalPart());
+            xmlNode = new XmlNode(element.getName(), targetNamespace, false, (element.getMaxOccurs() != 1),
+                                  schemaTypeName.getLocalPart());
             xmlNode.setMinOccurs(element.getMinOccurs());
             parentNode.addChildToList(xmlNode);
             if (("http://www.w3.org/2001/XMLSchema").equals(schemaTypeName.getNamespaceURI())) {
@@ -100,18 +102,20 @@ public class XmlNodeGenerator {
                 if (childSchemaType == null) {
                     schemaOfType = getXmlSchema(schemaTypeName);
                     childSchemaType = schemaOfType.getTypeByName(schemaTypeName.getLocalPart());
-                }else{
+                } else {
                     schemaOfType = schema;
                 }
                 processSchemaType(childSchemaType, xmlNode, schemaOfType);
             }
-        }else if (schemaType != null) {
-            xmlNode = new XmlNode(element.getName(), targetNamespace, false, (element.getMaxOccurs() != 1), schemaType.getQName().getLocalPart());
+        } else if (schemaType != null) {
+            xmlNode = new XmlNode(element.getName(), targetNamespace, false, (element.getMaxOccurs() != 1),
+                                  schemaType.getQName().getLocalPart());
             xmlNode.setMinOccurs(element.getMinOccurs());
             parentNode.addChildToList(xmlNode);
             processSchemaType(schemaType, xmlNode, schema);
-        }else if (refName != null) {
-            xmlNode = new XmlNode(refName.getLocalPart(), targetNamespace, false, (element.getMaxOccurs() != 1), refName.getLocalPart());
+        } else if (refName != null) {
+            xmlNode = new XmlNode(refName.getLocalPart(), targetNamespace, false, (element.getMaxOccurs() != 1),
+                                  refName.getLocalPart());
             parentNode.addChildToList(xmlNode);
             if (("http://www.w3.org/2001/XMLSchema").equals(refName.getNamespaceURI())) {
             } else {
@@ -164,7 +168,6 @@ public class XmlNodeGenerator {
         }
     }
 
-
     private XmlSchema getXmlSchema(QName qName) {
         for (XmlSchema xmlSchema : xmlSchemaList) {
             if (xmlSchema.getTargetNamespace().equals(qName.getNamespaceURI())) {
@@ -177,23 +180,27 @@ public class XmlNodeGenerator {
     private void generateQueue(XmlNode node) {
         if (node.isArray()) {
             if (node.getChildrenList().size() > 0) {
-                JsonObject obj = new JsonObject(node.getName(), JSONType.NESTED_ARRAY, node.getValueType() , node.getNamespaceUri());
+                JsonObject obj = new JsonObject(node.getName(), JSONType.NESTED_ARRAY, node.getValueType(),
+                                                node.getNamespaceUri());
                 obj.setMinOccurs(node.getMinOccurs());
                 queue.add(obj);
                 processXmlNodeChildren(node.getChildrenList());
             } else {
-                JsonObject obj = new JsonObject(node.getName(), JSONType.ARRAY , node.getValueType() , node.getNamespaceUri());
+                JsonObject obj =
+                        new JsonObject(node.getName(), JSONType.ARRAY, node.getValueType(), node.getNamespaceUri());
                 obj.setMinOccurs(node.getMinOccurs());
                 queue.add(obj);
             }
         } else {
             if (node.getChildrenList().size() > 0) {
-                JsonObject obj = new JsonObject(node.getName(), JSONType.NESTED_OBJECT, node.getValueType() , node.getNamespaceUri());
+                JsonObject obj = new JsonObject(node.getName(), JSONType.NESTED_OBJECT, node.getValueType(),
+                                                node.getNamespaceUri());
                 obj.setMinOccurs(node.getMinOccurs());
                 queue.add(obj);
                 processXmlNodeChildren(node.getChildrenList());
             } else {
-                JsonObject obj = new JsonObject(node.getName(), JSONType.OBJECT , node.getValueType() , node.getNamespaceUri());
+                JsonObject obj =
+                        new JsonObject(node.getName(), JSONType.OBJECT, node.getValueType(), node.getNamespaceUri());
                 obj.setMinOccurs(node.getMinOccurs());
                 queue.add(obj);
             }
@@ -206,6 +213,41 @@ public class XmlNodeGenerator {
         }
     }
 
+    private void generateSchemaList(XmlNode node) {
+        if (node.isArray()) {
+            if (node.getChildrenList().size() > 0) {
+                JsonObject obj = new JsonObject(node.getName(), JSONType.NESTED_ARRAY, node.getValueType(),
+                                                node.getNamespaceUri());
+                obj.setMinOccurs(node.getMinOccurs());
+                schemaList.add(obj);
+                processXmlNodeChildrenSchemaList(node.getChildrenList());
+            } else {
+                JsonObject obj =
+                        new JsonObject(node.getName(), JSONType.ARRAY, node.getValueType(), node.getNamespaceUri());
+                obj.setMinOccurs(node.getMinOccurs());
+                schemaList.add(obj);
+            }
+        } else {
+            if (node.getChildrenList().size() > 0) {
+                JsonObject obj = new JsonObject(node.getName(), JSONType.NESTED_OBJECT, node.getValueType(),
+                                                node.getNamespaceUri());
+                obj.setMinOccurs(node.getMinOccurs());
+                schemaList.add(obj);
+                processXmlNodeChildrenSchemaList(node.getChildrenList());
+            } else {
+                JsonObject obj =
+                        new JsonObject(node.getName(), JSONType.OBJECT, node.getValueType(), node.getNamespaceUri());
+                obj.setMinOccurs(node.getMinOccurs());
+                schemaList.add(obj);
+            }
+        }
+    }
+
+    private void processXmlNodeChildrenSchemaList(List<XmlNode> childrenNodes) {
+        for (XmlNode childrenNode : childrenNodes) {
+            generateSchemaList(childrenNode);
+        }
+    }
 
     public XmlNode getMainXmlNode() {
         if (mainXmlNode == null) {
@@ -219,4 +261,8 @@ public class XmlNodeGenerator {
         return queue;
     }
 
+    public List<JsonObject> getSchemaList(XmlNode node) {
+        generateSchemaList(node);
+        return schemaList;
+    }
 }
