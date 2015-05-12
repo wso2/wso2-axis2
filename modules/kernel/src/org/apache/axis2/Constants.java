@@ -112,6 +112,7 @@ public class Constants extends org.apache.axis2.namespace.Constants {
     public static final String TRANSPORT_LOCAL = "local";
     public static final String TRANSPORT_JMS = "jms";
     public static final String TRANSPORT_VFS = "vfs";
+    public static final String TRANSPORT_RABBITMQ = "rabbitmq";
 
     /**
      * Field TRANSPORT_HTTP
