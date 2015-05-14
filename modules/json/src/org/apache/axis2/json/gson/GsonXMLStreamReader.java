@@ -70,12 +70,17 @@ public class GsonXMLStreamReader implements XMLStreamReader {
 
     private List<XmlSchema> xmlSchemaList;
 
-    private Queue<JsonObject> queue = new LinkedList<JsonObject>();
+    private List<JsonObject> schemaList = new LinkedList<JsonObject>();
+    private boolean skipSchemaListElement = false;
+    private int schemaListPointer = 0;
+
+    private List<JsonObject> miniList = new LinkedList<JsonObject>();
+    private boolean skipMiniListElement = false;
+    private int miniListPointer = 0;
 
     private XmlNodeGenerator xmlNodeGenerator;
 
     private Stack<JsonObject> stackObj = new Stack<JsonObject>();
-    private Stack<JsonObject> miniStack = new Stack<JsonObject>();
     private JsonObject topNestedArrayObj = null;
     private Stack<JsonObject> processedJsonObject = new Stack<JsonObject>();
 
@@ -144,11 +149,11 @@ public class GsonXMLStreamReader implements XMLStreamReader {
             XmlNode requesNode = nodeMap.get(elementQname);
             if (requesNode != null) {
                 xmlNodeGenerator = new XmlNodeGenerator();
-                queue = xmlNodeGenerator.getQueue(requesNode);
+                schemaList = xmlNodeGenerator.getSchemaList(requesNode);
             } else {
                 xmlNodeGenerator = new XmlNodeGenerator(xmlSchemaList, elementQname);
                 mainXmlNode = xmlNodeGenerator.getMainXmlNode();
-                queue = xmlNodeGenerator.getQueue(mainXmlNode);
+                schemaList = xmlNodeGenerator.getSchemaList(mainXmlNode);
                 nodeMap.put(elementQname, mainXmlNode);
                 configContext.setProperty(JsonConstant.XMLNODES, nodeMap);
             }
@@ -156,13 +161,12 @@ public class GsonXMLStreamReader implements XMLStreamReader {
             Map<QName, XmlNode> newNodeMap = new HashMap<QName, XmlNode>();
             xmlNodeGenerator = new XmlNodeGenerator(xmlSchemaList, elementQname);
             mainXmlNode = xmlNodeGenerator.getMainXmlNode();
-            queue = xmlNodeGenerator.getQueue(mainXmlNode);
+            schemaList = xmlNodeGenerator.getSchemaList(mainXmlNode);
             newNodeMap.put(elementQname, mainXmlNode);
             configContext.setProperty(JsonConstant.XMLNODES, newNodeMap);
         }
         isProcessed = true;
     }
-
 
     public Object getProperty(String name) throws IllegalArgumentException {
         return null;
@@ -555,7 +559,7 @@ public class GsonXMLStreamReader implements XMLStreamReader {
             readName();
         } else if (state == JsonState.EndObjectBeginObject_END) {
             state = JsonState.EndObjectBeginObject_START;
-            fillMiniStack();
+            fillMiniList();
         } else if (state == JsonState.EndObjectBeginObject_START) {
             readBeginObject();
         } else if (state == JsonState.EndArrayEndObject) {
@@ -589,11 +593,12 @@ public class GsonXMLStreamReader implements XMLStreamReader {
         }
     }
 
-    private void fillMiniStack() {
-        miniStack.clear();
+    private void fillMiniList() {
+        miniList.clear();
+        skipMiniListElement = false;
         JsonObject nestedArray = stackObj.peek();
         while (!processedJsonObject.peek().equals(nestedArray)) {
-            miniStack.push(processedJsonObject.pop());
+            miniList.add(0, processedJsonObject.pop());
         }
     }
 
@@ -670,27 +675,55 @@ public class GsonXMLStreamReader implements XMLStreamReader {
 
     private void nextName() throws IOException, XMLStreamException {
         String name = jsonReader.nextName();
-        if (!miniStack.empty()) {
-            JsonObject jsonObj = miniStack.peek();
-            if (jsonObj.getName().equals(name)) {
-                namespace = jsonObj.getNamespaceUri();
-                stackObj.push(miniStack.pop());
-            } else {
-                throw new XMLStreamException(JsonConstant.IN_JSON_MESSAGE_NOT_VALID + "expected : " + jsonObj.getName() + " but found : " + name);
-            }
-        } else if (!queue.isEmpty()) {
-            JsonObject jsonObj = queue.peek();
-            if (jsonObj.getName().equals(name)) {
-                namespace = jsonObj.getNamespaceUri();
-                stackObj.push(queue.poll());
-            } else {
-                throw new XMLStreamException(JsonConstant.IN_JSON_MESSAGE_NOT_VALID + "expected : " + jsonObj.getName() + " but found : " + name);
+        boolean isElementExists = false;
+        if (!miniList.isEmpty()) {
+            while (!isElementExists && (miniListPointer < miniList.size() || skipMiniListElement)) {
+                if (miniListPointer >= miniList.size()) {
+                    skipMiniListElement = false;
+                    miniListPointer = 0;
+                }
+                JsonObject jsonObject = miniList.get(miniListPointer);
+                if (jsonObject.getName().equals(name)) {
+                    isElementExists = true;
+                    namespace = jsonObject.getNamespaceUri();
+                    stackObj.push(jsonObject);
+                    miniList.remove(miniListPointer);
+                    if (miniListPointer > 0)
+                        skipMiniListElement = true;
+                } else {
+                    ++miniListPointer;
+                }
+                if (miniListPointer > miniList.size() && isElementExists) {
+                    throw new XMLStreamException(
+                            JsonConstant.IN_JSON_MESSAGE_NOT_VALID + name + " does not exist in schema");
+                }
             }
         } else {
-            throw new XMLStreamException(JsonConstant.IN_JSON_MESSAGE_NOT_VALID);
+            if (!schemaList.isEmpty()) {
+                while (!isElementExists && (schemaListPointer < schemaList.size() || skipSchemaListElement)) {
+                    if (schemaListPointer >= schemaList.size()) {
+                        skipSchemaListElement = false;
+                        schemaListPointer = 0;
+                    }
+                    JsonObject jsonObject = schemaList.get(schemaListPointer);
+                    if (jsonObject.getName().equals(name)) {
+                        isElementExists = true;
+                        namespace = jsonObject.getNamespaceUri();
+                        stackObj.push(jsonObject);
+                        schemaList.remove(schemaListPointer);
+                        if (schemaListPointer > 0)
+                            skipSchemaListElement = true;
+                    } else {
+                        ++schemaListPointer;
+                    }
+                }
+                if (schemaListPointer > schemaList.size() && !isElementExists) {
+                    throw new XMLStreamException(
+                            JsonConstant.IN_JSON_MESSAGE_NOT_VALID + name + " does not exist in schema");
+                }
+            }
         }
-
-        localName = stackObj.peek().getName();
+        localName = name;
         value = null;
     }
 
