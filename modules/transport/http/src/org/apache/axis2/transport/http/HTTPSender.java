@@ -293,8 +293,8 @@ public class HTTPSender extends AbstractHTTPSender {
             msgContext.setProperty(HTTPConstants.HTTP_METHOD, method);
             processResponse(method, msgContext);
         } else if (!errorCodes.contains(statusCode)
-                    && (statusCode == HttpStatus.SC_INTERNAL_SERVER_ERROR
-                            || statusCode == HttpStatus.SC_BAD_REQUEST || statusCode == HttpStatus.SC_CONFLICT)) {
+                && (statusCode == HttpStatus.SC_INTERNAL_SERVER_ERROR
+                        || statusCode == HttpStatus.SC_BAD_REQUEST || statusCode == HttpStatus.SC_CONFLICT)) {
             // Save the HttpMethod so that we can release the connection when cleaning up
             msgContext.setProperty(HTTPConstants.HTTP_METHOD, method);
             Header contenttypeHeader =
