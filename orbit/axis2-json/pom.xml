@@ -62,7 +62,7 @@
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-json</artifactId>
-            <version>${version.axis2}</version>
+            <version>${version.axis2.json}</version>
             <optional>true</optional>
             <exclusions>
                 <exclusion>
@@ -109,7 +109,7 @@
         </plugins>
     </build>
     <properties>
-        <version.axis2>1.6.1-wso2v13-SNAPSHOT</version.axis2>
-        <exp.pkg.version.axis2>1.6.1.wso2v13-SNAPSHOT</exp.pkg.version.axis2>
+        <version.axis2.json>1.6.2-wso2v13-SNAPSHOT</version.axis2.json>
+        <exp.pkg.version.axis2>1.6.2.wso2v13-SNAPSHOT</exp.pkg.version.axis2>
     </properties>
 </project>

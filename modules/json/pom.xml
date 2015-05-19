@@ -28,14 +28,14 @@
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
     <artifactId>axis2-json</artifactId>
-    <version>1.6.1-wso2v13-SNAPSHOT</version>
+    <version>1.6.2-wso2v13-SNAPSHOT</version>
     <name>Apache Axis2 - JSON</name>
     <description>Axis2 JSON module</description>
     <dependencies>
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-kernel</artifactId>
-            <version>${project.version}</version>
+            <version>${version.axis2}</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jettison</groupId>
@@ -44,12 +44,12 @@
          <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-transport-http</artifactId>
-            <version>${project.version}</version>
+            <version>${version.axis2}</version>
         </dependency>
          <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-transport-local</artifactId>
-            <version>${project.version}</version>
+            <version>${version.axis2}</version>
         </dependency>
         <dependency>
             <groupId>xmlunit</groupId>
@@ -59,13 +59,13 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>axis2-testutils</artifactId>
-            <version>${project.version}</version>
+            <version>${version.axis2}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>axis2-adb</artifactId>
-            <version>${project.version}</version>
+            <version>${version.axis2}</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -74,7 +74,7 @@
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>axis2-adb-codegen</artifactId>
-            <version>${project.version}</version>
+            <version>${version.axis2}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -101,7 +101,7 @@
                         </goals>
                         <configuration>
                             <resourceBundles>
-                                <resourceBundle>org.apache.axis2:axis2-resource-bundle:${project.version}</resourceBundle>
+                                <resourceBundle>org.apache.axis2:axis2-resource-bundle:${version.axis2}</resourceBundle>
                             </resourceBundles>
                         </configuration>
                     </execution>
@@ -172,4 +172,9 @@
             </plugin>
         </plugins>
     </build>
+
+    <properties>
+        <version.axis2>1.6.1-wso2v13-SNAPSHOT</version.axis2>
+    </properties>
+
 </project>
