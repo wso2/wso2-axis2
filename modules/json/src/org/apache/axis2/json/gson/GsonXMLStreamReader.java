@@ -22,7 +22,11 @@ package org.apache.axis2.json.gson;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.json.gson.factory.*;
+import org.apache.axis2.json.gson.factory.JSONType;
+import org.apache.axis2.json.gson.factory.JsonConstant;
+import org.apache.axis2.json.gson.factory.JsonObject;
+import org.apache.axis2.json.gson.factory.XmlNode;
+import org.apache.axis2.json.gson.factory.XmlNodeGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.commons.schema.XmlSchema;
@@ -33,7 +37,12 @@ import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Stack;
 
 
 public class GsonXMLStreamReader implements XMLStreamReader {
