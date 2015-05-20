@@ -22,11 +22,7 @@ package org.apache.axis2.json.gson;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.json.gson.factory.JSONType;
-import org.apache.axis2.json.gson.factory.JsonConstant;
-import org.apache.axis2.json.gson.factory.JsonObject;
-import org.apache.axis2.json.gson.factory.XmlNode;
-import org.apache.axis2.json.gson.factory.XmlNodeGenerator;
+import org.apache.axis2.json.gson.factory.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.commons.schema.XmlSchema;
@@ -37,13 +33,7 @@ import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Queue;
-import java.util.Stack;
+import java.util.*;
 
 
 public class GsonXMLStreamReader implements XMLStreamReader {
@@ -730,14 +720,20 @@ public class GsonXMLStreamReader implements XMLStreamReader {
     private String nextValue() {
         try {
             tokenType = jsonReader.peek();
-
+            JsonObject peek = stackObj.peek();
+            String valueType = peek.getValueType();
+            if (!validateArgumentTypes(tokenType, valueType)) {
+                log.error("Value type miss match, Expected value type - '" + valueType + "', but found - '" + tokenType
+                        .toString() + "'");
+                throw new IllegalArgumentException(
+                        "Value type miss match, Expected value type - '" + valueType + "', but found - '" + tokenType
+                                .toString() + "'");
+            }
             if (tokenType == JsonToken.STRING) {
                 value = jsonReader.nextString();
             } else if (tokenType == JsonToken.BOOLEAN) {
                 value = String.valueOf(jsonReader.nextBoolean());
             } else if (tokenType == JsonToken.NUMBER) {
-                JsonObject peek = stackObj.peek();
-                String valueType = peek.getValueType();
                 if (valueType.equals("int")) {
                     value = String.valueOf(jsonReader.nextInt());
                 } else if (valueType.equals("long")) {
@@ -759,6 +755,27 @@ public class GsonXMLStreamReader implements XMLStreamReader {
             throw new RuntimeException("IO error while reading json stream");
         }
         return value;
+    }
+
+    /**
+     * this method is to check whether input json type matches with the types specified in the schema
+     *
+     * @param tokenType
+     * @param expectedType
+     * @return true if it matches false otherwise
+     */
+    private boolean validateArgumentTypes(JsonToken tokenType, String expectedType) {
+        if (expectedType.equalsIgnoreCase(tokenType.toString())) {
+            return true;
+        } else if (tokenType == JsonToken.NULL) {
+            return true;
+        } else if (tokenType == JsonToken.NUMBER) {
+            if (expectedType.equals("int") || expectedType.equals("long") || expectedType.equals("double")
+                    || expectedType.equals("float")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void beginObject() throws IOException {
