@@ -87,7 +87,7 @@ public class JsonFormatter implements MessageFormatter {
                 QName elementQname = outMsgCtxt.getAxisOperation().getMessage
                         (WSDLConstants.MESSAGE_LABEL_OUT_VALUE).getElementQName();
 
-                ArrayList<XmlSchema> schemas = outMsgCtxt.getAxisService().getSchema();
+                ArrayList<XmlSchema> schemas = outMsgCtxt.getAxisOperation().getAxisService().getSchema();
                 GsonXMLStreamWriter xmlsw = new GsonXMLStreamWriter(jsonWriter,
                                                                     elementQname,
                                                                     schemas,
