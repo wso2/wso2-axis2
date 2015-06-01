@@ -67,7 +67,11 @@ public class XmlNodeGenerator {
             schemaType = operationSchema.getTypeByName(messageSchemaTypeName);
             if (schemaType == null) {
                 schemaOfType = getXmlSchema(messageSchemaTypeName);
-                schemaType = schemaOfType.getTypeByName(messageSchemaTypeName.getLocalPart());
+                /* When sending a response as a simple type element, schemaOfType will set as null from getXmlSchema
+                method. therefore this IF statement is added to avoid the NPE. */
+                if (schemaOfType != null) {
+                    schemaType = schemaOfType.getTypeByName(messageSchemaTypeName.getLocalPart());
+                }
             } else {
                 schemaOfType = operationSchema;
             }
