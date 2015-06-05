@@ -54,6 +54,7 @@ import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PushbackInputStream;
 import java.net.SocketException;
 import java.util.Iterator;
 import java.util.Map;
@@ -254,8 +255,12 @@ public class HTTPTransportUtils {
                     .equals(headers.get(HTTPConstants.HEADER_CONTENT_ENCODING)) ||
                     HTTPConstants.COMPRESSION_GZIP.equals(headers.get(
                             HTTPConstants.HEADER_CONTENT_ENCODING_LOWERCASE))) {
-                    in = new GZIPInputStream(in);
-
+                PushbackInputStream pushbackInputStream = new PushbackInputStream(in);
+                int bytesRead = pushbackInputStream.read();
+                if (bytesRead != -1) {
+                    pushbackInputStream.unread(bytesRead);
+                    return new GZIPInputStream(pushbackInputStream);
+                }
             }
         }
         return in;
