@@ -69,13 +69,11 @@ public class SOAPBuilder implements Builder {
                         .validateSOAPVersion(BuilderUtil.getEnvelopeNamespace(contentType), envelope);
                 BuilderUtil.validateCharSetEncoding(charSetEncoding, builder.getDocument()
                         .getCharsetEncoding(), envelope.getNamespace().getNamespaceURI());
-
             } else {
                 if (contentType != null) {
                     if (contentType.indexOf(SOAP12Constants.SOAP_12_CONTENT_TYPE) > -1) {
                         soapFactory = OMAbstractFactory.getSOAP12Factory();
-                    } else if (contentType
-                            .indexOf(SOAP11Constants.SOAP_11_CONTENT_TYPE) > -1 || isRESTRequest(contentType)) {
+                    } else if (contentType.indexOf(SOAP11Constants.SOAP_11_CONTENT_TYPE) > -1 || isRESTRequest(contentType)) {
                         soapFactory = OMAbstractFactory.getSOAP11Factory();
                     }
                 }
