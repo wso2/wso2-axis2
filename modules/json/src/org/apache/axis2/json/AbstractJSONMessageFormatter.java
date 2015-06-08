@@ -289,7 +289,7 @@ public abstract class AbstractJSONMessageFormatter implements MessageFormatter {
 	}
 
 	private void removeNamespaces(OMElement elem, boolean processAttrbs) {
-		OMFactory omFactory = OMAbstractFactory.getOMFactory();
+		OMFactory omFactory = elem.getOMFactory();
         OMNamespace ns = elem.getNamespace();
         String prefix;
         if (ns != null) {
