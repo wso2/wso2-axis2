@@ -336,10 +336,15 @@ public class AxisService2WSDL11 implements Java2WSDLConstants {
 				} else {
 					messagePart.addAttribute(ATTRIBUTE_NAME, axismessage.getPartName(), null);
 				}
-				messagePart.addAttribute(ELEMENT_ATTRIBUTE_NAME,
-						WSDLSerializationUtil.getPrefix(schemaElementName.getNamespaceURI(),
-                                                        axisService.getNamespaceMap())
-								+ ":" + schemaElementName.getLocalPart(), null);
+				String namespacePrefix = WSDLSerializationUtil
+						.getPrefix(schemaElementName.getNamespaceURI(), axisService.getNamespaceMap());
+				if (namespacePrefix != null) {
+					namespacePrefix += ":";
+				} else {
+					namespacePrefix = "";
+				}
+				messagePart
+						.addAttribute(ELEMENT_ATTRIBUTE_NAME, namespacePrefix + schemaElementName.getLocalPart(), null);
 			}
 		}
 
