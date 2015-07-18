@@ -823,8 +823,12 @@ public class AxisServlet extends HttpServlet {
 
         public void processXMLRequest() throws IOException, ServletException {
             try {
-                RESTUtil.processXMLRequest(messageContext, request.getInputStream(),
-                        response.getOutputStream(), request.getContentType());
+                /* We don't need contentType for GET Methods */
+                if (request.getMethod().equals(HTTPConstants.HEADER_GET)) {
+                    RESTUtil.processURLRequest(messageContext, response.getOutputStream(), null);
+                } else {
+                    RESTUtil.processURLRequest(messageContext, response.getOutputStream(), request.getContentType());
+                }
                 this.checkResponseWritten();
             } catch (AxisFault axisFault) {
                 processFault(axisFault);
