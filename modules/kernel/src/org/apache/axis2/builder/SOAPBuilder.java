@@ -88,7 +88,7 @@ public class SOAPBuilder implements Builder {
         return envelope;
     }
 
-    public boolean isRESTRequest(String contentType) {
+    private boolean isRESTRequest(String contentType) {
         return contentType != null &&
                 (contentType.indexOf(HTTPConstants.MEDIA_TYPE_APPLICATION_XML) > -1 ||
                         contentType.indexOf(HTTPConstants.MEDIA_TYPE_X_WWW_FORM) > -1 ||
