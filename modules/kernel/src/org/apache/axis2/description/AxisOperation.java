@@ -159,7 +159,8 @@ public abstract class AxisOperation extends AxisDescription
         AxisConfiguration axisConfiguration = service.getAxisConfiguration();
         PhaseResolver phaseResolver = new PhaseResolver(axisConfiguration);
         if (!service.isEngaged(module.getName()) &&
-            (axisConfiguration != null && !axisConfiguration.isEngaged(module.getName()))) {
+            (axisConfiguration != null && !axisConfiguration.isEngaged(module.getName())) &&
+                !isModuleEngagedAtServiceLevel(module)) {
             phaseResolver.disengageModuleFromGlobalChains(module);
         }
         phaseResolver.disengageModuleFromOperationChain(module, this);
@@ -173,6 +174,35 @@ public abstract class AxisOperation extends AxisDescription
                 service.removeOperation(operation.getName());
             }
         }
+    }
+
+    private boolean isModuleEngagedAtServiceLevel(AxisModule axisModule) {
+        AxisServiceGroup axisServiceGroup;
+        AxisService axisService;
+        AxisOperation axisOperation;
+        AxisConfiguration config = getAxisConfiguration();
+        for (Iterator<AxisServiceGroup> serviceGroups = config.getServiceGroups(); serviceGroups.hasNext(); ) {
+            axisServiceGroup = serviceGroups.next();
+            if (axisServiceGroup.isEngaged(axisModule)) {
+                return true;
+            } else {
+                for (Iterator<AxisService> services = axisServiceGroup.getServices(); services.hasNext(); ) {
+                    axisService = services.next();
+                    if (axisService.isEngaged(axisModule)) {
+                        return true;
+                    } else {
+                        for (Iterator<AxisOperation> operations = axisService.getOperations(); operations.hasNext(); ) {
+                            axisOperation = operations.next();
+                            if (axisOperation.isEngaged(axisModule)) {
+                                return true;
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**

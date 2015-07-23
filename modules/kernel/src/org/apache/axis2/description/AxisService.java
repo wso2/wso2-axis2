@@ -2307,10 +2307,39 @@ public class AxisService extends AxisDescription {
 			axisOperation.disengageModule(module);
 		}
 		AxisConfiguration config = getAxisConfiguration();
-		if (!config.isEngaged(module.getName())) {
+		if (!config.isEngaged(module.getName()) && !isModuleEngagedAtServiceLevel(module)) {
 			PhaseResolver phaseResolver = new PhaseResolver(config);
 			phaseResolver.disengageModuleFromGlobalChains(module);
 		}
+	}
+
+	private boolean isModuleEngagedAtServiceLevel(AxisModule axisModule) {
+		AxisServiceGroup axisServiceGroup;
+		AxisService axisService;
+		AxisOperation axisOperation;
+		AxisConfiguration config = getAxisConfiguration();
+		for (Iterator<AxisServiceGroup> serviceGroups = config.getServiceGroups(); serviceGroups.hasNext(); ) {
+			axisServiceGroup = serviceGroups.next();
+			if (axisServiceGroup.isEngaged(axisModule)) {
+				return true;
+			} else {
+				for (Iterator<AxisService> services = axisServiceGroup.getServices(); services.hasNext(); ) {
+					axisService = services.next();
+					if (axisService.isEngaged(axisModule)) {
+						return true;
+					} else {
+						for (Iterator<AxisOperation> operations = axisService.getOperations(); operations.hasNext(); ) {
+							axisOperation = operations.next();
+							if (axisOperation.isEngaged(axisModule)) {
+								return true;
+							}
+
+						}
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	/**
