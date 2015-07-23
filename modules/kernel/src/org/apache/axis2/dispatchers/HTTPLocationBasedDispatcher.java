@@ -108,7 +108,7 @@ public class HTTPLocationBasedDispatcher extends AbstractDispatcher {
     private String parseRequestURL(String path, String serviceName) {
 
         serviceName = "/" + serviceName;
-        int index = path.lastIndexOf(serviceName);
+        int index = path.indexOf(serviceName);
         String httpLocation = null;
 
         if (-1 != index) {
