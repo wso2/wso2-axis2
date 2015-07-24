@@ -27,10 +27,7 @@ import org.apache.axis2.description.WSDL2Constants;
 import org.apache.axis2.util.WSDL20Util;
 
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.*;
 import java.util.Iterator;
 
 
@@ -63,20 +60,20 @@ public class URLTemplatingUtil {
 
         firstElement = messageContext.getEnvelope().getBody().getFirstElement();
         String params = "";
+        String encoding = "UTF-8";
 
         if (firstElement != null) {
             Iterator iter = firstElement.getChildElements();
 
-            String legalCharacters = WSDL2Constants.LEGAL_CHARACTERS_IN_QUERY.replaceAll(queryParameterSeparator, "");
-
             while (iter.hasNext()) {
+                String parameter ;
                 OMElement element = (OMElement) iter.next();
                 try {
-                    params = params + URIEncoderDecoder.quoteIllegal(element.getLocalName(), legalCharacters) + "=" + URIEncoderDecoder.quoteIllegal(element.getText(), legalCharacters) +
-                            queryParameterSeparator;
+                    parameter = element.getLocalName() + "=" + URLEncoder.encode(element.getText(), encoding).replace("+", "%20")+queryParameterSeparator;;
                 } catch (UnsupportedEncodingException e) {
                     throw AxisFault.makeFault(e);
                 }
+                params = "".equals(params) ? parameter : (params  + parameter);
             }
         }
 
