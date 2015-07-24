@@ -107,7 +107,7 @@
         </plugins>
     </build>
     <properties>
-        <version.axis2>1.6.1-wso2v12-SNAPSHOT</version.axis2>
-        <exp.pkg.version.axis2>1.6.1.wso2v12</exp.pkg.version.axis2>
+        <version.axis2>1.6.1-wso2v13-SNAPSHOT</version.axis2>
+        <exp.pkg.version.axis2>1.6.1.wso2v13</exp.pkg.version.axis2>
     </properties>
 </project>
