@@ -193,6 +193,10 @@ public abstract class AxisOperation extends AxisDescription
                     } else {
                         for (Iterator<AxisOperation> operations = axisService.getOperations(); operations.hasNext(); ) {
                             axisOperation = operations.next();
+                            if (this.getName().equals(axisOperation.getName()) &&
+                                    this.getAxisService().getName().equals(axisService.getName())) { //ignore self
+                                continue;
+                            }
                             if (axisOperation.isEngaged(axisModule)) {
                                 return true;
                             }

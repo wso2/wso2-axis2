@@ -2325,6 +2325,9 @@ public class AxisService extends AxisDescription {
 			} else {
 				for (Iterator<AxisService> services = axisServiceGroup.getServices(); services.hasNext(); ) {
 					axisService = services.next();
+					if (this.getName().equals(axisService.getName())) { //ignore self
+						continue;
+					}
 					if (axisService.isEngaged(axisModule)) {
 						return true;
 					} else {
