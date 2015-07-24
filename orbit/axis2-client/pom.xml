@@ -25,7 +25,7 @@
     <description>
         A single JAR file containing all the client side libraries
     </description>
-    <version>1.6.2.wso2v13-SNAPSHOT</version>
+    <version>1.6.2.wso2v13</version>
     <url>http://wso2.org</url>
 
     <repositories>
