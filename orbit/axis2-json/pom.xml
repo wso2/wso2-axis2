@@ -22,7 +22,7 @@
     <artifactId>axis2-json</artifactId>
     <packaging>bundle</packaging>
     <name>axis2.json.wso2</name>
-    <version>1.6.1-wso2v14-SNAPSHOT</version>
+    <version>1.6.1.wso2v14-SNAPSHOT</version>
     <description>
         org.wso2.carbon.axis2.json. This bundle will export packages for Axis2-json.
     </description>
