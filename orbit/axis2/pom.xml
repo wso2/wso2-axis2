@@ -25,7 +25,7 @@
     <description>
         org.wso2.carbon.axis2. This bundle will export packages for Axis2 WS engine.
     </description>
-    <version>1.6.1.wso2v14-SNAPSHOT</version>
+    <version>1.6.1.wso2v14</version>
     <url>http://wso2.org</url>
 
     <repositories>
