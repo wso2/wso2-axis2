@@ -18,7 +18,7 @@
  */
 
 
-/*package org.apache.axis2.json;
+package org.apache.axis2.json;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -32,6 +32,7 @@ import junit.framework.TestCase;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.transport.http.SOAPMessageFormatter;
@@ -45,15 +46,14 @@ public class JSONOMBuilderTest extends TestCase {
         String jsonString = getBadgerfishJSONString();
         ByteArrayInputStream inStream = new ByteArrayInputStream(jsonString.getBytes());
 
-        JSONOMBuilder omBuilder = new JSONBadgerfishOMBuilder();
-        OMElement elem = omBuilder.processDocument(inStream,
-                JSONTestConstants.CONTENT_TYPE_BADGERFISH, null);
+        MessageContext msgCtx = new MessageContext();
+        JSONOMBuilder omBuilder = new JSONOMBuilder();
+        OMElement elem = omBuilder.processDocument(inStream, JSONTestConstants.CONTENT_TYPE_BADGERFISH, msgCtx);
 
         elem.toString();
 
         SOAPEnvelope envelope = TransportUtils.createSOAPEnvelope(elem);
 
-        MessageContext msgCtx = new MessageContext();
         msgCtx.setEnvelope(envelope);
 
         OMOutputFormat outputFormat = new OMOutputFormat();
@@ -72,10 +72,10 @@ public class JSONOMBuilderTest extends TestCase {
             IOException, ParserConfigurationException, SAXException {
         String jsonString = getBadgerfishJSONString();
         ByteArrayInputStream inStream = new ByteArrayInputStream(jsonString.getBytes());
+        MessageContext msgCtx = new MessageContext();
 
-        JSONOMBuilder omBuilder = new JSONBadgerfishOMBuilder();
-        OMElement elem = omBuilder.processDocument(inStream,
-                JSONTestConstants.CONTENT_TYPE_BADGERFISH, null);
+        JSONOMBuilder omBuilder = new JSONOMBuilder();
+        OMElement elem = omBuilder.processDocument(inStream, JSONTestConstants.CONTENT_TYPE_BADGERFISH, msgCtx);
 
         elem.toString();
 
@@ -86,9 +86,18 @@ public class JSONOMBuilderTest extends TestCase {
 
     }
 
+    public void testEmptyJsonString() throws AxisFault {
+        String emptyJson = "{}";
+        ByteArrayInputStream inStream = new ByteArrayInputStream(emptyJson.getBytes());
+        MessageContext messageContext = new MessageContext();
+
+        JSONOMBuilder omBuilder = new JSONOMBuilder();
+        OMElement elem = omBuilder.processDocument(inStream, JSONTestConstants.CONTENT_TYPE_BADGERFISH, messageContext);
+        assertEquals(null, elem);
+    }
+
     private String getBadgerfishJSONString() {
         return "{\"p\":{\"@xmlns\":{\"bb\":\"http://other.nsb\",\"aa\":\"http://other.ns\",\"$\":\"http://def.ns\"},\"sam\":{\"$\":\"555\", \"@att\":\"lets\"}}}";
     }
 
 }
-*/

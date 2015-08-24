@@ -118,17 +118,29 @@ public abstract class AbstractJSONOMBuilder implements Builder {
         if there is a prefix, message starts like {"prefix:foo":
          */
         try {
-            //read the stream until we find a : symbol
-            char temp = (char)reader.read();
+            //read the stream until we find a : symbol, break the loop if it encounter end of json String
+            char temp = (char) reader.read();
+            int bracketCounter = 0;        // counter increase by 1 when get a '{' and decrease by 1 when get a '}'
             while (temp != ':') {
-                if (temp != ' ' && temp != '{' && temp != '\n' && temp != '\r' && temp != '\t') {
+                if (temp == '{') {
+                    bracketCounter++;
+                } else if (temp == '}') {
+                    bracketCounter--;
+                } else if (temp != ' ' && temp != '\n' && temp != '\r' && temp != '\t') {
                     localName += temp;
                 }
-                temp = (char)reader.read();
+
+
+                if (bracketCounter > 0) {
+                    temp = (char) reader.read();
+                } else {
+                    break;
+                }
             }
 
             //if the part we read ends with ", there is no prefix, otherwise it has a prefix
-            if (localName.charAt(0) == '"') {
+
+            if (localName.length() > 0 && localName.charAt(0) == '"') {
                 if (localName.charAt(localName.length() - 1) == '"') {
                     localName = localName.substring(1, localName.length() - 1);
                 } else {
@@ -148,8 +160,12 @@ public abstract class AbstractJSONOMBuilder implements Builder {
         } catch (IOException e) {
             throw AxisFault.makeFault(e);
         }
-        AbstractJSONDataSource jsonDataSource = getDataSource(reader, prefix, localName);
-        return new OMSourcedElementImpl(localName, ns, factory, jsonDataSource);
+        if (localName != null && !localName.isEmpty()) {
+            AbstractJSONDataSource jsonDataSource = getDataSource(reader, prefix, localName);
+            return factory.createOMElement(jsonDataSource, localName, ns);
+        } else {
+            return null;
+        }
     }
 
     protected abstract AbstractJSONDataSource getDataSource(Reader
