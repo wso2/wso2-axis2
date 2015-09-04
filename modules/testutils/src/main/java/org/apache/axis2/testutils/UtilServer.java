@@ -51,6 +51,7 @@ public class UtilServer {
 
     public static synchronized void start(String repository, String axis2xml) throws Exception {
         if (receiver != null) {
+            System.out.println("Server already started !!");
             throw new IllegalStateException("Server already started");
         }
         ConfigurationContext er = getNewConfigurationContext(repository, axis2xml);
