@@ -19,15 +19,14 @@
 
 package org.apache.axis2.testutils;
 
+import java.io.File;
+import javax.xml.namespace.QName;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.engine.ListenerManager;
 import org.apache.axis2.transport.http.SimpleHTTPServer;
-
-import javax.xml.namespace.QName;
-import java.io.File;
 
 public class UtilServer {
     private static SimpleHTTPServer receiver;
@@ -58,9 +57,13 @@ public class UtilServer {
 
         receiver = new SimpleHTTPServer(er, TESTING_PORT);
 
-        receiver.start();
-        System.out.print("Server started on port "
-                + TESTING_PORT + ".....");
+        try {
+            receiver.start();
+        } catch (AxisFault e) {
+            System.out.println("Error occurred starting the server. " + e.getMessage());
+            throw e;
+        }
+        System.out.print("Server started on port " + TESTING_PORT + ".....");
     }
 
     public static ConfigurationContext getNewConfigurationContext(
@@ -73,9 +76,7 @@ public class UtilServer {
         if (axis2xml == null) {
             axis2xml = file.getAbsolutePath() + "/conf/axis2.xml";
         }
-        return ConfigurationContextFactory
-                .createConfigurationContextFromFileSystem(file.getAbsolutePath(),
-		                                                         axis2xml);
+        return ConfigurationContextFactory.createConfigurationContextFromFileSystem(file.getAbsolutePath(), axis2xml);
     }
 
     public static synchronized void stop() throws AxisFault {
@@ -83,12 +84,7 @@ public class UtilServer {
             throw new IllegalStateException("Server not started");
         }
         receiver.stop();
-        while (receiver.isRunning()) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e1) {
-            }
-        }
+        waitUntilStopped();
         // tp.doStop();
         System.out.print("Server stopped .....");
         ListenerManager listenerManager =
@@ -103,4 +99,15 @@ public class UtilServer {
         return receiver.getConfigurationContext();
     }
 
+    public static boolean waitUntilStopped() {
+        System.out.println("Waiting until receiver stopped ..");
+        while (receiver != null && receiver.isRunning()) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e1) {
+                //ignore
+            }
+        }
+        return true;
+    }
 }
