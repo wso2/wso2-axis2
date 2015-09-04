@@ -20,36 +20,30 @@
 package org.apache.axis2.json.gson;
 
 import org.apache.axis2.testutils.UtilServer;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.RequestEntity;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
-
-
 public class JSONXMLStreamAPITest {
 
     @Before
-    public void setUp()throws Exception {
+    public void setUp() throws Exception {
+        UtilServer.waitUntilStopped();
         UtilServer.start("target/repo", "test-repository/gson/axis2.xml");
 
     }
 
     @After
-    public void tearDown()throws Exception {
+    public void tearDown() throws Exception {
         UtilServer.stop();
 
     }
 
     @Test
-    public void xmlStreamAPITest()throws Exception{
-        String getLibURL = "http://localhost:" + UtilServer.TESTING_PORT +"/axis2/services/LibraryService/getLibrary";
-        String echoLibURL = "http://localhost:" + UtilServer.TESTING_PORT +"/axis2/services/LibraryService/echoLibrary";
+    public void xmlStreamAPITest() throws Exception {
+        String getLibURL = "http://localhost:" + UtilServer.TESTING_PORT + "/axis2/services/LibraryService/getLibrary";
+        String echoLibURL = "http://localhost:" + UtilServer.TESTING_PORT + "/axis2/services/LibraryService/echoLibrary";
         String contentType = "application/json";
         String charSet = "UTF-8";
 
@@ -85,17 +79,15 @@ public class JSONXMLStreamAPITest {
                 "{\"author\":\"Jhon_4\",\"numOfPages\":175,\"publisher\":\"Foxier\",\"reviewers\":[\"rev1\",\"rev2\"," +
                 "\"rev3\"]}],\"staff\":50}}}";
 
+        System.out.println("Sending request : echoLibURL = " + echoLibURL);
         String actualResponse = UtilTest.post(echoLibrary, echoLibURL, contentType, charSet);
         Assert.assertNotNull(actualResponse);
-        Assert.assertEquals(echoLibraryResponse , actualResponse);
+        Assert.assertEquals(echoLibraryResponse, actualResponse);
 
+        System.out.println("Sending request : getLibURL = " + getLibURL);
         String actualRespose_2 = UtilTest.post(getLibrary, getLibURL, contentType, charSet);
         Assert.assertNotNull(actualRespose_2);
         Assert.assertEquals(getLibraryResponse, actualRespose_2);
 
     }
-
-
-
-
 }
