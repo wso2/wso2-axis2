@@ -55,6 +55,7 @@ public class JSONRPCIntegrationTest {
     public void testJsonInOnlyRPCMessageReceiver() throws Exception {
         String jsonRequest = "{\"ping\":[{\"arg0\":{\"name\":\"Simon\",\"age\":\"35\",\"gender\":\"male\"}}]}";
         String echoPersonUrl = "http://localhost:" + UtilServer.TESTING_PORT + "/axis2/services/JSONPOJOService/ping";
+        System.out.println("Sending request : echoPersonUrl = " + echoPersonUrl);
         String response = UtilTest.post(jsonRequest, echoPersonUrl, contentType, charSet);
         Assert.assertEquals("", response);
     }

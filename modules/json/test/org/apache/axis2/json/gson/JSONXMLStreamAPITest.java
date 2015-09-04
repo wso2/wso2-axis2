@@ -79,10 +79,12 @@ public class JSONXMLStreamAPITest {
                 "{\"author\":\"Jhon_4\",\"numOfPages\":175,\"publisher\":\"Foxier\",\"reviewers\":[\"rev1\",\"rev2\"," +
                 "\"rev3\"]}],\"staff\":50}}}";
 
+        System.out.println("Sending request : echoLibURL = " + echoLibURL);
         String actualResponse = UtilTest.post(echoLibrary, echoLibURL, contentType, charSet);
         Assert.assertNotNull(actualResponse);
         Assert.assertEquals(echoLibraryResponse, actualResponse);
 
+        System.out.println("Sending request : getLibURL = " + getLibURL);
         String actualRespose_2 = UtilTest.post(getLibrary, getLibURL, contentType, charSet);
         Assert.assertNotNull(actualRespose_2);
         Assert.assertEquals(getLibraryResponse, actualRespose_2);
