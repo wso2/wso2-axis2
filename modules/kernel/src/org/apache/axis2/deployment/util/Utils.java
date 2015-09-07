@@ -537,6 +537,54 @@ public class Utils {
         return operation;
     }
 
+    /**
+     * This method returns Axis operation with IN and OUT message exchange pattern for a service method which has void
+     * as the return type.
+     * <p>
+     * Axis services can contain methods throws an exception and void as the return type,
+     * Normally in such case the returned Axis operation has IN only message exchange pattern. So that the http status
+     * code for the response is 202. This overloaded method added to fix that issue. This will return Axis operation
+     * with IN and OUT message exchange pattern for a service method which has void as the return type and the method
+     * must throw an checked exception. Then the response http status code will be 200 OK. To get 200 http status
+     * code you must set the mepinandout parameter to true in the axis2.xml
+     * </p>
+     *
+     * @param method method object which represents the service method
+     * @param isHttpSCOKforVoidMethod is httpSCOKforVoidServiceMethod  parameter true or false in the axis2.xml
+     */
+    public static AxisOperation getAxisOperationForJmethod(Method method, boolean isHttpSCOKforVoidMethod)
+            throws AxisFault {
+        AxisOperation operation;
+        if ("void".equals(method.getReturnType().getName())) {
+            if (method.getExceptionTypes().length > 0) {
+                if (isHttpSCOKforVoidMethod) {
+                    operation = AxisOperationFactory.getAxisOperation(WSDLConstants.MEP_CONSTANT_IN_OUT);
+                } else {
+                    operation = AxisOperationFactory.getAxisOperation(WSDLConstants.MEP_CONSTANT_ROBUST_IN_ONLY);
+                }
+            } else {
+                operation = AxisOperationFactory.getAxisOperation(WSDLConstants.MEP_CONSTANT_IN_ONLY);
+            }
+        } else {
+            operation = AxisOperationFactory.getAxisOperation(WSDLConstants.MEP_CONSTANT_IN_OUT);
+        }
+        String opName = method.getName();
+
+        WebMethodAnnotation methodAnnon = JSR181Helper.INSTANCE.getWebMethodAnnotation(method);
+        if (methodAnnon != null) {
+            String action = methodAnnon.getAction();
+            if (action != null && !"".equals(action)) {
+                operation.setSoapAction(action);
+            }
+            if (methodAnnon.getOperationName() != null) {
+                opName = methodAnnon.getOperationName();
+            }
+        }
+
+        operation.setName(new QName(opName));
+        return operation;
+    }
+
     public static OMElement getParameter(String name, String value,
                                          boolean locked) {
         OMFactory fac = OMAbstractFactory.getOMFactory();

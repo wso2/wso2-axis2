@@ -20,6 +20,7 @@
 package org.apache.axis2.description.java2wsdl;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.jaxrs.JAXRSUtils;
 import org.apache.axis2.jaxrs.JAXRSModel;
@@ -329,7 +330,16 @@ public class DefaultSchemaGenerator implements Java2WSDLConstants, SchemaGenerat
             boolean addToService = false;
             AxisOperation axisOperation = service.getOperation(new QName(methodName));
             if (axisOperation == null) {
-                axisOperation = Utils.getAxisOperationForJmethod(jMethod);
+                if (service.getAxisConfiguration() != null &&
+                        service.getAxisConfiguration()
+                                .getParameter(Constants.Configuration.GET_HTTP_SC_OK_FOR_VOID_SERVICE_METHODS) != null
+                        && service.getAxisConfiguration()
+                        .getParameter(Constants.Configuration.GET_HTTP_SC_OK_FOR_VOID_SERVICE_METHODS).getValue()
+                        .equals(Constants.VALUE_TRUE)) {
+                    axisOperation = Utils.getAxisOperationForJmethod(jMethod, true);
+                } else {
+                    axisOperation = Utils.getAxisOperationForJmethod(jMethod, false);
+                }
 //                if (WSDL2Constants.MEP_URI_ROBUST_IN_ONLY.equals(
 //                        axisOperation.getMessageExchangePattern())) {
 //                    AxisMessage outMessage = axisOperation.getMessage(

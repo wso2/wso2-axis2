@@ -467,5 +467,10 @@ public class Constants extends org.apache.axis2.namespace.Constants {
         public static final String APPLICATION_XML_BUILDER_ALLOW_DTD="ApplicationXMLBuilder.allowDTD";
 
         public static final String DEFAULT_CONTENT_TYPE = "defaultContentType";
+
+        /**
+         *  This parameter enables message exchange pattern in and out for the Axis operation.
+         */
+        public static final String GET_HTTP_SC_OK_FOR_VOID_SERVICE_METHODS = "mepinandout";
     }
 }
