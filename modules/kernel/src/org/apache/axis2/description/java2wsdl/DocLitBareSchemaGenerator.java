@@ -20,6 +20,7 @@
 package org.apache.axis2.description.java2wsdl;
 
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.deployment.util.Utils;
 import org.apache.axis2.description.AxisMessage;
 import org.apache.axis2.description.AxisOperation;
@@ -102,7 +103,16 @@ public class DocLitBareSchemaGenerator extends DefaultSchemaGenerator {
             boolean addToService = false;
             AxisOperation axisOperation = service.getOperation(new QName(methodName));
             if (axisOperation == null) {
-                axisOperation = Utils.getAxisOperationForJmethod(jMethod);
+                if (service.getAxisConfiguration() != null &&
+                        service.getAxisConfiguration()
+                                .getParameter(Constants.Configuration.GET_HTTP_SC_OK_FOR_VOID_SERVICE_METHODS) != null
+                        && service.getAxisConfiguration()
+                        .getParameter(Constants.Configuration.GET_HTTP_SC_OK_FOR_VOID_SERVICE_METHODS).getValue()
+                        .equals(Constants.VALUE_TRUE)) {
+                    axisOperation = Utils.getAxisOperationForJmethod(jMethod, true);
+                } else {
+                    axisOperation = Utils.getAxisOperationForJmethod(jMethod, false);
+                }
                 if (WSDL2Constants.MEP_URI_ROBUST_IN_ONLY.equals(
                         axisOperation.getMessageExchangePattern())){
                     AxisMessage outMessage = axisOperation.getMessage(
