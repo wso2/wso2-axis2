@@ -19,6 +19,7 @@
 
 package org.apache.axis2.json.gson;
 
+import org.apache.axis2.testutils.PortAllocator;
 import org.apache.axis2.testutils.UtilServer;
 import org.junit.After;
 import org.junit.Assert;
@@ -27,10 +28,13 @@ import org.junit.Test;
 
 public class JSONXMLStreamAPITest {
 
+    int TESTING_PORT;
+
     @Before
     public void setUp() throws Exception {
         UtilServer.waitUntilStopped();
-        UtilServer.start("target/repo", "test-repository/gson/axis2.xml");
+        TESTING_PORT = PortAllocator.allocatePort();
+        UtilServer.start(TESTING_PORT, "target/repo", "test-repository/gson/axis2.xml");
 
     }
 
@@ -42,8 +46,8 @@ public class JSONXMLStreamAPITest {
 
     @Test
     public void xmlStreamAPITest() throws Exception {
-        String getLibURL = "http://localhost:" + UtilServer.TESTING_PORT + "/axis2/services/LibraryService/getLibrary";
-        String echoLibURL = "http://localhost:" + UtilServer.TESTING_PORT + "/axis2/services/LibraryService/echoLibrary";
+        String getLibURL = "http://localhost:" + TESTING_PORT + "/axis2/services/LibraryService/getLibrary";
+        String echoLibURL = "http://localhost:" + TESTING_PORT + "/axis2/services/LibraryService/echoLibrary";
         String contentType = "application/json";
         String charSet = "UTF-8";
 
