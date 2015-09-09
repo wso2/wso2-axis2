@@ -825,9 +825,11 @@ public class AxisServlet extends HttpServlet {
             try {
                 /* We don't need contentType for GET Methods */
                 if (request.getMethod().equals(HTTPConstants.HEADER_GET)) {
-                    RESTUtil.processURLRequest(messageContext, response.getOutputStream(), null);
+                    RESTUtil.processXMLRequest(messageContext, request.getInputStream(),
+                                               response.getOutputStream(), null);
                 } else {
-                    RESTUtil.processURLRequest(messageContext, response.getOutputStream(), request.getContentType());
+                    RESTUtil.processXMLRequest(messageContext, request.getInputStream(),
+                                               response.getOutputStream(), request.getContentType());
                 }
                 this.checkResponseWritten();
             } catch (AxisFault axisFault) {
