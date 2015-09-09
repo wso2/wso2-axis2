@@ -31,8 +31,6 @@ import org.apache.axis2.transport.http.SimpleHTTPServer;
 public class UtilServer {
     private static SimpleHTTPServer receiver;
 
-    public static final int TESTING_PORT = PortAllocator.allocatePort();
-
     public static synchronized void deployService(AxisService service)
             throws AxisFault {
         receiver.getConfigurationContext().getAxisConfiguration().addService(
@@ -45,18 +43,18 @@ public class UtilServer {
                 .removeService(service.getLocalPart());
     }
 
-    public static synchronized void start(String repository) throws Exception {
-        start(repository, null);
+    public static synchronized void start(int testingPort, String repository) throws Exception {
+        start(testingPort, repository, null);
     }
 
-    public static synchronized void start(String repository, String axis2xml) throws Exception {
+    public static synchronized void start(int testingPort, String repository, String axis2xml) throws Exception {
         if (receiver != null) {
             System.out.println("Server already started !!");
             throw new IllegalStateException("Server already started");
         }
         ConfigurationContext er = getNewConfigurationContext(repository, axis2xml);
 
-        receiver = new SimpleHTTPServer(er, TESTING_PORT);
+        receiver = new SimpleHTTPServer(er, testingPort);
 
         try {
             receiver.start();
@@ -64,7 +62,7 @@ public class UtilServer {
             System.out.println("Error occurred starting the server. " + e.getMessage());
             throw e;
         }
-        System.out.print("Server started on port " + TESTING_PORT + ".....");
+        System.out.print("Server started on port " + testingPort + ".....");
     }
 
     public static ConfigurationContext getNewConfigurationContext(
