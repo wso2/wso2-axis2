@@ -110,6 +110,6 @@
     </build>
     <properties>
         <version.axis2.json>1.6.1-wso2v15-SNAPSHOT</version.axis2.json>
-        <exp.pkg.version.axis2>1.6.1.wso2v15-SNAPSHOT</exp.pkg.version.axis2>
+        <exp.pkg.version.axis2>${version.axis2.json}</exp.pkg.version.axis2>
     </properties>
 </project>
