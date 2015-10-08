@@ -277,7 +277,7 @@ public abstract class AbstractJSONMessageFormatter implements MessageFormatter {
 	private void removeIndentations(OMElement elem) {
 		Iterator children = elem.getChildren();
 		while (children.hasNext()) {
-			OMNode child = (OMNode)children.next();
+			OMNode child = (OMNode) children.next();
 			if (child instanceof OMText) {
 				if ("".equals(((OMText) child).getText().trim())) {
 					children.remove();
@@ -289,23 +289,23 @@ public abstract class AbstractJSONMessageFormatter implements MessageFormatter {
 	}
 
 	private void removeNamespaces(OMElement elem, boolean processAttrbs) {
-	OMFactory omFactory = elem.getOMFactory();
-        OMNamespace ns = elem.getNamespace();
-        String prefix;
-        if (ns != null) {
-            prefix = elem.getNamespace().getPrefix();
-            elem.setNamespace(omFactory.createOMNamespace("", prefix));
-        }
+		OMFactory omFactory = elem.getOMFactory();
+		OMNamespace ns = elem.getNamespace();
+		String prefix;
+		if (ns != null) {
+			prefix = elem.getNamespace().getPrefix();
+			elem.setNamespace(omFactory.createOMNamespace("", prefix));
+		}
 		Iterator children = elem.getChildElements();
 		while (children.hasNext()) {
-			removeNamespaces((OMElement)children.next(), processAttrbs);
+			removeNamespaces((OMElement) children.next(), processAttrbs);
 		}
 		if (!processAttrbs) {
 			return;
 		}
 		Iterator attrbs = elem.getAllAttributes();
 		while (attrbs.hasNext()) {
-			OMAttribute attrb = (OMAttribute)attrbs.next();
+			OMAttribute attrb = (OMAttribute) attrbs.next();
 			prefix = attrb.getQName().getPrefix();
 			attrb.setOMNamespace(omFactory.createOMNamespace("", prefix));
 		}
