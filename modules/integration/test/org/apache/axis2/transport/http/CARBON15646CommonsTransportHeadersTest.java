@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import java.util.HashMap;
 
-public class CARBON15646CommonsTransportHeadersTestCase extends TestCase {
+public class CARBON15646CommonsTransportHeadersTest extends TestCase {
     Header[] headers;
     CommonsTransportHeaders commonsTransportHeaders;
     String value;
@@ -27,7 +27,8 @@ public class CARBON15646CommonsTransportHeadersTestCase extends TestCase {
         commonsTransportHeaders = new CommonsTransportHeaders(headers);
     }
 
-    @Test public void testForCARBON15646() {
+    @Test
+    public void testForCARBON15646() {
 
         initForRandomNoOfHeaders();
 
