@@ -37,9 +37,18 @@ public class CommonsTransportHeaders implements Map {
 
     private void init() {
         headerMap = new HashMap();
-
         for (int i = 0; i < headers.length; i++) {
-            headerMap.put(headers[i].getName(), headers[i].getValue());
+            if (headerMap.containsKey(headers[i].getName())) {
+                String headerValue = (String) headerMap.get(headers[i].getName());
+                if (headerValue != null) {
+                    headerValue = headerValue + "; " + headers[i].getValue();
+                } else {
+                    headerValue = headers[i].getValue();
+                }
+                headerMap.put(headers[i].getName(), headerValue);
+            } else {
+                headerMap.put(headers[i].getName(), headers[i].getValue());
+            }
         }
     }
 
