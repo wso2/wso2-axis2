@@ -26,7 +26,7 @@ import org.junit.Test;
 
 import java.util.HashMap;
 
-public class CARBON15646CommonsTransportHeadersTest extends TestCase {
+public class CommonsTransportHeadersTest extends TestCase {
     Header[] headers;
     CommonsTransportHeaders commonsTransportHeaders;
     String value;
