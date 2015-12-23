@@ -190,7 +190,7 @@ public class MultipartFormDataFormatter implements MessageFormatter {
                     OMElement omElement =
                             omFactory.createOMElement(ele.getQName().getLocalPart(), null);
                     omElement.addChild(
-                            processComplexType(omElement, ele.getChildElements(), omFactory));
+                            processComplexType(omElement, ele.getChildElements(), omFactory, false));
                     parts.add(new ComplexPart(ele.getQName().getLocalPart(), omElement.toString()));
                 } else {
                     parts.add(new StringPart(ele.getQName().getLocalPart(), ele.getText()));
@@ -207,21 +207,24 @@ public class MultipartFormDataFormatter implements MessageFormatter {
      * @param omFactory
      * @return
      */
-    private OMElement processComplexType(OMElement parent, Iterator iter, OMFactory omFactory) {
-
+    private OMElement processComplexType(OMElement parent, Iterator iter, OMFactory omFactory, boolean returnParent) {
         OMElement omElement = null;
         while (iter.hasNext()) {
             OMElement ele = (OMElement) iter.next();
             omElement = omFactory.createOMElement(ele.getQName().getLocalPart(), null);
             Iterator iter2 = ele.getChildElements();
             if (iter2.hasNext()) {
-                parent.addChild(processComplexType(omElement, ele.getChildElements(), omFactory));
+                parent.addChild(processComplexType(omElement, ele.getChildElements(), omFactory, true));
             } else {
                 omElement = omFactory.createOMElement(ele.getQName().getLocalPart(), null);
                 omElement.setText(ele.getText());
                 parent.addChild(omElement);
             }
         }
-        return omElement;
+        if (returnParent) {
+            return parent;
+        } else {
+            return omElement;
+        }
     }
 }
