@@ -87,7 +87,7 @@ public class XFormURLEncodedBuilder implements Builder {
                     (String) axisBinding.getProperty(WSDL2Constants.ATTR_WSOAP_VERSION);
             soapFactory = getSOAPFactory(soapVersion);
         } else {
-            soapFactory = getSOAPFactory(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI);
+            soapFactory = getSOAPFactory(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI);
         }
         EndpointReference endpointReference = messageContext.getTo();
         if (endpointReference == null) {
