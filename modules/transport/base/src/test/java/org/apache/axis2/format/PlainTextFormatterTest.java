@@ -29,6 +29,7 @@ import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.format.PlainTextFormatter;
 import org.apache.axis2.transport.base.BaseConstants;
@@ -120,5 +121,31 @@ public class PlainTextFormatterTest extends TestCase {
 
     public void testElementGetBytesLatin1() throws Exception {
         testElementGetBytes("ISO-8859-1");
+    }
+
+    public void testCustomContentType() throws Exception {
+        String customContentType = "foo/bar";
+        String encoding = "UTF-8";
+        MessageContext messageContext = createElementMessageContextElement(testElementString);
+        assertNotNull(messageContext);
+        messageContext.setProperty(Constants.Configuration.CONTENT_TYPE, customContentType);
+
+        OMOutputFormat format = new OMOutputFormat();
+        format.setCharSetEncoding(encoding);
+        PlainTextFormatter formatter = new PlainTextFormatter();
+        String formattedContentType = formatter.getContentType(messageContext, format, null);
+        customContentType += "; charset=" + encoding;
+        assertEquals("ContentType retrieved from message context is invalid",
+                customContentType, formattedContentType);
+    }
+
+    public void testDefaultContentType() throws Exception {
+        MessageContext messageContext = createElementMessageContextElement(testElementString);
+        assertNotNull(messageContext);
+        OMOutputFormat format = new OMOutputFormat();
+        PlainTextFormatter formatter = new PlainTextFormatter();
+        String formattedContentType = formatter.getContentType(messageContext, format, null);
+        assertEquals("ContentType retrieved from message context is invalid",
+                org.apache.axis2.namespace.Constants.MIME_CT_TEXT_PLAIN, formattedContentType);
     }
 }
