@@ -44,6 +44,7 @@ import org.apache.commons.httpclient.HttpConnectionManager;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.HttpState;
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.NTCredentials;
@@ -55,6 +56,7 @@ import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.params.HttpClientParams;
 import org.apache.commons.httpclient.protocol.Protocol;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.protocol.HTTP;
@@ -239,6 +241,31 @@ public abstract class AbstractHTTPSender {
             } else if (!"identity".equalsIgnoreCase(contentEncoding.getValue())) {
                 throw new AxisFault("HTTP :" + "unsupported content-encoding of '"
                         + contentEncoding.getValue() + "' found");
+            }
+        }
+
+        if (httpMethod.getStatusCode() == HttpStatus.SC_ACCEPTED) {
+            Header contentLength = httpMethod.getResponseHeader(HTTPConstants.HEADER_CONTENT_LENGTH);
+            boolean acceptedContainsBody = false;
+            if (in.available() > 0 || (contentLength != null && Integer.parseInt(contentLength.getValue()) > 0)) {
+                acceptedContainsBody = true;
+            } else {
+                Header transferEncoding = httpMethod.getResponseHeader(HTTPConstants.HEADER_TRANSFER_ENCODING);
+                if (transferEncoding != null && transferEncoding.getValue().equals(
+                        HTTPConstants.HEADER_TRANSFER_ENCODING_CHUNKED)) {
+                    String responseBody = httpMethod.getResponseBodyAsString();
+                    if (responseBody.length() > 0) {
+                        acceptedContainsBody = true;
+                        in = IOUtils.toInputStream(responseBody, "UTF-8");
+                    }
+                }
+            }
+            if (!acceptedContainsBody) {
+                /*
+                 * For HTTP 202 Accepted code, if the body is empty string then release connection.
+                 */
+                httpMethod.releaseConnection();
+                return;
             }
         }
 

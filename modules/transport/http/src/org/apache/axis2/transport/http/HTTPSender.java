@@ -280,16 +280,11 @@ public class HTTPSender extends AbstractHTTPSender {
                     log.warn(strRetryErrorCode + " is not a valid status code");
                 }
             }
-        }       
-        if (statusCode == HttpStatus.SC_ACCEPTED) {
-        	/* When an HTTP 202 Accepted code has been received, this will be the case of an execution 
-        	 * of an in-only operation. In such a scenario, the HTTP response headers should be returned,
-        	 * i.e. session cookies. */
-        	obtainHTTPHeaderInformation(method, msgContext);
-        	// Since we don't expect any content with a 202 response, we must release the connection
-        	method.releaseConnection();
-        } else if (HTTPStatusCodeFamily.SUCCESSFUL.equals(family)) {
+        }
+        if (HTTPStatusCodeFamily.SUCCESSFUL.equals(family)) {
             // Save the HttpMethod so that we can release the connection when cleaning up
+            // HTTP 202 Accepted should support body based on ESBJAVA-4370 as spec does not strictly enforce
+            // no-entity-body with 202 Accepted response.
             msgContext.setProperty(HTTPConstants.HTTP_METHOD, method);
             processResponse(method, msgContext);
         } else if (!errorCodes.contains(statusCode)
