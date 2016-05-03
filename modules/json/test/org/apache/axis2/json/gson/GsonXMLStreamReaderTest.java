@@ -68,8 +68,10 @@ public class GsonXMLStreamReaderTest {
 
     @Test
     public void testGsonXMLStreamReaderWithDataTypes() throws Exception {
-        String jsonString = "{\"response\":{\"return\":{\"name\":\"kate\",\"homes\":1,\"age\":23,\"height\":5.5,\"image\":\"iVBORw0KGg\"}}}";
-        String xmlString = "<response xmlns=\"http://www.w3schools.com\"><return><name>kate</name><homes>1</homes><age>23</age><height>5.5</height><image>iVBORw0KGg</image></return></response>";
+        String jsonString = "{\"response\":{\"return\":{\"name\":\"kate\",\"homes\":1,\"age\":23,\"height\":5.5," +
+                "\"image\":\"iVBORw0KGg\"}}}";
+        String xmlString = "<response xmlns=\"http://www.w3schools.com\"><return><name>kate</name><homes>1</homes>" +
+                "<age>23</age><height>5.5</height><image>iVBORw0KGg</image></return></response>";
         InputStream inputStream = new ByteArrayInputStream(jsonString.getBytes());
         JsonReader jsonReader = new JsonReader(new InputStreamReader(inputStream , "UTF-8"));
         String fileName = "test-resources/custom_schema/testSchema_3.xsd";
