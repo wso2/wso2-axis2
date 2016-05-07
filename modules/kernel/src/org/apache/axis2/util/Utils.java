@@ -269,11 +269,10 @@ public class Utils {
         	servicePath = servicePath+"/";
         }
 
-        int index = path.lastIndexOf(servicePath);
         String serviceOpPart = null;
 
-        if (-1 != index) {
-            int serviceStart = index + servicePath.length();
+        if (path.startsWith(servicePath)) {
+            int serviceStart = servicePath.length();
 
             //get the string after services path
             if (path.length() > serviceStart) {
