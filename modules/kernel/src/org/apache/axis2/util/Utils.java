@@ -75,6 +75,8 @@ import java.net.InetAddress;
 
 public class Utils {
     private static final Log log = LogFactory.getLog(Utils.class);
+    private static final String LOCAL_TRANSPORT_PREFIX = "local:/";
+    private static final String AXIS2_SERVICE_PREFIX = "axis2/";
 
     public static void addHandler(Flow flow, Handler handler, String phaseName) {
         HandlerDescription handlerDesc = new HandlerDescription(handler.getName());
@@ -271,8 +273,9 @@ public class Utils {
 
         String serviceOpPart = null;
 
-        if (path.startsWith(servicePath)) {
-            int serviceStart = servicePath.length();
+        if (path.startsWith(servicePath) || path.startsWith(LOCAL_TRANSPORT_PREFIX) || path.startsWith(AXIS2_SERVICE_PREFIX)) {
+            int index = path.lastIndexOf(servicePath);
+            int serviceStart = index + servicePath.length();
 
             //get the string after services path
             if (path.length() > serviceStart) {
