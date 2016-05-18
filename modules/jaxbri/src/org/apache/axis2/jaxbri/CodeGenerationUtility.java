@@ -154,6 +154,7 @@ public class CodeGenerationUtility {
                                 while ((str = bufferedReader.readLine()) != null) {
                                     stringBuffer.append(str);
                                 }
+                                bufferedReader.close();
                                 publicIDToStringMap.put(publicId, stringBuffer);
                             }
 
