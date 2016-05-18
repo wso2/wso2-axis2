@@ -139,7 +139,7 @@
                     <artifactId>commons-httpclient</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>commons-fileupload</groupId>
+                    <groupId>org.wso2.orbit.commons-fileupload</groupId>
                     <artifactId>commons-fileupload</artifactId>
                 </exclusion>
                 <exclusion>
