@@ -82,6 +82,12 @@ public class JSONBuilder implements Builder {
                 }
             } catch (IOException e) {
                 throw AxisFault.makeFault(e);
+            } finally {
+                try {
+                    buf.close();
+                } catch (IOException e) {
+                    throw AxisFault.makeFault(e);
+                }
             }
         } else if (messageContext.getProperty(JSON_STRING) != null) {
             stringBuilder.append((String) messageContext.getProperty(JSON_STRING));
