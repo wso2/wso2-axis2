@@ -32,9 +32,9 @@ import org.junit.runners.MethodSorters;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ParameterDescriptionImplTests extends TestCase {
 
-    public void test1() {
-        Method[] methods = TestInterface.class.getMethods();
-        Method method1 = methods[0];
+    public void test1() throws NoSuchMethodException {
+        Method method1 = TestInterface.class.getMethod("method1", Holder.class);
+
         ParameterDescription pdc1 = new ParameterDescriptionImpl(0, method1.getParameterTypes()[0],
                                                                  method1.getGenericParameterTypes()[0],
                                                                  method1.getAnnotations(), null);
@@ -43,9 +43,8 @@ public class ParameterDescriptionImplTests extends TestCase {
 
     }
 
-    public void test2() {
-        Method[] methods = TestInterface.class.getMethods();
-        Method method2 = methods[1];
+    public void test2() throws NoSuchMethodException {
+        Method method2 = TestInterface.class.getMethod("method2", Holder.class);
         ParameterDescription pdc2 = new ParameterDescriptionImpl(0, method2.getParameterTypes()[0],
                                                                  method2.getGenericParameterTypes()[0],
                                                                  method2.getAnnotations(), null);
@@ -56,9 +55,8 @@ public class ParameterDescriptionImplTests extends TestCase {
         }
     }
 
-    public void test3() {
-        Method[] methods = TestInterface.class.getMethods();
-        Method method3 = methods[2];
+    public void test3() throws NoSuchMethodException {
+        Method method3 = TestInterface.class.getMethod("method3", Holder.class);
         ParameterDescription pdc3 = new ParameterDescriptionImpl(0, method3.getParameterTypes()[0],
                                                                  method3.getGenericParameterTypes()[0],
                                                                  method3.getAnnotations(), null);
@@ -66,9 +64,8 @@ public class ParameterDescriptionImplTests extends TestCase {
         assertEquals(List[].class, pdc3.getParameterActualType());
     }
 
-    public void test4() {
-        Method[] methods = TestInterface.class.getMethods();
-        Method method4 = methods[3];
+    public void test4() throws NoSuchMethodException {
+        Method method4 = TestInterface.class.getMethod("method4", String[].class);
         ParameterDescription pdc4 = new ParameterDescriptionImpl(0, method4.getParameterTypes()[0],
                                                                  method4.getGenericParameterTypes()[0],
                                                                  method4.getAnnotations(), null);
@@ -76,9 +73,8 @@ public class ParameterDescriptionImplTests extends TestCase {
         assertEquals(String[].class, pdc4.getParameterActualType());
     }
 
-    public void test5() {
-        Method[] methods = TestInterface.class.getMethods();
-        Method method5 = methods[4];
+    public void test5() throws NoSuchMethodException {
+        Method method5 = TestInterface.class.getMethod("method5", List[].class);
         ParameterDescription pdc = new ParameterDescriptionImpl(0, method5.getParameterTypes()[0],
                                                                 method5.getGenericParameterTypes()[0],
                                                                 method5.getAnnotations(), null);
