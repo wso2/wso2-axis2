@@ -751,6 +751,12 @@ public class GsonXMLStreamReader implements XMLStreamReader {
                     value = String.valueOf(jsonReader.nextDouble());
                 } else if (valueType.equals("float")) {
                     value = String.valueOf(jsonReader.nextDouble());
+                } else if (valueType.equals("decimal")) {
+                    value = String.valueOf(jsonReader.nextDouble());
+                } else if (valueType.equals("byte")) {
+                    value = String.valueOf(jsonReader.nextInt());
+                } else if (valueType.equals("short")) {
+                    value = String.valueOf(jsonReader.nextInt());
                 }
             } else if (tokenType == JsonToken.NULL) {
                 jsonReader.nextNull();
@@ -780,7 +786,13 @@ public class GsonXMLStreamReader implements XMLStreamReader {
             return true;
         } else if (tokenType == JsonToken.NUMBER) {
             if (expectedType.equals("int") || expectedType.equals("long") || expectedType.equals("double")
-                    || expectedType.equals("float")) {
+                    || expectedType.equals("float") || expectedType.equals("decimal") || expectedType.equals("byte")
+                    || expectedType.equals("short")) {
+                return true;
+            }
+        } else if (tokenType == JsonToken.STRING) {
+            if (expectedType.equals("string") || expectedType.equals("date") || expectedType.equals("time")
+                    || expectedType.equals("datetime") || expectedType.equals("base64Binary")) {
                 return true;
             }
         }

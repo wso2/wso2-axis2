@@ -75,6 +75,9 @@ import java.net.InetAddress;
 
 public class Utils {
     private static final Log log = LogFactory.getLog(Utils.class);
+    private static final String LOCAL_TRANSPORT_PREFIX = "local:/";
+    private static final String HTTP_URL_PREFIX = "http://";
+    private static final String AXIS2_SERVICE_TEST_PREFIX = "/axis2/services/";
 
     public static void addHandler(Flow flow, Handler handler, String phaseName) {
         HandlerDescription handlerDesc = new HandlerDescription(handler.getName());
@@ -269,10 +272,22 @@ public class Utils {
         	servicePath = servicePath+"/";
         }
 
-        int index = path.lastIndexOf(servicePath);
+        //Adding "/" at the beginning of the "servicePath" to check the "paths" which are starting with "servicePath"
+        if(!servicePath.startsWith("/")){
+            servicePath = "/"+servicePath;
+        }
+
         String serviceOpPart = null;
 
-        if (-1 != index) {
+        /* Here we had to check multiple cases to prevent the tests from failing with the fix given to
+        https://wso2.org/jira/browse/ESBJAVA-4014.
+        1. Accessing admin services through local transport (local:/AuthenticationAdmin)
+        2. Dispatching requests coming to "http://127.0.0.1" kind of paths
+        3. Dispatching requests coming to "10.100.0.37/axis2/services" kind of paths
+         */
+        if (path.startsWith(servicePath) || path.startsWith(LOCAL_TRANSPORT_PREFIX) || path.startsWith(HTTP_URL_PREFIX)
+                || path.contains(AXIS2_SERVICE_TEST_PREFIX)) {
+            int index = path.lastIndexOf(servicePath);
             int serviceStart = index + servicePath.length();
 
             //get the string after services path
