@@ -278,7 +278,7 @@
             <version>1.1.1</version>
         </dependency>
         <dependency>
-            <groupId>org.wso2.commons-httpclient</groupId>
+            <groupId>org.wso2.orbit.commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
             <version>${orbit.version.spring}</version>
             <exclusions>
