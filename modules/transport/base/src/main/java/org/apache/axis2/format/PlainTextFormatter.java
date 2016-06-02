@@ -19,6 +19,7 @@
 
 package org.apache.axis2.format;
 
+import org.apache.axis2.Constants;
 import org.apache.axis2.transport.http.util.URLTemplatingUtil;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.AxisFault;
@@ -64,7 +65,10 @@ public class PlainTextFormatter implements MessageFormatterEx {
 
     public String getContentType(MessageContext messageContext, OMOutputFormat format, String soapAction) {
         String encoding = format.getCharSetEncoding();
-        String contentType = "text/plain";
+        String contentType = (String) messageContext.getProperty(Constants.Configuration.CONTENT_TYPE);
+        if(contentType == null) {
+            contentType = org.apache.axis2.namespace.Constants.MIME_CT_TEXT_PLAIN;
+        }
 
         if (encoding != null) {
             contentType += "; charset=" + encoding;
