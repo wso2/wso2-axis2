@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.axis2</groupId>
     <artifactId>axis2-parent</artifactId>
-    <version>1.6.1-wso2v18-SNAPSHOT</version>
+    <version>1.6.1-wso2v19-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Apache Axis2 - Parent</name>
     <inceptionYear>2004</inceptionYear>
@@ -74,7 +74,7 @@
         <antlr.version>2.7.7</antlr.version>
         <bsf.version>2.4.0</bsf.version>
         <commons.codec.version>1.3</commons.codec.version>
-        <commons.fileupload.version>1.2</commons.fileupload.version>
+        <commons.fileupload.version>1.3.1.wso2v1</commons.fileupload.version>
         <commons.httpclient.version>3.1</commons.httpclient.version>
         <commons.io.version>2.0</commons.io.version>
         <commons.logging.version>1.1.1</commons.logging.version>
@@ -771,7 +771,7 @@
                 <version>${httpcore.version}</version>
             </dependency>
             <dependency>
-                <groupId>commons-fileupload</groupId>
+                <groupId>org.wso2.orbit.commons-fileupload</groupId>
                 <artifactId>commons-fileupload</artifactId>
                 <version>${commons.fileupload.version}</version>
             </dependency>
