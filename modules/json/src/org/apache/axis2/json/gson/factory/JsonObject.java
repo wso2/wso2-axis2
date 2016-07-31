@@ -19,6 +19,8 @@
 
 package org.apache.axis2.json.gson.factory;
 
+import java.util.ArrayList;
+import java.util.List;
 
 public class JsonObject {
     private String name;
@@ -27,11 +29,19 @@ public class JsonObject {
     private String namespaceUri;
     private long minOccurs;
 
+    private String parentName;
+    private List<String> childObjects;
+
     public JsonObject(String name, JSONType type, String valueType , String namespaceUri) {
         this.name = name;
         this.type = type;
         this.valueType = valueType;
         this.namespaceUri = namespaceUri;
+        if( this.type != JSONType.OBJECT ) {
+            this.childObjects = new ArrayList<>();
+        } else {
+            this.childObjects = null;
+        }
     }
 
     public String getName() {
@@ -56,5 +66,21 @@ public class JsonObject {
 
     public long getMinOccurs() {
         return minOccurs;
+    }
+
+    public void addChildObject(String childName) {
+        this.childObjects.add(childName);
+    }
+
+    public String getParentName() {
+        return parentName;
+    }
+
+    public void setParentName(String parentName) {
+        this.parentName = parentName;
+    }
+
+    public List<String> getChildObjects() {
+        return childObjects;
     }
 }
