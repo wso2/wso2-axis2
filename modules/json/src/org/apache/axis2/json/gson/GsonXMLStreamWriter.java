@@ -266,9 +266,9 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
                         potentialEmpty = false;
                         potentialEmptyElement = null;
                     }
-                    if (!queObj.getName().equals(localName) && queObj.getMinOccurs() == 0
-                        && (stack.isEmpty() || !stack.peek().getName().equals(localName))) {
-                        queue.poll();
+                    if (!queObj.getName().equals(localName) && queObj.getMinOccurs() == 0 &&
+                        (stack.isEmpty() || !stack.peek().getName().equals(localName))) {
+                        skipChildElementsFromQueue(queObj);
                         queObj = queue.peek();
                     }
                     if (queObj.getName().equals(localName)) {
@@ -350,13 +350,68 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
                             jsonWriter.beginObject();
                             processedJsonObjects.push(stackObj);
                         }
-                    } else {
+                    } else if (queObj.getMinOccurs() == 0) {
+                        skipChildElementsFromMiniStack(queObj);
+                        queObj = miniStack.peek();
+                        if (queObj.getName().equals(localName)) {
+                            if (flushObject != null) {
+                                popStack();
+                                writeEndJson(flushObject);
+                                flushObject = null;
+                            }
+                            if (topNestedArrayObj != null && (queObj.getType() == JSONType.NESTED_OBJECT ||
+                                                              queObj.getType() == JSONType.NESTED_ARRAY)) {
+                                processedJsonObjects.push(queObj);
+                            }
+                            writeStartJson(queObj);
+                            stack.push(miniStack.pop());
+                        }
+                    }
+                    else {
                         throw new XMLStreamException("Invalid Staring element");
                     }
                 }
             }
         } catch (IOException e) {
             throw new XMLStreamException(" Json Writer throw an error");
+        }
+    }
+
+    private void skipChildElementsFromQueue(JsonObject parentObject) {
+        JsonObject tempObject = queue.poll();
+        processedJsonObjects.push(tempObject);
+        if (parentObject.getChildObjects() != null && parentObject.getChildObjects().size() > 0) {
+            for (String childName : parentObject.getChildObjects()) {
+                JsonObject childObject = queue.peek();
+                if (childObject.getName().equals(childName) &&
+                    childObject.getParentName().equals(parentObject.getName())) {
+                    tempObject = queue.poll();
+                    processedJsonObjects.push(tempObject);
+                    JsonObject tempParentObject = queue.peek();
+                    if (tempParentObject.getChildObjects() != null && tempParentObject.getChildObjects().size() > 0) {
+                        skipChildElementsFromQueue(tempParentObject);
+                    }
+                }
+            }
+        }
+    }
+
+    private void skipChildElementsFromMiniStack(JsonObject parentObject) {
+        JsonObject tempObject = miniStack.pop();
+        processedJsonObjects.push(tempObject);
+        if (parentObject.getChildObjects() != null && parentObject.getChildObjects().size() > 0) {
+            for (String childName : parentObject.getChildObjects()) {
+                JsonObject childObject = miniStack.peek();
+                if (childObject.getName().equals(childName) &&
+                    childObject.getParentName().equals(parentObject.getName())) {
+                    tempObject = miniStack.pop();
+                    processedJsonObjects.push(tempObject);
+                    JsonObject tempParentObject = miniStack.peek();
+                    if (tempParentObject.getChildObjects() != null && tempParentObject.getChildObjects().size() > 0) {
+                        skipChildElementsFromMiniStack(tempParentObject);
+                    }
+                }
+            }
         }
     }
 
