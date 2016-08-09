@@ -231,7 +231,8 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
 
     private void fillMiniStack(JsonObject nestedJsonObject) {
 
-        while (!processedJsonObjects.peek().getName().equals(nestedJsonObject.getName())) {
+        while (!(processedJsonObjects.peek().getName().equals(nestedJsonObject.getName()) &&
+                 processedJsonObjects.peek().getType().name().equals(nestedJsonObject.getType().name()))) {
             miniStack.push(processedJsonObjects.pop());
         }
         processedJsonObjects.pop();
