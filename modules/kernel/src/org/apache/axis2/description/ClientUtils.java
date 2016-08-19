@@ -83,7 +83,7 @@ public class ClientUtils {
         }
     }
 
-    public synchronized static TransportInDescription inferInTransport(AxisConfiguration ac,
+    public static TransportInDescription inferInTransport(AxisConfiguration ac,
                                                                        Options options,
                                                                        MessageContext msgCtxt)
             throws AxisFault {
@@ -118,8 +118,10 @@ public class ClientUtils {
                     throw new AxisFault(Messages.getMessage("unknownTransport",
                                                             listenerTransportProtocol));
                 }
-                if (!listenerManager.isListenerRunning(transportIn.getName())) {
-                    listenerManager.addListener(transportIn, false);
+                synchronized (ClientUtils.class) {
+                    if (!listenerManager.isListenerRunning(transportIn.getName())) {
+                        listenerManager.addListener(transportIn, false);
+                    }
                 }
             }
             if (msgCtxt.getAxisService() != null) {
