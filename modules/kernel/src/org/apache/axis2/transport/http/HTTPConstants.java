@@ -39,6 +39,7 @@ public class HTTPConstants {
     public static final String MEDIA_TYPE_APPLICATION_ECHO_XML = "application/echo+xml";
     public static final String MEDIA_TYPE_APPLICATION_JSON = "application/json";
     public static final String MEDIA_TYPE_APPLICATION_JWT= "application/jwt";
+    public static final String HOST_NAME_VERIFIER = "HostnameVerifier";
 
     /**
      * Field REQUEST_URI
