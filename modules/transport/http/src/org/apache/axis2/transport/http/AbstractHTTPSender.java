@@ -208,16 +208,7 @@ public abstract class AbstractHTTPSender {
             if (!cookie.equals("")) {
                 cookie = cookie + ";";
             }
-            HeaderElement[] elements = header.getElements();
-            for (HeaderElement element : elements) {
-                cookie = cookie + element.getName() + "=" + element.getValue();
-                NameValuePair[] parameters = element.getParameters();
-                if (parameters != null) {
-                    for (NameValuePair parameter : parameters) {
-                        cookie = cookie + "; " + parameter.getName() + "=" + parameter.getValue();
-                    }
-                }
-            }
+            cookie += header.getValue();
         }
         return cookie;
     }
