@@ -328,9 +328,13 @@ public class HTTPSender extends AbstractHTTPSender {
         } else {
             // Since we don't process the response, we must release the connection immediately
             method.releaseConnection();
-            throw new AxisFault(Messages.getMessage("transportError",
-                                                    String.valueOf(statusCode),
-                                                    method.getStatusText()));
+            //solving CARBON-16056
+            msgContext.setProperty(HTTPConstants.MC_HTTP_STATUS_CODE, method.getStatusCode());
+            AxisFault axisFault = new AxisFault(
+                    Messages.getMessage("transportError", String.valueOf(statusCode), method.getStatusText()),
+                    msgContext);
+            axisFault.setFaultCode(String.valueOf(method.getStatusCode()));
+            throw axisFault;
         }
     }
 
