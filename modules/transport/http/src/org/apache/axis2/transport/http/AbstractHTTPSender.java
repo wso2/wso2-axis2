@@ -62,6 +62,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.protocol.HTTP;
 
 import javax.xml.namespace.QName;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -220,7 +221,11 @@ public abstract class AbstractHTTPSender {
 
         InputStream in = httpMethod.getResponseBodyAsStream();
         if (in == null) {
-            throw new AxisFault(Messages.getMessage("canNotBeNull", "InputStream"));
+            if (hasResponseBodyForHTTPStatusCode(httpMethod.getStatusCode())) {
+                throw new AxisFault(Messages.getMessage("canNotBeNull", "InputStream"));
+            } else {
+                in = new ByteArrayInputStream("".getBytes());
+            }
         }
         Header contentEncoding =
                 httpMethod.getResponseHeader(HTTPConstants.HEADER_CONTENT_ENCODING);
@@ -263,6 +268,24 @@ public abstract class AbstractHTTPSender {
         OperationContext opContext = msgContext.getOperationContext();
         if (opContext != null) {
             opContext.setProperty(MessageContext.TRANSPORT_IN, in);
+        }
+    }
+
+    /**
+     * Check whether there is a message body or not for parsed HTTP status code, according to the HTTP spec.
+     *
+     * @param statusCode HTTP status code
+     * @return true if there is a message body for parsed status code, false if not.
+     */
+    private boolean hasResponseBodyForHTTPStatusCode(int statusCode) {
+        if (statusCode == HttpStatus.SC_NO_CONTENT) {
+            return false;
+        } else if (statusCode == HttpStatus.SC_NOT_MODIFIED) {
+            return false;
+        } else if (statusCode / 100 == 1) {
+            return false;
+        } else {
+            return true;
         }
     }
 
