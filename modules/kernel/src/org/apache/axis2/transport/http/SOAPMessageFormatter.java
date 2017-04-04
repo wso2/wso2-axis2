@@ -234,7 +234,9 @@ public class SOAPMessageFormatter implements MessageFormatter {
             
             Attachments attachments = msgCtxt.getAttachmentMap();
             for (String contentID : attachments.getAllContentIDs()) {
-                attachmentsWriter.writePart(attachments.getDataHandler(contentID), contentID);
+                if (!contentID.equalsIgnoreCase(attachments.getSOAPPartContentID())) {
+                    attachmentsWriter.writePart(attachments.getDataHandler(contentID), contentID);
+                }
             }
             
             if (MM7CompatMode) {
