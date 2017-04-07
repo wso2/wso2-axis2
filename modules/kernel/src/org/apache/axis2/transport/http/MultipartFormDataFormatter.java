@@ -23,11 +23,15 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMOutputFormat;
+import org.apache.axiom.om.impl.llom.OMTextImpl;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.builder.DiskFileDataSource;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.http.util.ComplexPart;
 import org.apache.axis2.transport.http.util.URLTemplatingUtil;
+import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
+import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
 
@@ -37,6 +41,9 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+
+import javax.activation.DataHandler;
 
 /**
  * Formates the request message as multipart/form-data. An example of this serialization is shown
@@ -177,30 +184,53 @@ public class MultipartFormDataFormatter implements MessageFormatter {
      * @param dataOut
      * @return
      */
-    private Part[] createMultipatFormDataRequest(OMElement dataOut) {
-        ArrayList parts = new ArrayList();
-        if (dataOut != null) {
-            Iterator iter1 = dataOut.getChildElements();
-            OMFactory omFactory = OMAbstractFactory.getOMFactory();
-            while (iter1.hasNext()) {
-                OMElement ele = (OMElement) iter1.next();
-                Iterator iter2 = ele.getChildElements();
-                // check whether the element is a complex type
-                if (iter2.hasNext()) {
-                    OMElement omElement =
-                            omFactory.createOMElement(ele.getQName().getLocalPart(), null);
-                    omElement.addChild(
-                            processComplexType(omElement, ele.getChildElements(), omFactory, false));
-                    parts.add(new ComplexPart(ele.getQName().getLocalPart(), omElement.toString()));
-                } else {
-                    parts.add(new StringPart(ele.getQName().getLocalPart(), ele.getText()));
-                }
-            }
-        }
-        Part[] partsArray = new Part[parts.size()];
-        return (Part[]) parts.toArray(partsArray);
-    }
-
+	private Part[] createMultipatFormDataRequest(OMElement dataOut) {
+		List<Part> parts = new ArrayList<Part>();
+		if (dataOut != null) {
+			Iterator<?> iter1 = dataOut.getChildElements();
+			OMFactory omFactory = OMAbstractFactory.getOMFactory();
+			while (iter1.hasNext()) {
+				Part part = null;
+				OMElement ele = (OMElement) iter1.next();
+				Iterator<?> iter2 = ele.getChildElements();
+				// Checks whether the element is a complex type
+				if (iter2.hasNext()) {
+					OMElement omElement = omFactory.createOMElement(ele.getQName().getLocalPart(), null);
+					omElement.addChild(processComplexType(omElement, ele.getChildElements(), omFactory, false));
+					part = new ComplexPart(ele.getQName().getLocalPart(), omElement.toString());
+				} else {
+					// Gets the first child object
+					OMTextImpl firstChild = (OMTextImpl) ele.getFirstOMChild();
+					// Checks whether the first object is a binary
+					if (firstChild.isBinary()) {
+						if (firstChild.getDataHandler() != null) {
+							if (((DataHandler) firstChild.getDataHandler())
+									.getDataSource() instanceof DiskFileDataSource) {
+								String fileName = null;
+								String contentType = null;
+								// Gets the disk file data source
+								DiskFileDataSource fileDataSource = (DiskFileDataSource) ((DataHandler) firstChild
+										.getDataHandler()).getDataSource();
+								// Gets the filename and content type
+								fileName = fileDataSource.getName();
+								contentType = fileDataSource.getContentType();
+								// Creates the FilePart
+								part = new FilePart(ele.getQName().getLocalPart(),
+										new ByteArrayPartSource(fileName, ele.getText().getBytes()), contentType, null);
+							}
+						}
+					}
+					if (part == null) {
+						part = new StringPart(ele.getQName().getLocalPart(), ele.getText());
+					}
+				}
+				parts.add(part);
+			}
+		}
+		Part[] partsArray = new Part[parts.size()];
+		return (Part[]) parts.toArray(partsArray);
+	}
+  
     /**
      * @param parent
      * @param iter
