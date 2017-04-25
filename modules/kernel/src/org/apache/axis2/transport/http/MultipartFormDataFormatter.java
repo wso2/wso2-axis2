@@ -20,6 +20,7 @@
 package org.apache.axis2.transport.http;
 
 import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMOutputFormat;
@@ -28,6 +29,9 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.http.util.ComplexPart;
 import org.apache.axis2.transport.http.util.URLTemplatingUtil;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
+import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
 
@@ -37,6 +41,7 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
+import javax.xml.namespace.QName;
 
 /**
  * Formates the request message as multipart/form-data. An example of this serialization is shown
@@ -79,6 +84,51 @@ import java.util.Iterator;
  * @@@@-@@-@@ --AaB03x--
  */
 public class MultipartFormDataFormatter implements MessageFormatter {
+
+    /**
+     * QName of the reserved XML node for file fields
+     */
+    private static final QName FILE_FIELD_QNAME = new QName("http://org.apache.axis2/xsd/form-data", "file");
+
+    /**
+     * QName of the reserved XML attribute for filename
+     */
+    private static final QName FILENAME_ATTRIBUTE_QNAME = new QName("filename");
+
+    /**
+     * QName of the reserved XML attribute for filename
+     */
+    private static final QName FILE_FIELD_NAME_ATTRIBUTE_QNAME = new QName("name");
+
+    /**
+     * QName of the reserved XML attribute for content-type
+     */
+    private static final QName CONTENT_TYPE_ATTRIBUTE_QNAME = new QName("content-type");
+
+    /**
+     * QName of the reserved XML attribute for charset
+     */
+    private static final QName CHARSET_ATTRIBUTE_QNAME = new QName("charset");
+
+    /**
+     * Default filename used in file fields
+     */
+    private static final String DEFAULT_FILE_NAME = "esb-generated-file";
+
+    /**
+     * Default field name used in file fields
+     */
+    private static final String DEFAULT_FILE_FIELD_NAME = "file";
+
+    /**
+     * Default content-type used in the file fields
+     */
+    private static final String DEFAULT_CONTENT_TYPE = "text/plain";
+
+    /**
+     * Default charset used in file fields
+     */
+    private static final String DEFAULT_CHARSET = "ISO-8859-1";
 
     /**
      * @return a byte array of the message formatted according to the given
@@ -178,7 +228,7 @@ public class MultipartFormDataFormatter implements MessageFormatter {
      * @return
      */
     private Part[] createMultipatFormDataRequest(OMElement dataOut) {
-        ArrayList parts = new ArrayList();
+        ArrayList<Part> parts = new ArrayList<Part>();
         if (dataOut != null) {
             Iterator iter1 = dataOut.getChildElements();
             OMFactory omFactory = OMAbstractFactory.getOMFactory();
@@ -192,13 +242,41 @@ public class MultipartFormDataFormatter implements MessageFormatter {
                     omElement.addChild(
                             processComplexType(omElement, ele.getChildElements(), omFactory, false));
                     parts.add(new ComplexPart(ele.getQName().getLocalPart(), omElement.toString()));
+                } else if (FILE_FIELD_QNAME.equals(ele.getQName())) {
+
+                    String fieldName
+                            = getAttributeValue(ele.getAttribute(FILE_FIELD_NAME_ATTRIBUTE_QNAME), DEFAULT_FILE_FIELD_NAME);
+                    String filename
+                            = getAttributeValue(ele.getAttribute(FILENAME_ATTRIBUTE_QNAME), DEFAULT_FILE_NAME);
+                    String contentType
+                            = getAttributeValue(ele.getAttribute(CONTENT_TYPE_ATTRIBUTE_QNAME),
+                                                DEFAULT_CONTENT_TYPE);
+                    String charset
+                            = getAttributeValue(ele.getAttribute(CHARSET_ATTRIBUTE_QNAME), DEFAULT_CHARSET);
+
+                    parts.add(new FilePart(fieldName,
+                                           new ByteArrayPartSource(filename,
+                                                                   Base64.decodeBase64(ele.getText().getBytes())),
+                                           contentType,
+                                           charset));
                 } else {
                     parts.add(new StringPart(ele.getQName().getLocalPart(), ele.getText()));
                 }
             }
+
         }
         Part[] partsArray = new Part[parts.size()];
-        return (Part[]) parts.toArray(partsArray);
+        return parts.toArray(partsArray);
+    }
+
+    private String getAttributeValue(OMAttribute filenameAttribute, String defaultValue) {
+        String filename = defaultValue;
+
+        if (filenameAttribute != null) {
+            filename = filenameAttribute.getAttributeValue();
+        }
+
+        return filename;
     }
 
     /**
