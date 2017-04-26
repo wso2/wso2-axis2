@@ -388,7 +388,9 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
                     tempObject = queue.poll();
                     processedJsonObjects.push(tempObject);
                     JsonObject tempParentObject = queue.peek();
-                    if (tempParentObject.getChildObjects() != null && tempParentObject.getChildObjects().size() > 0) {
+                    if (tempParentObject.getChildObjects() != null && tempParentObject.getChildObjects().size() > 0 &&
+                            tempParentObject.getParentName() != null &&
+                            tempParentObject.getParentName().equals(childObject.getName())) {
                         skipChildElementsFromQueue(tempParentObject);
                     }
                 }
@@ -407,7 +409,9 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
                     tempObject = miniStack.pop();
                     processedJsonObjects.push(tempObject);
                     JsonObject tempParentObject = miniStack.peek();
-                    if (tempParentObject.getChildObjects() != null && tempParentObject.getChildObjects().size() > 0) {
+                    if (tempParentObject.getChildObjects() != null && tempParentObject.getChildObjects().size() > 0 &&
+                            tempParentObject.getParentName() != null &&
+                            tempParentObject.getParentName().equals(childObject.getName())) {
                         skipChildElementsFromMiniStack(tempParentObject);
                     }
                 }
