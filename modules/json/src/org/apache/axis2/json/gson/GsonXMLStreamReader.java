@@ -780,20 +780,22 @@ public class GsonXMLStreamReader implements XMLStreamReader {
      * @return true if it matches false otherwise
      */
     private boolean validateArgumentTypes(JsonToken tokenType, String expectedType) {
-        if (expectedType.equalsIgnoreCase(tokenType.toString())) {
-            return true;
-        } else if (tokenType == JsonToken.NULL) {
-            return true;
-        } else if (tokenType == JsonToken.NUMBER) {
-            if (expectedType.equals("int") || expectedType.equals("long") || expectedType.equals("double")
-                    || expectedType.equals("float") || expectedType.equals("decimal") || expectedType.equals("byte")
-                    || expectedType.equals("short")) {
+        if (expectedType != null) {
+            if (expectedType.equalsIgnoreCase(tokenType.toString())) {
                 return true;
-            }
-        } else if (tokenType == JsonToken.STRING) {
-            if (expectedType.equals("string") || expectedType.equals("date") || expectedType.equals("time")
-                    || expectedType.equals("datetime") || expectedType.equals("base64Binary")) {
+            } else if (tokenType == JsonToken.NULL) {
                 return true;
+            } else if (tokenType == JsonToken.NUMBER) {
+                if (expectedType.equals("int") || expectedType.equals("long") || expectedType.equals("double")
+                        || expectedType.equals("float") || expectedType.equals("decimal") || expectedType.equals("byte")
+                        || expectedType.equals("short")) {
+                    return true;
+                }
+            } else if (tokenType == JsonToken.STRING) {
+                if (expectedType.equals("string") || expectedType.equals("date") || expectedType.equals("time")
+                        || expectedType.equals("datetime") || expectedType.equals("base64Binary")) {
+                    return true;
+                }
             }
         }
         return false;
