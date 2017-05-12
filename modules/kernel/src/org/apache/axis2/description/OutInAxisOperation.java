@@ -19,8 +19,10 @@
 
 package org.apache.axis2.description;
 
+import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.util.UIDGenerator;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
@@ -344,14 +346,23 @@ class OutInAxisOperationClient extends OperationClient {
              * the inbound SOAP version.  Best way to do this is to trust the content type and let
              * createSOAPMessage take care of figuring out what the SOAP namespace is.
              */
+            SOAPEnvelope resenvelope = null;
             if (checkContentLength(responseMessageContext)) {
-                SOAPEnvelope resenvelope = TransportUtils.createSOAPMessage(responseMessageContext);
-                if (resenvelope != null) {
-                    responseMessageContext.setEnvelope(resenvelope);
-                } else {
-                    throw new AxisFault(Messages
-                            .getMessage("blockingInvocationExpectsResponse"));
-                }
+                resenvelope = TransportUtils.createSOAPMessage(responseMessageContext);
+            } else {
+                /*
+                 * Despite the Content-Length equals 0 we need envelope object in context
+                 * to protect from NullPointerException in Axis2Sender.sendBack
+                 */ 
+                SOAPFactory soapFactory = OMAbstractFactory.getSOAP11Factory();
+                resenvelope = soapFactory.getDefaultEnvelope();
+            }
+            
+            if (resenvelope != null) {
+                responseMessageContext.setEnvelope(resenvelope);
+            } else {
+                throw new AxisFault(Messages
+                        .getMessage("blockingInvocationExpectsResponse"));
             }
         }
         SOAPEnvelope resenvelope = responseMessageContext.getEnvelope();
