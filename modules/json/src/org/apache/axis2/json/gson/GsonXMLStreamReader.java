@@ -780,19 +780,20 @@ public class GsonXMLStreamReader implements XMLStreamReader {
      * @return true if it matches false otherwise
      */
     private boolean validateArgumentTypes(JsonToken tokenType, String expectedType) {
-        if (expectedType.equalsIgnoreCase(tokenType.toString())) {
+        if (expectedType != null && expectedType.equalsIgnoreCase(tokenType.toString())) {
             return true;
         } else if (tokenType == JsonToken.NULL) {
             return true;
         } else if (tokenType == JsonToken.NUMBER) {
-            if (expectedType.equals("int") || expectedType.equals("long") || expectedType.equals("double")
-                    || expectedType.equals("float") || expectedType.equals("decimal") || expectedType.equals("byte")
-                    || expectedType.equals("short")) {
+            if ("int".equals(expectedType) || "long".equals(expectedType)
+                    || "double".equals(expectedType) || "float".equals(expectedType) || "decimal".equals(expectedType)
+                    || "byte".equals(expectedType) || "short".equals(expectedType)) {
                 return true;
             }
         } else if (tokenType == JsonToken.STRING) {
-            if (expectedType.equals("string") || expectedType.equals("date") || expectedType.equals("time")
-                    || expectedType.equals("datetime") || expectedType.equals("base64Binary")) {
+            if ("string".equals(expectedType) || "date".equals(expectedType)
+                    || "time".equals(expectedType) || "datetime".equals(expectedType)
+                    || "base64Binary".equals(expectedType)) {
                 return true;
             }
         }
