@@ -21,6 +21,7 @@ package org.apache.axis2.json.gson.factory;
 
 
 import org.apache.ws.commons.schema.XmlSchema;
+import org.apache.ws.commons.schema.XmlSchemaAll;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaObjectCollection;
@@ -164,6 +165,16 @@ public class XmlNodeGenerator {
                     Object obj = objectIterator.next();
                     if (obj instanceof XmlSchemaElement) {
                         processElement((XmlSchemaElement)obj , parentNode , schema);
+                    }
+                }
+            } else if (particle instanceof XmlSchemaAll) {
+                XmlSchemaAll all = (XmlSchemaAll) particle;
+                XmlSchemaObjectCollection objectCollection = all.getItems();
+                Iterator objectIterator = objectCollection.getIterator();
+                while (objectIterator.hasNext()) {
+                    Object obj = objectIterator.next();
+                    if (obj instanceof XmlSchemaElement) {
+                        processElement((XmlSchemaElement) obj, parentNode, schema);
                     }
                 }
             }

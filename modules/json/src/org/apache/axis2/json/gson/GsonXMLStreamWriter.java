@@ -268,10 +268,12 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
                     }
                     if (!queObj.getName().equals(localName) && queObj.getMinOccurs() == 0 &&
                         (stack.isEmpty() || !stack.peek().getName().equals(localName))) {
-                        skipChildElementsFromQueue(queObj);
-                        queObj = queue.peek();
+                        while (queObj != null && !queObj.getName().equals(localName)) {
+                            skipChildElementsFromQueue(queObj);
+                            queObj = queue.peek();
+                        }
                     }
-                    if (queObj.getName().equals(localName)) {
+                    if (queObj != null && queObj.getName().equals(localName)) {
                         if (flushObject != null) {
                             if (topNestedArrayObj != null && flushObject.getType() == JSONType.NESTED_ARRAY
                                 && flushObject.getName().equals(topNestedArrayObj.getName())) {
@@ -379,7 +381,9 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
 
     private void skipChildElementsFromQueue(JsonObject parentObject) {
         JsonObject tempObject = queue.poll();
-        processedJsonObjects.push(tempObject);
+        if (processedJsonObjects.isEmpty() || !tempObject.equals(processedJsonObjects.peek())) {
+            processedJsonObjects.push(tempObject);
+        }
         if (parentObject.getChildObjects() != null && parentObject.getChildObjects().size() > 0) {
             for (String childName : parentObject.getChildObjects()) {
                 JsonObject childObject = queue.peek();
@@ -392,6 +396,9 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
                             tempParentObject.getParentName() != null &&
                             tempParentObject.getParentName().equals(childObject.getName())) {
                         skipChildElementsFromQueue(tempParentObject);
+                    } else if (tempParentObject.getParentName() != null && tempParentObject.getParentName()
+                            .equals(childName)) {
+                        skipChildElementsFromQueue(childObject);
                     }
                 }
             }
@@ -413,6 +420,9 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
                             tempParentObject.getParentName() != null &&
                             tempParentObject.getParentName().equals(childObject.getName())) {
                         skipChildElementsFromMiniStack(tempParentObject);
+                    } else if (tempParentObject.getParentName() != null && tempParentObject.getParentName()
+                            .equals(childName)) {
+                        skipChildElementsFromMiniStack(childObject);
                     }
                 }
             }
