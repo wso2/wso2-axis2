@@ -785,15 +785,15 @@ public class GsonXMLStreamReader implements XMLStreamReader {
         } else if (tokenType == JsonToken.NULL) {
             return true;
         } else if (tokenType == JsonToken.NUMBER) {
-            if ("int".equals(expectedType) || "long".equals(expectedType)
-                    || "double".equals(expectedType) || "float".equals(expectedType) || "decimal".equals(expectedType)
-                    || "byte".equals(expectedType) || "short".equals(expectedType)) {
+            if ("int".equalsIgnoreCase(expectedType) || "long".equalsIgnoreCase(expectedType)
+                    || "double".equalsIgnoreCase(expectedType) || "float".equalsIgnoreCase(expectedType) || "decimal".equalsIgnoreCase(expectedType)
+                    || "byte".equalsIgnoreCase(expectedType) || "short".equalsIgnoreCase(expectedType)) {
                 return true;
             }
         } else if (tokenType == JsonToken.STRING) {
-            if ("string".equals(expectedType) || "date".equals(expectedType)
-                    || "time".equals(expectedType) || "datetime".equals(expectedType)
-                    || "base64Binary".equals(expectedType)) {
+            if ("string".equalsIgnoreCase(expectedType) || "date".equalsIgnoreCase(expectedType)
+                    || "time".equalsIgnoreCase(expectedType) || "datetime".equalsIgnoreCase(expectedType)
+                    || "base64Binary".equalsIgnoreCase(expectedType)) {
                 return true;
             }
         }
