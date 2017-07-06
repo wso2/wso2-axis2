@@ -37,7 +37,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.WeakHashMap;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
@@ -58,7 +57,6 @@ import org.apache.axis2.util.StreamWrapper;
 
 public class BeanUtil {
     private static int nsCount = 1;
-    private static Map<String, BeanInfo> beanInfoMap = new WeakHashMap<>();
 
     /**
      * To Serilize Bean object this method is used, this will create an object array using given
@@ -99,24 +97,18 @@ public class BeanUtil {
 
 
     private static BeanInfo getBeanInfo(Class beanClass, Class beanSuperclass) throws IntrospectionException {
-        String beanInfoKey;
-        if (beanSuperclass != null)
-            beanInfoKey = beanClass.getName().concat("|").concat(beanSuperclass.getName());
-        else
-            beanInfoKey = beanClass.getName();
-
-        BeanInfo beanInfo = beanInfoMap.get(beanInfoKey);
-        if (beanInfo == null) {
-            try {
-                if (beanSuperclass != null)
-                    beanInfo = Introspector.getBeanInfo(beanClass, beanSuperclass);
-                else
-                    beanInfo = Introspector.getBeanInfo(beanClass);
-            } catch (IntrospectionException e) {
-                throw e;
-            }
-            beanInfoMap.put(beanInfoKey, beanInfo);
+        BeanInfo beanInfo; 
+        try {
+            if (beanSuperclass != null)
+            	beanInfo = Introspector.getBeanInfo(beanClass, beanSuperclass);
+            else
+                beanInfo = Introspector.getBeanInfo(beanClass);
         }
+        catch (IntrospectionException e) {
+            throw e;
+        }
+
+         
         return beanInfo;
     }
 
