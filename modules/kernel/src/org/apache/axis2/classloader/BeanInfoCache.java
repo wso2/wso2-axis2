@@ -112,19 +112,11 @@ public final class BeanInfoCache {
         BeanInfoCache cache;
         if (classLoader instanceof BeanInfoCachingClassLoader) {
             cache = ((BeanInfoCachingClassLoader)classLoader).getBeanInfoCache();
-        } else if (classLoader == BeanInfoCache.class.getClassLoader()) {
+        } else {
+            // resObject from Admin Services have the bean.getClassLoader() is
+            // "org.eclipse.osgi.internal.baseadaptor.DefaultClassLoader"
             cache = localCache;
-        } else {
-            cache = null;
         }
-        if (cache != null) {
-            return cache.getBeanInfo(beanClass, stopClass);
-        } else {
-            if (log.isWarnEnabled()) {
-                log.warn("Unable to locate a BeanInfo cache for " + beanClass + " (stopClass=" + stopClass
-                        + "). This will negatively affect performance!");
-            }
-            return Introspector.getBeanInfo(beanClass, stopClass);
-        }
+        return cache.getBeanInfo(beanClass, stopClass);
     }
 }
