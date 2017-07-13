@@ -28,14 +28,15 @@ import org.apache.axis2.Constants;
 import org.apache.axis2.builder.Builder;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.json.gson.factory.JsonConstant;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 
 public class JsonBuilder implements Builder {
-    Logger log = Logger.getLogger(JsonBuilder.class);
+    private static final Log log = LogFactory.getLog(JsonBuilder.class);
     public OMElement processDocument(InputStream inputStream, String s, MessageContext messageContext) throws AxisFault {
         messageContext.setProperty(JsonConstant.IS_JSON_STREAM , true);
         JsonReader jsonReader;
