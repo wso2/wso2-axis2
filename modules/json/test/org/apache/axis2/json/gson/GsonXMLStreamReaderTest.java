@@ -66,14 +66,17 @@ public class GsonXMLStreamReaderTest {
 
     }
 
+    /**
+     * This method tests GsonXMLStreamReader for a schema with different data types including binary.
+     */
     @Test
     public void testGsonXMLStreamReaderWithDataTypes() throws Exception {
-        String jsonString = "{\"response\":{\"return\":{\"name\":\"kate\",\"homes\":1,\"age\":23,\"height\":5.5," +
-                "\"image\":\"iVBORw0KGg\"}}}";
-        String xmlString = "<response xmlns=\"http://www.w3schools.com\"><return><name>kate</name><homes>1</homes>" +
-                "<age>23</age><height>5.5</height><image>iVBORw0KGg</image></return></response>";
+        String jsonString = "{\"response\":{\"return\":{\"name\":\"kate\",\"homes\":1,\"age\":23,\"height\":5.5,"
+                + "\"image\":\"iVBORw0KGg\"}}}";
+        String xmlString = "<response xmlns=\"http://www.w3schools.com\"><return><name>kate</name><homes>1</homes>"
+                + "<age>23</age><height>5.5</height><image>iVBORw0KGg</image></return></response>";
         InputStream inputStream = new ByteArrayInputStream(jsonString.getBytes());
-        JsonReader jsonReader = new JsonReader(new InputStreamReader(inputStream , "UTF-8"));
+        JsonReader jsonReader = new JsonReader(new InputStreamReader(inputStream, "UTF-8"));
         String fileName = "test-resources/custom_schema/testSchema_3.xsd";
         InputStream is = new FileInputStream(fileName);
         XmlSchemaCollection schemaCol = new XmlSchemaCollection();
@@ -83,13 +86,12 @@ public class GsonXMLStreamReaderTest {
         QName elementQName = new QName("http://www.w3schools.com", "response");
         ConfigurationContext configCtxt = new ConfigurationContext(new AxisConfiguration());
         GsonXMLStreamReader gsonXMLStreamReader = new GsonXMLStreamReader(jsonReader);
-        gsonXMLStreamReader.initXmlStreamReader(elementQName , schemaList , configCtxt);
+        gsonXMLStreamReader.initXmlStreamReader(elementQName, schemaList, configCtxt);
         StAXOMBuilder stAXOMBuilder = new StAXOMBuilder(gsonXMLStreamReader);
         OMElement omElement = stAXOMBuilder.getDocumentElement();
         String actual = omElement.toString();
         inputStream.close();
         is.close();
-        Assert.assertEquals(xmlString , actual);
-
+        Assert.assertEquals(xmlString, actual);
     }
 }
