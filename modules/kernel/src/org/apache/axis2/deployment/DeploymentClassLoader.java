@@ -20,6 +20,8 @@
 package org.apache.axis2.deployment;
 
 import org.apache.axiom.attachments.utils.IOUtils;
+import org.apache.axis2.classloader.BeanInfoCache;
+import org.apache.axis2.classloader.BeanInfoCachingClassLoader;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -31,12 +33,11 @@ import java.net.URLStreamHandler;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class DeploymentClassLoader extends URLClassLoader {
+public class DeploymentClassLoader extends URLClassLoader implements BeanInfoCachingClassLoader {
     // List of URL's
     private URL[] urls = null;
 
@@ -44,6 +45,8 @@ public class DeploymentClassLoader extends URLClassLoader {
     private List embedded_jars;
 
     private boolean isChildFirstClassLoading;
+
+    private final BeanInfoCache beanInfoCache = new BeanInfoCache();
 
     /**
      * DeploymentClassLoader is extended from URLClassLoader. The constructor
@@ -290,5 +293,9 @@ public class DeploymentClassLoader extends URLClassLoader {
 
     public void setChildFirstClassLoading(boolean childFirstClassLoading) {
         isChildFirstClassLoading = childFirstClassLoading;
+    }
+
+    public final BeanInfoCache getBeanInfoCache() {
+        return beanInfoCache;
     }
 }
