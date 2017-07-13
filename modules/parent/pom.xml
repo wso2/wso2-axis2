@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.axis2</groupId>
     <artifactId>axis2-parent</artifactId>
-    <version>1.6.1-wso2v22-SNAPSHOT</version>
+    <version>1.6.1-wso2v22</version>
     <packaging>pom</packaging>
     <name>Apache Axis2 - Parent</name>
     <inceptionYear>2004</inceptionYear>
@@ -1258,4 +1258,8 @@
             </plugin>
         </plugins>
     </reporting>
+
+  <scm>
+    <tag>v1.6.1-wso2v22</tag>
+  </scm>
 </project>
