@@ -19,12 +19,10 @@
   ~ under the License.
   -->
 
-
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
            targetNamespace="http://www.w3schools.com"
            xmlns="http://www.w3schools.com"
            elementFormDefault="qualified">
-
     <xs:element name="response">
         <xs:complexType>
             <xs:sequence>
@@ -32,7 +30,6 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-
     <xs:complexType name="Person">
         <xs:sequence>
             <xs:element name="name" type="xs:string" minOccurs="0"/>
@@ -42,5 +39,4 @@
             <xs:element name="image" type="xs:base64Binary"/>
         </xs:sequence>
     </xs:complexType>
-
 </xs:schema>
