@@ -228,70 +228,68 @@ public class MultipartFormDataFormatter implements MessageFormatter {
         return soapAction;
     }
 
-	/**
-	 * @param dataOut
-	 * @return
-	 */
-	private Part[] createMultipatFormDataRequest(OMElement dataOut) {
-		List<Part> parts = new ArrayList<Part>();
-		if (dataOut != null) {
-			Iterator<?> iter1 = dataOut.getChildElements();
-			OMFactory omFactory = OMAbstractFactory.getOMFactory();
-			while (iter1.hasNext()) {
-				Part part = null;
-				OMElement ele = (OMElement) iter1.next();
-				Iterator<?> iter2 = ele.getChildElements();
-				// Checks whether the element is a complex type
-				if (iter2.hasNext()) {
-					OMElement omElement = omFactory.createOMElement(ele.getQName().getLocalPart(), null);
-					omElement.addChild(processComplexType(omElement, ele.getChildElements(), omFactory, false));
-					part = new ComplexPart(ele.getQName().getLocalPart(), omElement.toString());
-				} else if (FILE_FIELD_QNAME.equals(ele.getQName())) {
+    /**
+     * @param dataOut
+     * @return
+     */
+    private Part[] createMultipatFormDataRequest(OMElement dataOut) {
+        List<Part> parts = new ArrayList<Part>();
+        if (dataOut != null) {
+            Iterator<?> iter1 = dataOut.getChildElements();
+            OMFactory omFactory = OMAbstractFactory.getOMFactory();
+            while (iter1.hasNext()) {
+                Part part = null;
+                OMElement ele = (OMElement) iter1.next();
+                Iterator<?> iter2 = ele.getChildElements();
+                // Checks whether the element is a complex type
+                if (iter2.hasNext()) {
+                    OMElement omElement = omFactory.createOMElement(ele.getQName().getLocalPart(), null);
+                    omElement.addChild(processComplexType(omElement, ele.getChildElements(), omFactory, false));
+                    part = new ComplexPart(ele.getQName().getLocalPart(), omElement.toString());
+                } else if (FILE_FIELD_QNAME.equals(ele.getQName())) {
 
-					String fieldName = getAttributeValue(ele.getAttribute(FILE_FIELD_NAME_ATTRIBUTE_QNAME),
-							DEFAULT_FILE_FIELD_NAME);
-					String filename = getAttributeValue(ele.getAttribute(FILENAME_ATTRIBUTE_QNAME), DEFAULT_FILE_NAME);
-					String contentType = getAttributeValue(ele.getAttribute(CONTENT_TYPE_ATTRIBUTE_QNAME),
-							DEFAULT_CONTENT_TYPE);
-					String charset = getAttributeValue(ele.getAttribute(CHARSET_ATTRIBUTE_QNAME), DEFAULT_CHARSET);
+                    String fieldName = getAttributeValue(ele.getAttribute(FILE_FIELD_NAME_ATTRIBUTE_QNAME),
+                            DEFAULT_FILE_FIELD_NAME);
+                    String filename = getAttributeValue(ele.getAttribute(FILENAME_ATTRIBUTE_QNAME), DEFAULT_FILE_NAME);
+                    String contentType = getAttributeValue(ele.getAttribute(CONTENT_TYPE_ATTRIBUTE_QNAME),
+                            DEFAULT_CONTENT_TYPE);
+                    String charset = getAttributeValue(ele.getAttribute(CHARSET_ATTRIBUTE_QNAME), DEFAULT_CHARSET);
 
-					part = new FilePart(fieldName,
-							new ByteArrayPartSource(filename, Base64.decodeBase64(ele.getText().getBytes())),
-							contentType, charset);
-				} else {
-					// Gets the first child object
-					OMTextImpl firstChild = (OMTextImpl) ele.getFirstOMChild();
-					// Checks whether the first object is a binary
-					if (firstChild.isBinary()) {
-						if (firstChild.getDataHandler() != null) {
-							if (((DataHandler) firstChild.getDataHandler())
-									.getDataSource() instanceof DiskFileDataSource) {
-								String fileName = null;
-								String contentType = null;
-								// Gets the disk file data source
-								DiskFileDataSource fileDataSource = (DiskFileDataSource) ((DataHandler) firstChild
-										.getDataHandler()).getDataSource();
-								// Gets the filename and content type
-								fileName = fileDataSource.getName();
-								contentType = fileDataSource.getContentType();
-								// Creates the FilePart
-								part = new FilePart(ele.getQName().getLocalPart(),
-										new ByteArrayPartSource(fileName, ele.getText().getBytes()), contentType, null);
-							}
-						}
-					}
-					if (part == null) {
-						part = new StringPart(ele.getQName().getLocalPart(), ele.getText());
-					}
-				}
-
-				parts.add(part);
-			}
-
-		}
-		Part[] partsArray = new Part[parts.size()];
-		return parts.toArray(partsArray);
-	}
+                    part = new FilePart(fieldName,
+                            new ByteArrayPartSource(filename, Base64.decodeBase64(ele.getText().getBytes())),
+                            contentType, charset);
+                } else {
+                    // Gets the first child object
+                    OMTextImpl firstChild = (OMTextImpl) ele.getFirstOMChild();
+                    // Checks whether the first object is a binary
+                    if (firstChild.isBinary()) {
+                        if (firstChild.getDataHandler() != null) {
+                            if (((DataHandler) firstChild.getDataHandler())
+                                    .getDataSource() instanceof DiskFileDataSource) {
+                                String fileName = null;
+                                String contentType = null;
+                                // Gets the disk file data source
+                                DiskFileDataSource fileDataSource = (DiskFileDataSource) ((DataHandler) firstChild
+                                        .getDataHandler()).getDataSource();
+                                // Gets the filename and content type
+                                fileName = fileDataSource.getName();
+                                contentType = fileDataSource.getContentType();
+                                // Creates the FilePart
+                                part = new FilePart(ele.getQName().getLocalPart(),
+                                        new ByteArrayPartSource(fileName, ele.getText().getBytes()), contentType, null);
+                            }
+                        }
+                    }
+                    if (part == null) {
+                        part = new StringPart(ele.getQName().getLocalPart(), ele.getText());
+                    }
+                }
+                parts.add(part);
+            }
+        }
+        Part[] partsArray = new Part[parts.size()];
+        return parts.toArray(partsArray);
+    }
 
     private String getAttributeValue(OMAttribute filenameAttribute, String defaultValue) {
         String filename = defaultValue;
