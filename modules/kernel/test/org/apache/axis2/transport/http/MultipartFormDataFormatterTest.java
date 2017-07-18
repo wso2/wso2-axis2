@@ -46,72 +46,72 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 
 public class MultipartFormDataFormatterTest extends AbstractTestCase {
 
-	public MultipartFormDataFormatterTest(String testName) {
-		super(testName);
-	}
+    public MultipartFormDataFormatterTest(String testName) {
+        super(testName);
+    }
 
-	public void testTransportHeadersOfFileAttachments() throws Exception {
+    public void testTransportHeadersOfFileAttachments() throws Exception {
 
-		String FILE_NAME = "binaryFile.xml";
-		String FIELD_NAME = "fileData";
-		String CONTENT_TYPE_VALUE = "text/xml";
-		String MEDIATE_ELEMENT = "mediate";
-		String FILE_KEY = "fileAttachment";
-		String CONTENT_DISPOSITION = "Content-Disposition";
-		String CONTENT_TRANSFER_ENCODING = "Content-Transfer-Encoding";
-		String CONTENT_TYPE = "Content-Type";
-		String FORM_DATA_ELEMENT = "form-data";
-		String NAME_ELEMENT = "name";
-		String FILE_NAME_ELEMENT = "filename";
-		String CONTENT_TRANSFER_ENCODING_VALUE = "binary";
+        String FILE_NAME = "binaryFile.xml";
+        String FIELD_NAME = "fileData";
+        String CONTENT_TYPE_VALUE = "text/xml";
+        String MEDIATE_ELEMENT = "mediate";
+        String FILE_KEY = "fileAttachment";
+        String CONTENT_DISPOSITION = "Content-Disposition";
+        String CONTENT_TRANSFER_ENCODING = "Content-Transfer-Encoding";
+        String CONTENT_TYPE = "Content-Type";
+        String FORM_DATA_ELEMENT = "form-data";
+        String NAME_ELEMENT = "name";
+        String FILE_NAME_ELEMENT = "filename";
+        String CONTENT_TRANSFER_ENCODING_VALUE = "binary";
 
-		MultipartFormDataFormatter formatter = new MultipartFormDataFormatter();
-		File binaryAttachment = getTestResourceFile(FILE_NAME);
+        MultipartFormDataFormatter formatter = new MultipartFormDataFormatter();
+        File binaryAttachment = getTestResourceFile(FILE_NAME);
 
-		MessageContext mc = new MessageContext();
+        MessageContext mc = new MessageContext();
 
-		DiskFileItem diskFileItem = null;
-		InputStream input = null;
-		try {
-			if (binaryAttachment.exists() && !binaryAttachment.isDirectory()) {
-				diskFileItem = (DiskFileItem) new DiskFileItemFactory().createItem(FIELD_NAME, CONTENT_TYPE_VALUE, true,
-						binaryAttachment.getName());
-				input = new FileInputStream(binaryAttachment);
-				OutputStream os = diskFileItem.getOutputStream();
-				int ret = input.read();
-				while (ret != -1) {
-					os.write(ret);
-					ret = input.read();
-				}
-				os.flush();
-			}
+        DiskFileItem diskFileItem = null;
+        InputStream input = null;
+        try {
+            if (binaryAttachment.exists() && !binaryAttachment.isDirectory()) {
+                diskFileItem = (DiskFileItem) new DiskFileItemFactory().createItem(FIELD_NAME, CONTENT_TYPE_VALUE, true,
+                        binaryAttachment.getName());
+                input = new FileInputStream(binaryAttachment);
+                OutputStream os = diskFileItem.getOutputStream();
+                int ret = input.read();
+                while (ret != -1) {
+                    os.write(ret);
+                    ret = input.read();
+                }
+                os.flush();
+            }
 
-		} finally {
-			input.close();
-		}
+        } finally {
+            input.close();
+        }
 
-		DataSource dataSource = new DiskFileDataSource(diskFileItem);
-		DataHandler dataHandler = new DataHandler(dataSource);
+        DataSource dataSource = new DiskFileDataSource(diskFileItem);
+        DataHandler dataHandler = new DataHandler(dataSource);
 
-		SOAPFactory soapFactory = OMAbstractFactory.getSOAP12Factory();
-		SOAPEnvelope soapEnvelope = soapFactory.getDefaultEnvelope();
-		SOAPBody body = soapEnvelope.getBody();
-		OMElement bodyFirstChild = soapFactory.createOMElement(new QName(MEDIATE_ELEMENT), body);
-		OMText binaryNode = soapFactory.createOMText(dataHandler, true);
-		soapFactory.createOMElement(FILE_KEY, null, bodyFirstChild).addChild(binaryNode);
-		mc.setEnvelope(soapEnvelope);
+        SOAPFactory soapFactory = OMAbstractFactory.getSOAP12Factory();
+        SOAPEnvelope soapEnvelope = soapFactory.getDefaultEnvelope();
+        SOAPBody body = soapEnvelope.getBody();
+        OMElement bodyFirstChild = soapFactory.createOMElement(new QName(MEDIATE_ELEMENT), body);
+        OMText binaryNode = soapFactory.createOMText(dataHandler, true);
+        soapFactory.createOMElement(FILE_KEY, null, bodyFirstChild).addChild(binaryNode);
+        mc.setEnvelope(soapEnvelope);
 
-		OMOutputFormat format = new OMOutputFormat();
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		formatter.writeTo(mc, format, baos, true);
+        OMOutputFormat format = new OMOutputFormat();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        formatter.writeTo(mc, format, baos, true);
 
-		MimeMultipart mp = new MimeMultipart(new ByteArrayDataSource(baos.toByteArray(), format.getContentType()));
-		BodyPart bp = mp.getBodyPart(0);
-		String contentDispositionValue = FORM_DATA_ELEMENT + "; " + NAME_ELEMENT + "=\"" + FILE_KEY + "\"; "
-				+ FILE_NAME_ELEMENT + "=\"" + binaryAttachment.getName() + "\"";
-		String contentTypeValue = bp.getHeader(CONTENT_TYPE)[0].split(";")[0];
-		assertEquals(contentDispositionValue, bp.getHeader(CONTENT_DISPOSITION)[0]);
-		assertEquals(CONTENT_TYPE_VALUE, contentTypeValue);
-		assertEquals(CONTENT_TRANSFER_ENCODING_VALUE, bp.getHeader(CONTENT_TRANSFER_ENCODING)[0]);
-	}
+        MimeMultipart mp = new MimeMultipart(new ByteArrayDataSource(baos.toByteArray(), format.getContentType()));
+        BodyPart bp = mp.getBodyPart(0);
+        String contentDispositionValue = FORM_DATA_ELEMENT + "; " + NAME_ELEMENT + "=\"" + FILE_KEY + "\"; "
+                + FILE_NAME_ELEMENT + "=\"" + binaryAttachment.getName() + "\"";
+        String contentTypeValue = bp.getHeader(CONTENT_TYPE)[0].split(";")[0];
+        assertEquals(contentDispositionValue, bp.getHeader(CONTENT_DISPOSITION)[0]);
+        assertEquals(CONTENT_TYPE_VALUE, contentTypeValue);
+        assertEquals(CONTENT_TRANSFER_ENCODING_VALUE, bp.getHeader(CONTENT_TRANSFER_ENCODING)[0]);
+    }
 }
