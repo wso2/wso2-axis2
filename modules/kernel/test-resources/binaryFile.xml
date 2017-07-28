@@ -1,5 +1,4 @@
 <?xml version="1.0"?>
-
 <!--
   ~ Licensed to the Apache Software Foundation (ASF) under one
   ~ or more contributor license agreements. See the NOTICE file
@@ -18,25 +17,15 @@
   ~ specific language governing permissions and limitations
   ~ under the License.
   -->
-
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           targetNamespace="http://www.w3schools.com"
-           xmlns="http://www.w3schools.com"
-           elementFormDefault="qualified">
-    <xs:element name="response">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="return" type="Person"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-    <xs:complexType name="Person">
-        <xs:sequence>
-            <xs:element name="name" type="xs:string" minOccurs="0"/>
-            <xs:element name="homes" type="xs:byte"/>
-            <xs:element name="age" type="xs:short"/>
-            <xs:element name="height" type="xs:decimal"/>
-            <xs:element name="image" type="xs:base64Binary"/>
-        </xs:sequence>
-    </xs:complexType>
-</xs:schema>
+<catalog>
+   <book id="bk101">
+      <author>Gambardella, Matthew</author>
+      <title>XML Developer's Guide</title>
+      <genre>Computer</genre>
+      <price>44.95</price>
+      <publish_date>2000-10-01</publish_date>
+      <description>An in-depth look at creating applications 
+      with XML.</description>
+   </book>
+ </catalog>
+ 

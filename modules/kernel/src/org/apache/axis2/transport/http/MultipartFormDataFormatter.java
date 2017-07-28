@@ -24,7 +24,9 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMOutputFormat;
+import org.apache.axiom.om.impl.llom.OMTextImpl;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.builder.DiskFileDataSource;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.http.util.ComplexPart;
@@ -41,6 +43,9 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+
+import javax.activation.DataHandler;
 import javax.xml.namespace.QName;
 
 /**
@@ -228,42 +233,59 @@ public class MultipartFormDataFormatter implements MessageFormatter {
      * @return
      */
     private Part[] createMultipatFormDataRequest(OMElement dataOut) {
-        ArrayList<Part> parts = new ArrayList<Part>();
+        List<Part> parts = new ArrayList<Part>();
         if (dataOut != null) {
-            Iterator iter1 = dataOut.getChildElements();
+            Iterator<?> iter1 = dataOut.getChildElements();
             OMFactory omFactory = OMAbstractFactory.getOMFactory();
             while (iter1.hasNext()) {
+                Part part = null;
                 OMElement ele = (OMElement) iter1.next();
-                Iterator iter2 = ele.getChildElements();
-                // check whether the element is a complex type
+                Iterator<?> iter2 = ele.getChildElements();
+                // Checks whether the element is a complex type
                 if (iter2.hasNext()) {
-                    OMElement omElement =
-                            omFactory.createOMElement(ele.getQName().getLocalPart(), null);
-                    omElement.addChild(
-                            processComplexType(omElement, ele.getChildElements(), omFactory, false));
-                    parts.add(new ComplexPart(ele.getQName().getLocalPart(), omElement.toString()));
+                    OMElement omElement = omFactory.createOMElement(ele.getQName().getLocalPart(), null);
+                    omElement.addChild(processComplexType(omElement, ele.getChildElements(), omFactory, false));
+                    part = new ComplexPart(ele.getQName().getLocalPart(), omElement.toString());
                 } else if (FILE_FIELD_QNAME.equals(ele.getQName())) {
 
-                    String fieldName
-                            = getAttributeValue(ele.getAttribute(FILE_FIELD_NAME_ATTRIBUTE_QNAME), DEFAULT_FILE_FIELD_NAME);
-                    String filename
-                            = getAttributeValue(ele.getAttribute(FILENAME_ATTRIBUTE_QNAME), DEFAULT_FILE_NAME);
-                    String contentType
-                            = getAttributeValue(ele.getAttribute(CONTENT_TYPE_ATTRIBUTE_QNAME),
-                                                DEFAULT_CONTENT_TYPE);
-                    String charset
-                            = getAttributeValue(ele.getAttribute(CHARSET_ATTRIBUTE_QNAME), DEFAULT_CHARSET);
+                    String fieldName = getAttributeValue(ele.getAttribute(FILE_FIELD_NAME_ATTRIBUTE_QNAME),
+                            DEFAULT_FILE_FIELD_NAME);
+                    String filename = getAttributeValue(ele.getAttribute(FILENAME_ATTRIBUTE_QNAME), DEFAULT_FILE_NAME);
+                    String contentType = getAttributeValue(ele.getAttribute(CONTENT_TYPE_ATTRIBUTE_QNAME),
+                            DEFAULT_CONTENT_TYPE);
+                    String charset = getAttributeValue(ele.getAttribute(CHARSET_ATTRIBUTE_QNAME), DEFAULT_CHARSET);
 
-                    parts.add(new FilePart(fieldName,
-                                           new ByteArrayPartSource(filename,
-                                                                   Base64.decodeBase64(ele.getText().getBytes())),
-                                           contentType,
-                                           charset));
+                    part = new FilePart(fieldName,
+                            new ByteArrayPartSource(filename, Base64.decodeBase64(ele.getText().getBytes())),
+                            contentType, charset);
                 } else {
-                    parts.add(new StringPart(ele.getQName().getLocalPart(), ele.getText()));
+                    // Gets the first child object
+                    OMTextImpl firstChild = (OMTextImpl) ele.getFirstOMChild();
+                    // Checks whether the first object is a binary
+                    if (firstChild.isBinary()) {
+                        if (firstChild.getDataHandler() != null) {
+                            if (((DataHandler) firstChild.getDataHandler())
+                                    .getDataSource() instanceof DiskFileDataSource) {
+                                String fileName = null;
+                                String contentType = null;
+                                // Gets the disk file data source
+                                DiskFileDataSource fileDataSource = (DiskFileDataSource) ((DataHandler) firstChild
+                                        .getDataHandler()).getDataSource();
+                                // Gets the filename and content type
+                                fileName = fileDataSource.getName();
+                                contentType = fileDataSource.getContentType();
+                                // Creates the FilePart
+                                part = new FilePart(ele.getQName().getLocalPart(),
+                                        new ByteArrayPartSource(fileName, ele.getText().getBytes()), contentType, null);
+                            }
+                        }
+                    }
+                    if (part == null) {
+                        part = new StringPart(ele.getQName().getLocalPart(), ele.getText());
+                    }
                 }
+                parts.add(part);
             }
-
         }
         Part[] partsArray = new Part[parts.size()];
         return parts.toArray(partsArray);

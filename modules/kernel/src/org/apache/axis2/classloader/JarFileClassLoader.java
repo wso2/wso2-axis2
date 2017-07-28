@@ -41,11 +41,13 @@ import java.util.jar.Manifest;
  *
  * @version $Rev: 725315 $ $Date: 2008-12-10 21:15:38 +0530 (Wed, 10 Dec 2008) $
  */
-public class JarFileClassLoader extends MultiParentClassLoader {
+public class JarFileClassLoader extends MultiParentClassLoader implements BeanInfoCachingClassLoader {
     private static final URL[] EMPTY_URLS = new URL[0];
 
     private final UrlResourceFinder resourceFinder = new UrlResourceFinder();
     private final AccessControlContext acc;
+
+    private final BeanInfoCache beanInfoCache = new BeanInfoCache();
 
     /**
      * Creates a JarFileClassLoader that is a child of the system class loader.
@@ -341,5 +343,9 @@ public class JarFileClassLoader extends MultiParentClassLoader {
     private boolean isSealed(Attributes packageAttributes, Attributes mainAttributes) {
         String sealed = getAttribute(Attributes.Name.SEALED, packageAttributes, mainAttributes);
         return sealed != null && "true".equalsIgnoreCase(sealed);
+    }
+
+    public final BeanInfoCache getBeanInfoCache() {
+        return beanInfoCache;
     }
 }

@@ -22,7 +22,6 @@ package org.apache.axis2.databinding.utils;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
-import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
@@ -37,7 +36,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.WeakHashMap;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
@@ -45,6 +43,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.axiom.om.*;
 import org.apache.axiom.om.util.Base64;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.classloader.BeanInfoCache;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.databinding.typemapping.SimpleTypeMapper;
 import org.apache.axis2.databinding.utils.reader.ADBXMLStreamReaderImpl;
@@ -58,7 +57,6 @@ import org.apache.axis2.util.StreamWrapper;
 
 public class BeanUtil {
     private static int nsCount = 1;
-    private static Map<String, BeanInfo> beanInfoMap = new WeakHashMap<>();
 
     /**
      * To Serilize Bean object this method is used, this will create an object array using given
@@ -99,25 +97,7 @@ public class BeanUtil {
 
 
     private static BeanInfo getBeanInfo(Class beanClass, Class beanSuperclass) throws IntrospectionException {
-        String beanInfoKey;
-        if (beanSuperclass != null)
-            beanInfoKey = beanClass.getName().concat("|").concat(beanSuperclass.getName());
-        else
-            beanInfoKey = beanClass.getName();
-
-        BeanInfo beanInfo = beanInfoMap.get(beanInfoKey);
-        if (beanInfo == null) {
-            try {
-                if (beanSuperclass != null)
-                    beanInfo = Introspector.getBeanInfo(beanClass, beanSuperclass);
-                else
-                    beanInfo = Introspector.getBeanInfo(beanClass);
-            } catch (IntrospectionException e) {
-                throw e;
-            }
-            beanInfoMap.put(beanInfoKey, beanInfo);
-        }
-        return beanInfo;
+        return BeanInfoCache.getCachedBeanInfo(beanClass, beanSuperclass);
     }
 
     private static BeanInfo getBeanInfo(Class beanClass) throws IntrospectionException {

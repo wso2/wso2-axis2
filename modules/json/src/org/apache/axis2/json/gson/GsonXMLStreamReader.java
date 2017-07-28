@@ -743,19 +743,19 @@ public class GsonXMLStreamReader implements XMLStreamReader {
             } else if (tokenType == JsonToken.BOOLEAN) {
                 value = String.valueOf(jsonReader.nextBoolean());
             } else if (tokenType == JsonToken.NUMBER) {
-                if (valueType.equals("int")) {
+                if ("int".equals(valueType)) {
                     value = String.valueOf(jsonReader.nextInt());
-                } else if (valueType.equals("long")) {
+                } else if ("long".equals(valueType)) {
                     value = String.valueOf(jsonReader.nextLong());
-                } else if (valueType.equals("double")) {
+                } else if ("double".equals(valueType)) {
                     value = String.valueOf(jsonReader.nextDouble());
-                } else if (valueType.equals("float")) {
+                } else if ("float".equals(valueType)) {
                     value = String.valueOf(jsonReader.nextDouble());
-                } else if (valueType.equals("decimal")) {
+                } else if ("decimal".equals(valueType)) {
                     value = String.valueOf(jsonReader.nextDouble());
-                } else if (valueType.equals("byte")) {
+                } else if ("byte".equals(valueType)) {
                     value = String.valueOf(jsonReader.nextInt());
-                } else if (valueType.equals("short")) {
+                } else if ("short".equals(valueType)) {
                     value = String.valueOf(jsonReader.nextInt());
                 }
             } else if (tokenType == JsonToken.NULL) {
