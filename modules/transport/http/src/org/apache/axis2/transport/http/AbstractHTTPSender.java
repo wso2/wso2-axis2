@@ -470,9 +470,24 @@ public abstract class AbstractHTTPSender {
 
         httpMethod.setQueryString(url.getQuery());
 
-        httpMethod.setRequestHeader(HTTPConstants.HEADER_CONTENT_TYPE,
-                                    messageFormatter.getContentType(msgContext, format,
-                                                                    soapActionString));
+        // If adding the Content-Type header from the message formatter needs to be skipped
+        if (Boolean.parseBoolean((String)msgContext.getProperty(HTTPConstants.NO_DEFAULT_CONTENT_TYPE))) {
+            // Check whether message context already has the Content-Type header,
+            // if so use that as the Content-Type header
+            Object transportHeadersObj = msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
+            if (transportHeadersObj != null && transportHeadersObj instanceof Map) {
+                Map transportHeaders = (Map) transportHeadersObj;
+                Object headerContentType = transportHeaders.get(HTTPConstants.HEADER_CONTENT_TYPE);
+                if (headerContentType != null) {
+                    httpMethod.setRequestHeader(HTTPConstants.HEADER_CONTENT_TYPE, headerContentType.toString());
+                }
+            }
+            // If NO_DEFAULT_CONTENT_TYPE is set to true and the Content-Type header is not present
+            // in the message context, backend will receive a request without a Content-Type header
+        } else {
+            httpMethod.setRequestHeader(HTTPConstants.HEADER_CONTENT_TYPE,
+                    messageFormatter.getContentType(msgContext, format, soapActionString));
+        }
 
         httpMethod.setRequestHeader(HTTPConstants.HEADER_HOST, url.getHost());
 

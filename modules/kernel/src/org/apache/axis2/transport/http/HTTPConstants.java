@@ -516,6 +516,11 @@ public class HTTPConstants {
      */
     public static final String CONTENT_TYPE = "Content-Type";
 
+    /**
+     * Set 'true' to prevent adding Message Formatter's default Content-Type
+     */
+    public static final String NO_DEFAULT_CONTENT_TYPE = "NoDefaultContentType";
+
     public static final String OMIT_SOAP_12_ACTION = "OmitSOAP12Action";
     public static final String CUSTOM_PROTOCOL_HANDLER = "CUSTOM_PROTOCOL_HANDLER";
     
