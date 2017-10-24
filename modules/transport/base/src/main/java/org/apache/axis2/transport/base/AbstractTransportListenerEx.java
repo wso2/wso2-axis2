@@ -80,7 +80,6 @@ public abstract class AbstractTransportListenerEx<E extends ProtocolEndpoint>
     
     @Override
     public void start() throws AxisFault {
-        Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
         super.start();
         // Explicitly start the endpoint configured at the transport level. All other endpoints will
         // be started by startListeningForService.
