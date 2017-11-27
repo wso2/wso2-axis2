@@ -217,10 +217,11 @@ public class BuilderUtil {
                                             Object parameter) {
         if (parameter instanceof DataHandler) {
             DataHandler dataHandler = (DataHandler)parameter;
-            OMText dataText = bodyFirstChild.getOMFactory().createOMText(
-                    dataHandler, true);
-            soapFactory.createOMElement(key, ns, bodyFirstChild).addChild(
-                    dataText);
+            OMElement oMElement = soapFactory.createOMElement(key, ns, bodyFirstChild);
+            if(dataHandler.getDataSource() instanceof DiskFileDataSource) {
+            	oMElement.addAttribute("filename", ((DiskFileDataSource)dataHandler.getDataSource()).getName(), ns);
+            }
+            oMElement.addChild(dataText);
         } else {
             String textValue = parameter.toString();
             soapFactory.createOMElement(key, ns, bodyFirstChild).setText(
