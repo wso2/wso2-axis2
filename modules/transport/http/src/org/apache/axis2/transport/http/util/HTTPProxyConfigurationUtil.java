@@ -166,7 +166,7 @@ public class HTTPProxyConfigurationUtil {
             proxyPassword = password;
         }
 
-        if (proxyUser != null && proxyPassword != null) {
+        if (proxyUser != null && proxyPassword != null && proxyCredentials == null) {
             proxyCredentials = new UsernamePasswordCredentials(proxyUser, proxyPassword);
         }
 
