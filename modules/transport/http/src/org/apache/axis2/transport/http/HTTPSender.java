@@ -71,6 +71,10 @@ public class HTTPSender extends AbstractHTTPSender {
                 this.sendViaPut(msgContext, url, soapActionString);
 
                 return;
+            } else if (Constants.Configuration.HTTP_METHOD_PATCH.equalsIgnoreCase(httpMethod)) {
+                this.sendViaPatch(msgContext, url, soapActionString);
+
+                return;
             }
         }
 
@@ -253,6 +257,44 @@ public class HTTPSender extends AbstractHTTPSender {
             throw AxisFault.makeFault(e);
         } finally {
             cleanup(msgContext, putMethod);
+        }
+    }
+
+    /**
+     * Used to send a request via HTTP Patch Method
+     *
+     * @param msgContext - The MessageContext of the message
+     * @param url - The target URL
+     * @param soapActionString - The soapAction string of the request
+     * @throws AxisFault - Thrown in case an exception occurs
+     */
+    private void sendViaPatch(MessageContext msgContext, URL url,
+            String soapActionString) throws AxisFault {
+
+        HttpClient httpClient = getHttpClient(msgContext);
+        PatchMethod patchMethod = new PatchMethod();
+        MessageFormatter messageFormatter = populateCommonProperties(msgContext, url, patchMethod, httpClient,
+                soapActionString);
+
+        patchMethod.setRequestEntity(new AxisRequestEntity(messageFormatter, msgContext, format, soapActionString,
+                chunked, isAllowedRetry));
+
+        if (!httpVersion.equals(HTTPConstants.HEADER_PROTOCOL_10) && chunked) {
+            patchMethod.setContentChunked(true);
+        }
+
+        String soapAction = messageFormatter.formatSOAPAction(msgContext, format, soapActionString);
+        if (soapAction != null && !msgContext.isDoingREST()) {
+            patchMethod.setRequestHeader(HTTPConstants.HEADER_SOAP_ACTION, soapAction);
+        }
+        try {
+            executeMethod(httpClient, msgContext, url, patchMethod);
+            handleResponse(msgContext, patchMethod);
+        } catch (IOException e) {
+            String message = "Unable to sendViaPatch to url[" + url + " ]";
+            throw new AxisFault(message,e);
+        } finally {
+            cleanup(msgContext, patchMethod);
         }
     }
 
