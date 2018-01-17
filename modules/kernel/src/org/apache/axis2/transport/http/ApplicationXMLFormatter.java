@@ -21,7 +21,6 @@ package org.apache.axis2.transport.http;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMOutputFormat;
-import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPFault;
 import org.apache.axiom.soap.SOAPFaultDetail;
@@ -39,6 +38,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.charset.Charset;
 
 /**
  * Formates the request message as application/xml
@@ -46,9 +46,12 @@ import java.net.URL;
 public class ApplicationXMLFormatter implements MessageFormatter {
 
     private static final Log log = LogFactory.getLog(ApplicationXMLFormatter.class);
-    public byte[] getBytes(MessageContext 
-                           messageContext, 
-                           OMOutputFormat format) throws AxisFault {
+
+    private static final String WRITE_XML_DECLARATION = "WRITE_XML_DECLARATION";
+    private static final String XML_DECLARATION_ENCODING = "XML_DECLARATION_ENCODING";
+    private static final String XML_DECLARATION_STANDALONE = "XML_DECLARATION_STANDALONE";
+
+    public byte[] getBytes(MessageContext messageContext, OMOutputFormat format) throws AxisFault {
         return getBytes(messageContext, format, false);
     }
     
@@ -121,6 +124,7 @@ public class ApplicationXMLFormatter implements MessageFormatter {
         }
         try {
             OMElement omElement = null;
+            writeXMLDeclaration(messageContext, outputStream, format);
 
             if (messageContext.getFLOW() == MessageContext.OUT_FAULT_FLOW) {
                 SOAPFault fault = messageContext.getEnvelope().getBody().getFault();
@@ -154,6 +158,33 @@ public class ApplicationXMLFormatter implements MessageFormatter {
         } finally {
             if (log.isDebugEnabled()) {
                 log.debug("end writeTo()");
+            }
+        }
+    }
+
+    private void writeXMLDeclaration(MessageContext messageContext, OutputStream outputStream, OMOutputFormat format) {
+        String xmlDeclaration;
+        String writeXmlDeclaration = (String) messageContext.getProperty(WRITE_XML_DECLARATION);
+        if (writeXmlDeclaration != null && "true".equalsIgnoreCase(writeXmlDeclaration)) {
+            String xmlDeclarationEncoding = (String) messageContext.getProperty(XML_DECLARATION_ENCODING);
+            if (xmlDeclarationEncoding == null) {
+                xmlDeclarationEncoding = (format.getCharSetEncoding() != null) ?
+                        format.getCharSetEncoding() :
+                        Charset.defaultCharset().toString();
+            }
+            String xmlDeclarationStandalone = (String) messageContext.getProperty(XML_DECLARATION_STANDALONE);
+
+            if (xmlDeclarationStandalone != null) {
+                xmlDeclaration = "<?xml version=\"1.0\" encoding=\"" + xmlDeclarationEncoding + "\" " + "standalone=\""
+                        + xmlDeclarationStandalone + "\" ?>";
+            } else {
+                xmlDeclaration = "<?xml version=\"1.0\" encoding=\"" + xmlDeclarationEncoding + "\" ?>";
+            }
+
+            try {
+                outputStream.write(xmlDeclaration.getBytes());
+            } catch (IOException e) {
+                log.error("Error while writing the XML declaration ", e);
             }
         }
     }
