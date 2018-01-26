@@ -153,6 +153,9 @@ public class CommonsHTTPTransportSender extends AbstractHandler implements
                     HTTPConstants.MAX_TOTAL_CONNECTIONS);
 
             HttpConnectionManager connectionManager = new MultiThreadedHttpConnectionManager();
+            
+            connectionManager.getParams().setSoTimeout(soTimeout);
+            connectionManager.getParams().setConnectionTimeout(connectionTimeout);
 
             if (defaultMaxConnectionsPerHostParam != null &&
                     defaultMaxConnectionsPerHostParam.getValue() != null) {
