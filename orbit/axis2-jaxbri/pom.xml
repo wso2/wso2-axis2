@@ -22,7 +22,7 @@
     <artifactId>axis2-jaxbri</artifactId>
     <packaging>bundle</packaging>
     <name>axis2.jaxbri.wso2</name>
-    <version>1.6.1.wso2v23</version>
+    <version>1.6.1-wso2v24-SNAPSHOT</version>
     <description>
         org.wso2.carbon.axis2.jaxbri. This bundle will export packages for Axis2-jibx.
     </description>
@@ -111,7 +111,7 @@
         </plugins>
     </build>
     <properties>
-        <version.axis2>1.6.1-wso2v23</version.axis2>
+        <version.axis2>1.6.1-wso2v24-SNAPSHOT</version.axis2>
         <exp.pkg.version.axis2>${version.axis2}</exp.pkg.version.axis2>
     </properties>
 </project>
