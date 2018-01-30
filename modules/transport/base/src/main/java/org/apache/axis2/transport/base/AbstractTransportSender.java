@@ -211,10 +211,13 @@ public abstract class AbstractTransportSender extends AbstractHandler implements
      * @return true if a sync response is expected
      */
     protected boolean waitForSynchronousResponse(MessageContext msgCtx) {
-        return
-            msgCtx.getOperationContext() != null &&
-            WSDL2Constants.MEP_URI_OUT_IN.equals(
-                msgCtx.getOperationContext().getAxisOperation().getMessageExchangePattern());
+        boolean waitingState = false;
+        if (msgCtx.getOperationContext() != null) {
+            String MEP = msgCtx.getOperationContext().getAxisOperation().getMessageExchangePattern();
+            waitingState = "http://www.w3.org/ns/wsdl/out-in".equals(MEP) ||
+                    "http://www.w3.org/ns/wsdl/in-out".equals(MEP);
+        }
+        return waitingState;
     }
 
     public String getTransportName() {
