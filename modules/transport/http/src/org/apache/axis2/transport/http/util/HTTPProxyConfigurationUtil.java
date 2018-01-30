@@ -42,6 +42,8 @@ public class HTTPProxyConfigurationUtil {
 
     protected static final String HTTP_PROXY_HOST = "http.proxyHost";
     protected static final String HTTP_PROXY_PORT = "http.proxyPort";
+    protected static final String HTTP_PROXY_USER = "http.proxyUser";
+    protected static final String HTTP_PROXY_PASSWORD = "http.proxyPassword";
     protected static final String HTTP_NON_PROXY_HOSTS = "http.nonProxyHosts";
 
     protected static final String ATTR_PROXY = "Proxy";
@@ -152,6 +154,20 @@ public class HTTPProxyConfigurationUtil {
         String port = System.getProperty(HTTP_PROXY_PORT);
         if(port != null) {
             proxyPort = Integer.parseInt(port);
+        }
+
+        String userName = System.getProperty(HTTP_PROXY_USER);
+        if (userName != null) {
+            proxyUser = userName;
+        }
+
+        String password = System.getProperty(HTTP_PROXY_PASSWORD);
+        if (password != null) {
+            proxyPassword = password;
+        }
+
+        if (proxyUser != null && proxyPassword != null && proxyCredentials == null) {
+            proxyCredentials = new UsernamePasswordCredentials(proxyUser, proxyPassword);
         }
 
         if(proxyCredentials != null) {
