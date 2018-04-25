@@ -19,9 +19,6 @@
 
 package org.apache.axis2.builder;
 
-import java.io.File;
-import java.io.FileInputStream;
-
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMSourcedElement;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -33,6 +30,9 @@ import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.transport.TransportUtils;
+
+import java.io.File;
+import java.io.FileInputStream;
 
 
 public class UnknownContentBuilderTest extends AbstractTestCase{
@@ -82,7 +82,7 @@ public class UnknownContentBuilderTest extends AbstractTestCase{
         axisConfig.addMessageBuilder("application/soap+xml", new SOAPBuilder());
         axisConfig.addMessageBuilder("text/xml", new SOAPBuilder());
         axisConfig.addMessageBuilder("application/xop+xml", new MTOMBuilder());
-        axisConfig.addMessageBuilder("application/xml", new ApplicationXMLBuilder());
+        axisConfig.addMessageBuilder("application/xml", new SecureApplicationXMLBuilder());
         axisConfig.addMessageBuilder("application/x-www-form-urlencoded",
                                      new XFormURLEncodedBuilder());
         axisConfig.addParameter(Constants.Configuration.USE_DEFAULT_FALLBACK_BUILDER, "true");
