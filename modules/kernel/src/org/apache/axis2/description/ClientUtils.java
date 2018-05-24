@@ -52,24 +52,28 @@ public class ClientUtils {
                 TransportOutDescription transportOut = ac.getTransportOut(transport);
                 if (transportOut == null) {
                     log.error("No Tranport Sender found for : " + transport);
+                    msgctx.getConfigurationContext().getOperationContext(msgctx.getMessageID()).cleanup();
                     throw new AxisFault("No Tranport Sender found for : " + transport);
                 } else {
                     return ac.getTransportOut(transport);
                 }
             } else {
                 log.error(Messages.getMessage("cannotInferTransport", transportURI));
+                msgctx.getConfigurationContext().getOperationContext(msgctx.getMessageID()).cleanup();
                 throw new AxisFault(Messages.getMessage("cannotInferTransport", transportURI));
             }
         } else {
             if (msgctx.getOptions().getTransportOut() != null) {
                 if (msgctx.getOptions().getTransportOut().getSender() == null) {
                     log.error(Messages.getMessage("Incomplete transport sender: missing sender!"));
+                    msgctx.getConfigurationContext().getOperationContext(msgctx.getMessageID()).cleanup();
                     throw new AxisFault("Incomplete transport sender: missing sender!");
                 }
                 return msgctx.getOptions().getTransportOut();
             }
             if (epr == null || (epr.getAddress() == null)) {
                 log.error(Messages.getMessage("cannotInferTransportNoAddr"));
+                msgctx.getConfigurationContext().getOperationContext(msgctx.getMessageID()).cleanup();
                 throw new AxisFault(Messages.getMessage("cannotInferTransportNoAddr"));
             }
             String uri = epr.getAddress();
@@ -78,6 +82,7 @@ public class ClientUtils {
                 return ac.getTransportOut(transport);
             } else {
                 log.error(Messages.getMessage("cannotInferTransport", uri));
+                msgctx.getConfigurationContext().getOperationContext(msgctx.getMessageID()).cleanup();
                 throw new AxisFault(Messages.getMessage("cannotInferTransport", uri));
             }
         }
