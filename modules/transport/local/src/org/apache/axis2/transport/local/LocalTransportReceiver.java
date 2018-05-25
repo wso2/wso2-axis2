@@ -97,6 +97,7 @@ public class LocalTransportReceiver {
                                OutputStream response)
             throws AxisFault {
         MessageContext msgCtx = confContext.createMessageContext();
+        msgCtx.setMessageID(inMessageContext.getMessageID());
 
         if (this.nonBlocking) {
             if (log.isDebugEnabled()) {
