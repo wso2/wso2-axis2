@@ -31,7 +31,6 @@ import org.apache.axiom.om.OMText;
 import org.apache.axiom.om.impl.MTOMConstants;
 import org.apache.axiom.om.impl.builder.StAXBuilder;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
-import org.apache.axiom.om.impl.builder.XOPAwareStAXOMBuilder;
 import org.apache.axiom.om.util.StAXParserConfiguration;
 import org.apache.axiom.om.util.StAXUtils;
 import org.apache.axiom.soap.SOAP11Constants;
@@ -41,7 +40,6 @@ import org.apache.axiom.soap.SOAPConstants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPProcessingException;
-import org.apache.axiom.soap.impl.builder.MTOMStAXSOAPModelBuilder;
 import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
@@ -219,8 +217,9 @@ public class BuilderUtil {
             DataHandler dataHandler = (DataHandler)parameter;
             OMText dataText = bodyFirstChild.getOMFactory().createOMText(
                     dataHandler, true);
-            soapFactory.createOMElement(key, ns, bodyFirstChild).addChild(
-                    dataText);
+            OMElement omElement = soapFactory.createOMElement(key, ns, bodyFirstChild);
+            omElement.addChild(dataText);
+            omElement.addAttribute("filename", ((DataHandler) parameter).getDataSource().getName(), ns);
         } else {
             String textValue = parameter.toString();
             soapFactory.createOMElement(key, ns, bodyFirstChild).setText(
