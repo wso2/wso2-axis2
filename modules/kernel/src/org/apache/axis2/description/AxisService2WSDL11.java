@@ -679,10 +679,13 @@ public class AxisService2WSDL11 implements Java2WSDLConstants {
 					port.addAttribute(BINDING_LOCAL_NAME, tns.getPrefix() + ":"
 							+ qname.getLocalPart(), null);
 					String endpointURL = getEndpointURL(axisEndpoint);
-					WSDLSerializationUtil.addExtensionElement(fac, port,
-							SOAP_ADDRESS, LOCATION, (endpointURL == null) ? ""
-									: endpointURL, soap);
-					generateEPRElement(fac, port, endpointURL);
+					if (endpointURL.startsWith("http") || endpointURL.startsWith("https") ||
+							endpointURL.startsWith("tcp")) {
+						WSDLSerializationUtil.addExtensionElement(fac, port,
+								SOAP_ADDRESS, LOCATION, (endpointURL == null) ? ""
+										: endpointURL, soap);
+						generateEPRElement(fac, port, endpointURL);
+					}
 					addPolicyAsExtElement(axisEndpoint, port);
 					generateSoap11Binding(fac, definition, axisEndpoint
 							.getBinding());
@@ -726,10 +729,13 @@ public class AxisService2WSDL11 implements Java2WSDLConstants {
 					port.addAttribute(BINDING_LOCAL_NAME, tns.getPrefix() + ":"
 							+ qname.getLocalPart(), null);
 					String endpointURL = getEndpointURL(axisEndpoint);
-					WSDLSerializationUtil.addExtensionElement(fac, port,
-							SOAP_ADDRESS, LOCATION, (endpointURL == null) ? ""
-									: endpointURL, soap12);
-					generateEPRElement(fac, port, endpointURL);
+					if (endpointURL.startsWith("http") || endpointURL.startsWith("https") ||
+							endpointURL.startsWith("tcp")) {
+						WSDLSerializationUtil.addExtensionElement(fac, port,
+								SOAP_ADDRESS, LOCATION, (endpointURL == null) ? ""
+										: endpointURL, soap12);
+						generateEPRElement(fac, port, endpointURL);
+					}
 					addPolicyAsExtElement(axisEndpoint, port);
 					generateSoap12Binding(fac, definition, axisEndpoint
 							.getBinding());
