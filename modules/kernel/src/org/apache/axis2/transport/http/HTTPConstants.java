@@ -388,6 +388,11 @@ public class HTTPConstants {
     public static final String SO_TIMEOUT = "SO_TIMEOUT";
 
     /**
+     * Field NO_KEEPALIVE
+     */
+    public static final String NO_KEEPALIVE = "NO_KEEPALIVE";
+
+    /**
      * Field SENDER[]
      */
     public static final byte SENDER[] = "400".getBytes();
