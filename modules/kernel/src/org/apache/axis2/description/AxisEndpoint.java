@@ -140,8 +140,10 @@ public class AxisEndpoint extends AxisDescription {
                                                                  null, tns.getPrefix() + ":" +
                                                                        getBinding().getName()
                                                                                .getLocalPart()));
-        endpointElement.addAttribute(omFactory.createOMAttribute(WSDL2Constants.ATTRIBUTE_ADDRESS,
-                                                                 null, getEndpointURL()));
+        if (endpointURL.startsWith("http") || endpointURL.startsWith("https") || endpointURL.startsWith("tcp")) {
+            endpointElement.addAttribute(omFactory.createOMAttribute(WSDL2Constants.ATTRIBUTE_ADDRESS,
+                    null, getEndpointURL()));
+        }
         Object authenticationScheme =
                 this.options.get(WSDL2Constants.ATTR_WHTTP_AUTHENTICATION_TYPE);
         if (authenticationScheme != null) {
