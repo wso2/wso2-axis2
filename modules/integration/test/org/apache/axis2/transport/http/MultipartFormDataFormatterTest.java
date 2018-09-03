@@ -70,6 +70,7 @@ public class MultipartFormDataFormatterTest extends TestCase {
         defaultEnvelope.getBody().addChild(rootElement);
 
         mc.setEnvelope(defaultEnvelope);
+        mc.setProperty("DECODE_MULTIPART_DATA", new Boolean(true));
 
         OMOutputFormat format = new OMOutputFormat();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
