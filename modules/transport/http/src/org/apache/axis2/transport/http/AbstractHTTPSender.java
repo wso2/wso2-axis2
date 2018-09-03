@@ -59,6 +59,7 @@ import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpHeaders;
 import org.apache.http.protocol.HTTP;
 
 import javax.xml.namespace.QName;
@@ -586,6 +587,20 @@ public abstract class AbstractHTTPSender {
         }
     }
 
+    /**
+     * Sets keep-alive configuration.
+     *
+     * @param msgContext the axis2 message context
+     * @param httpMethod the http method
+     */
+    protected void setKeepAlive(MessageContext msgContext, HttpMethod httpMethod) {
+        String disableKeepalive = (String) msgContext.getProperty(HTTPConstants.NO_KEEPALIVE);
+        if (disableKeepalive != null && Boolean.parseBoolean(disableKeepalive)) {
+            httpMethod.setRequestHeader(HttpHeaders.CONNECTION, HTTP.CONN_CLOSE);
+        }
+    }
+
+
     public void setFormat(OMOutputFormat format) {
         this.format = format;
     }
@@ -684,6 +699,7 @@ public abstract class AbstractHTTPSender {
         HttpState httpState = (HttpState)msgContext.getProperty(HTTPConstants.CACHED_HTTP_STATE);
 
         setTimeouts(msgContext, method);
+        setKeepAlive(msgContext, method);
 
         httpClient.executeMethod(config, method, httpState);
     }

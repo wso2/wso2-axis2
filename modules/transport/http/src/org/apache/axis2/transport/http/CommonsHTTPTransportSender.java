@@ -221,6 +221,7 @@ public class CommonsHTTPTransportSender extends AbstractHandler implements
              // set the timeout properties
             Parameter soTimeoutParam = transportOut.getParameter(HTTPConstants.SO_TIMEOUT);
             Parameter connTimeoutParam = transportOut.getParameter(HTTPConstants.CONNECTION_TIMEOUT);
+            Parameter disableKeepalive = transportOut.getParameter(HTTPConstants.NO_KEEPALIVE);
 
             // set the property values only if they are not set by the user explicitly
             if ((soTimeoutParam != null) &&
@@ -233,6 +234,10 @@ public class CommonsHTTPTransportSender extends AbstractHandler implements
                     (msgContext.getProperty(HTTPConstants.CONNECTION_TIMEOUT) == null)) {
                 msgContext.setProperty(HTTPConstants.CONNECTION_TIMEOUT, 
                         new Integer((String) connTimeoutParam.getValue()));
+            }
+
+            if ((disableKeepalive != null) && (msgContext.getProperty(HTTPConstants.NO_KEEPALIVE) == null)) {
+                msgContext.setProperty(HTTPConstants.NO_KEEPALIVE, disableKeepalive.getValue());
             }
 
             //if a parameter has set been set, we will omit the SOAP action for SOAP 1.2
