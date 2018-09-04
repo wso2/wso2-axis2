@@ -219,7 +219,6 @@ public class BuilderUtil {
                     dataHandler, true);
             OMElement omElement = soapFactory.createOMElement(key, ns, bodyFirstChild);
             omElement.addChild(dataText);
-            omElement.addAttribute("filename",((DataHandler) parameter).getDataSource().getName(),ns);
             omElement.addAttribute("filename", ((DataHandler) parameter).getDataSource().getName(), ns);
         } else {
             String textValue = parameter.toString();
