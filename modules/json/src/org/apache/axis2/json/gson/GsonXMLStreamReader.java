@@ -30,7 +30,6 @@ import org.apache.axis2.json.gson.factory.XmlNodeGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.commons.schema.XmlSchema;
-
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
@@ -672,8 +671,20 @@ public class GsonXMLStreamReader implements XMLStreamReader {
         }
     }
 
-    private void nextName() throws IOException, XMLStreamException {
+    private String bypassRootElement() throws IOException {
         String name = jsonReader.nextName();
+        if (!("request_box".equalsIgnoreCase(name) && schemaList.isEmpty())) {
+            JsonObject jsonObject = schemaList.get(0);
+            if (JsonState.StartState == state || JSONType.NESTED_ARRAY.equals(jsonObject.getType())) {
+                name = jsonObject.getName();
+            }
+        }
+
+        return name;
+    }
+
+    private void nextName() throws IOException, XMLStreamException {
+        String name = bypassRootElement();
         boolean isElementExists = false;
         if (!miniList.isEmpty()) {
             while (!isElementExists && (miniListPointer < miniList.size() || skipMiniListElement)) {

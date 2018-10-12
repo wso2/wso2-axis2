@@ -35,12 +35,13 @@ import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 public class GsonXMLStreamReaderTest {
     
-    
+
     @Test
     public void testGsonXMLStreamReader() throws Exception {
         String jsonString = "{\"response\":{\"return\":{\"name\":\"kate\",\"age\":\"35\",\"gender\":\"female\"}}}";
@@ -84,6 +85,112 @@ public class GsonXMLStreamReaderTest {
         List<XmlSchema> schemaList = new ArrayList<XmlSchema>();
         schemaList.add(schema);
         QName elementQName = new QName("http://www.w3schools.com", "response");
+        ConfigurationContext configCtxt = new ConfigurationContext(new AxisConfiguration());
+        GsonXMLStreamReader gsonXMLStreamReader = new GsonXMLStreamReader(jsonReader);
+        gsonXMLStreamReader.initXmlStreamReader(elementQName, schemaList, configCtxt);
+        StAXOMBuilder stAXOMBuilder = new StAXOMBuilder(gsonXMLStreamReader);
+        OMElement omElement = stAXOMBuilder.getDocumentElement();
+        String actual = omElement.toString();
+        inputStream.close();
+        is.close();
+        Assert.assertEquals(xmlString, actual);
+    }
+
+    /**
+     * This method tests GsonXMLStreamReader without the request name ie: request method + request path  which is
+     * required in the schema ( _postemployee ).
+     */
+    @Test
+    public void testGsonXMLStreamReaderSingleRequest() throws Exception {
+
+        String jsonString = "{ \"employee\":" +
+                "{ \"employeenumber\":\"0001\"," +
+                "\"firstname\":\"Steve\"," +
+                "\"lastname\":\"Wilson\"," +
+                "\"email\":\"wilson@Wso2.com\"," +
+                "\"salary\":\"15000.00\"" +
+                "}" +
+                "}";
+
+        String xmlString = "<_postemployee xmlns=\"http://www.w3schools.com\">" +
+                "<employeenumber>0001</employeenumber>" +
+                "<firstname>Steve</firstname>" +
+                "<lastname>Wilson</lastname>" +
+                "<email>wilson@Wso2.com</email>" +
+                "<salary>15000.00</salary>" +
+                "</_postemployee>";
+
+        InputStream inputStream = new ByteArrayInputStream(jsonString.getBytes());
+        JsonReader jsonReader = new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+        String fileName = "test-resources/custom_schema/testSchema_4.xsd";
+        InputStream is = new FileInputStream(fileName);
+        XmlSchemaCollection schemaCol = new XmlSchemaCollection();
+        XmlSchema schema = schemaCol.read(new StreamSource(is), null);
+        List<XmlSchema> schemaList = new ArrayList<XmlSchema>();
+        schemaList.add(schema);
+        QName elementQName = new QName("http://www.w3schools.com", "_postemployee");
+        ConfigurationContext configCtxt = new ConfigurationContext(new AxisConfiguration());
+        GsonXMLStreamReader gsonXMLStreamReader = new GsonXMLStreamReader(jsonReader);
+        gsonXMLStreamReader.initXmlStreamReader(elementQName, schemaList, configCtxt);
+        StAXOMBuilder stAXOMBuilder = new StAXOMBuilder(gsonXMLStreamReader);
+        OMElement omElement = stAXOMBuilder.getDocumentElement();
+        String actual = omElement.toString();
+        inputStream.close();
+        is.close();
+        Assert.assertEquals(xmlString, actual);
+    }
+
+    /**
+     * This method tests GsonXMLStreamReader without the request name ie: request method + request path which is
+     *required in the schema ( _postemployee_batch_req , _postemployee ).
+     */
+    @Test
+    public void testGsonXMLStreamReaderBatchRequest() throws Exception {
+
+        String jsonString = "{\"employees\": " +
+                "{\"employees\": [" +
+                "{ \"employeenumber\": \"00021\"," +
+                "\"firstname\": \"Will\"," +
+                "\"lastname\": \"Smith\"," +
+                "\"email\": \"will@smith.com\"," +
+                "\"salary\": \"1500.00\"" +
+                "}," +
+                "{ \"employeenumber\": \"00021\"," +
+                "\"firstname\": \"Will\"," +
+                "\"lastname\": \"Smith\"," +
+                "\"email\": \"will@smith.com\"," +
+                "\"salary\": \"1500.00\"" +
+                "}" +
+                "]" +
+                "}" +
+                "}";
+
+        String xmlString = "<_postemployee_batch_req xmlns=\"http://www.w3schools.com\">" +
+                "<_postemployee>" +
+                "<employeenumber>00021</employeenumber>" +
+                "<firstname>Will</firstname>" +
+                "<lastname>Smith</lastname>" +
+                "<email>will@smith.com</email>" +
+                "<salary>1500.00</salary>" +
+                "</_postemployee>" +
+                "<_postemployee>" +
+                "<employeenumber>00021</employeenumber>" +
+                "<firstname>Will</firstname>" +
+                "<lastname>Smith</lastname>" +
+                "<email>will@smith.com</email>" +
+                "<salary>1500.00</salary>" +
+                "</_postemployee>" +
+                "</_postemployee_batch_req>";
+
+        InputStream inputStream = new ByteArrayInputStream(jsonString.getBytes());
+        JsonReader jsonReader = new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+        String fileName = "test-resources/custom_schema/testSchema_5.xsd";
+        InputStream is = new FileInputStream(fileName);
+        XmlSchemaCollection schemaCol = new XmlSchemaCollection();
+        XmlSchema schema = schemaCol.read(new StreamSource(is), null);
+        List<XmlSchema> schemaList = new ArrayList<XmlSchema>();
+        schemaList.add(schema);
+        QName elementQName = new QName("http://www.w3schools.com", "_postemployee_batch_req");
         ConfigurationContext configCtxt = new ConfigurationContext(new AxisConfiguration());
         GsonXMLStreamReader gsonXMLStreamReader = new GsonXMLStreamReader(jsonReader);
         gsonXMLStreamReader.initXmlStreamReader(elementQName, schemaList, configCtxt);
