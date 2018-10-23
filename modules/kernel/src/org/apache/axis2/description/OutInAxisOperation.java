@@ -42,6 +42,7 @@ import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.CallbackReceiver;
 import org.apache.axis2.util.Utils;
 import org.apache.axis2.wsdl.WSDLConstants;
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -347,7 +348,7 @@ class OutInAxisOperationClient extends OperationClient {
              * createSOAPMessage take care of figuring out what the SOAP namespace is.
              */
             SOAPEnvelope resenvelope = null;
-            if (checkContentLength(responseMessageContext)) {
+            if (checkContentLength(responseMessageContext) && canResponseHaveBody(responseMessageContext)) {
                 resenvelope = TransportUtils.createSOAPMessage(responseMessageContext);
             } else {
                 /*
@@ -587,6 +588,20 @@ class OutInAxisOperationClient extends OperationClient {
                 log.debug("Exit: OutInAxisOperationClient$SyncCallBack::onError");
             }
         }
+    }
+
+    /**
+     * Check whether response can have a message body according to the HTTP spec.
+     * @param responseMessageContext the active response MessageContext
+     * @return true if there can be a message body in the response, false if not.
+     */
+    private boolean canResponseHaveBody(MessageContext responseMessageContext) {
+        int statusCode = Integer.parseInt(responseMessageContext.getProperty("transport.http.statusCode").toString());
+        return statusCode >= HttpStatus.SC_OK
+                && statusCode != HttpStatus.SC_NO_CONTENT
+                && statusCode != HttpStatus.SC_NOT_MODIFIED
+                && statusCode != HttpStatus.SC_RESET_CONTENT
+                && statusCode / 100 != 1;
     }
 
 }
