@@ -563,6 +563,11 @@
                     </instructions>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.plugin.version}</version>
+            </plugin>
         </plugins>
     </build>
 
@@ -576,6 +581,7 @@
         <version.apache.felix.framework>1.4.0</version.apache.felix.framework>
         <xmlbeans.version>2.3.0</xmlbeans.version>
         <orbit.version.neethi>2.0.4.wso2v5</orbit.version.neethi>
+        <maven.surefire.plugin.version>2.13</maven.surefire.plugin.version>
     </properties>
 
 </project>

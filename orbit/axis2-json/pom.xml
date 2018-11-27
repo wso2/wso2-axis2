@@ -106,10 +106,16 @@
                     </instructions>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.plugin.version}</version>
+            </plugin>
         </plugins>
     </build>
     <properties>
         <version.axis2.json>1.6.1-wso2v29-SNAPSHOT</version.axis2.json>
         <exp.pkg.version.axis2>${version.axis2.json}</exp.pkg.version.axis2>
+        <maven.surefire.plugin.version>2.13</maven.surefire.plugin.version>
     </properties>
 </project>
