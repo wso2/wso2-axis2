@@ -673,7 +673,7 @@ public class GsonXMLStreamReader implements XMLStreamReader {
 
     private String bypassRootElement() throws IOException {
         String name = jsonReader.nextName();
-        if (!("request_box".equalsIgnoreCase(name) && schemaList.isEmpty())) {
+        if (!(("request_box").equals(this.elementQname.getLocalPart())) && !schemaList.isEmpty()) {
             JsonObject jsonObject = schemaList.get(0);
             if (JsonState.StartState == state || JSONType.NESTED_ARRAY.equals(jsonObject.getType())) {
                 name = jsonObject.getName();
