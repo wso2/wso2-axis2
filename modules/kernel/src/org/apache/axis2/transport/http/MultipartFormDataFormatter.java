@@ -136,6 +136,11 @@ public class MultipartFormDataFormatter implements MessageFormatter {
     private static final String DEFAULT_CHARSET = "ISO-8859-1";
 
     /**
+     * Flag to decide if multipart data should be decoded/not decoded before sending out
+     */
+    private static final String DECODE_MULTIPART_DATA_PARAM = "DECODE_MULTIPART_DATA";
+
+    /**
      * @return a byte array of the message formatted according to the given
      *         message format.
      */
@@ -143,7 +148,7 @@ public class MultipartFormDataFormatter implements MessageFormatter {
 
         OMElement omElement = messageContext.getEnvelope().getBody().getFirstElement();
 
-        Part[] parts = createMultipatFormDataRequest(omElement);
+        Part[] parts = createMultipatFormDataRequest(messageContext, omElement);
         if (parts.length > 0) {
             ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
             try {
@@ -232,7 +237,7 @@ public class MultipartFormDataFormatter implements MessageFormatter {
      * @param dataOut
      * @return
      */
-    private Part[] createMultipatFormDataRequest(OMElement dataOut) {
+    private Part[] createMultipatFormDataRequest(MessageContext messageContext, OMElement dataOut) {
         List<Part> parts = new ArrayList<Part>();
         if (dataOut != null) {
             Iterator<?> iter1 = dataOut.getChildElements();
@@ -266,8 +271,15 @@ public class MultipartFormDataFormatter implements MessageFormatter {
                             DEFAULT_CONTENT_TYPE);
                     String charset = getAttributeValue(ele.getAttribute(CHARSET_ATTRIBUTE_QNAME), DEFAULT_CHARSET);
 
-                    part = new FilePart(fieldName, new ByteArrayPartSource(filename, ele.getText().getBytes()),
-                            contentType, charset);
+                    Boolean decodeMultipartData = (Boolean) messageContext.getProperty(DECODE_MULTIPART_DATA_PARAM);
+                    if (decodeMultipartData != null && decodeMultipartData) {
+                        part = new FilePart(fieldName,
+                                new ByteArrayPartSource(filename, Base64.decodeBase64(ele.getText().getBytes())),
+                                contentType, charset);
+                    } else {
+                        part = new FilePart(fieldName, new ByteArrayPartSource(filename, ele.getText().getBytes()),
+                                contentType, charset);
+                    }
                 } else {
                     // Gets the first child object
                     OMTextImpl firstChild = (OMTextImpl) ele.getFirstOMChild();
