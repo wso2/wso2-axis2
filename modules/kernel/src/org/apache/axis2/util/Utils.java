@@ -269,7 +269,7 @@ public class Utils {
         	servicePath = servicePath+"/";
         }
 
-        int index = path.lastIndexOf(servicePath);
+        int index = path.indexOf(servicePath);
         String serviceOpPart = null;
 
         if (-1 != index) {
