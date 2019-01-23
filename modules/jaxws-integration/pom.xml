@@ -172,9 +172,9 @@
                     <compilerArgument>
                         -Xbootclasspath/p:${basedir}/../jaxws-api/target/classes${path.separator}${basedir}/../jws-api/target/classes
                     </compilerArgument>
-                    <compilerVersion>1.5</compilerVersion>
-                    <source>1.5</source>
-                    <target>1.6</target>
+                    <compilerVersion>1.8</compilerVersion>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
             <plugin>
