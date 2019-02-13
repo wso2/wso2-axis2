@@ -24,6 +24,7 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -45,6 +46,7 @@ import org.apache.axiom.om.util.Base64;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.classloader.BeanInfoCache;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.databinding.annotation.IgnoreNullElement;
 import org.apache.axis2.databinding.typemapping.SimpleTypeMapper;
 import org.apache.axis2.databinding.utils.reader.ADBXMLStreamReaderImpl;
 import org.apache.axis2.deployment.util.BeanExcludeInfo;
@@ -53,10 +55,13 @@ import org.apache.axis2.description.java2wsdl.TypeTable;
 import org.apache.axis2.engine.ObjectSupplier;
 import org.apache.axis2.util.Loader;
 import org.apache.axis2.util.StreamWrapper;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class BeanUtil {
     private static int nsCount = 1;
+    private static final Log log = LogFactory.getLog(BeanUtil.class);
+    private static boolean isForceIncludeNullElements;
 
     /**
      * To Serilize Bean object this method is used, this will create an object array using given
@@ -178,6 +183,10 @@ public class BeanUtil {
                                         + beanClass.getName() + "'is not readable.");
                 }
 
+                if (value == null && isSkipWhenNull(beanClass, propertyName)) {
+                    continue;
+                }
+
                 if (SimpleTypeMapper.isSimpleType(ptype)) {
                     addTypeQname(elemntNameSpace, propertyQnameValueList, property,
                                  beanName, processingDocLitBare);
@@ -269,6 +278,31 @@ public class BeanUtil {
         } catch (java.lang.IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * When the annotation @IgnoreNullElement is set and the property forceIncludeNullElements in axis2.xml is not set
+     * or false then return false and skip null values.
+     *
+     * @param beanClass
+     * @param propertyName
+     * @return
+     */
+    private static boolean isSkipWhenNull(Class<?> beanClass, String propertyName) {
+
+        boolean isSkip = false;
+        try {
+            Field field = beanClass.getDeclaredField(propertyName);
+            if (field != null) {
+                IgnoreNullElement ignoreNullElement = field.getAnnotation(IgnoreNullElement.class);
+                if (ignoreNullElement != null) {
+                    isSkip = !isForceIncludeNullElements;
+                }
+            }
+        } catch (NoSuchFieldException e) {
+            log.error("Cannot find the field " + propertyName + " inside the class " + beanClass);
+        }
+        return isSkip;
     }
 
     private static void addTypeQname(QName elemntNameSpace,
@@ -968,6 +1002,11 @@ public class BeanUtil {
             throw new AxisFault("Invalid value \"" + omElement.getText() + "\" for element " +
                                 omElement.getLocalName(), faultCode, e);
         }
+    }
+
+    public static void setIsForceIncludeNullElements(boolean isForceIncludeNullElements) {
+
+        BeanUtil.isForceIncludeNullElements = isForceIncludeNullElements;
     }
 
 }

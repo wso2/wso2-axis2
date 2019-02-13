@@ -51,6 +51,7 @@ import org.apache.axis2.transport.http.util.RESTUtil;
 import org.apache.axis2.util.JavaUtils;
 import org.apache.axis2.util.MessageContextBuilder;
 import org.apache.axis2.util.OnDemandLogger;
+import org.apache.axis2.databinding.utils.BeanUtil;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 
 import javax.servlet.ServletConfig;
@@ -557,6 +558,15 @@ public class AxisServlet extends HttpServlet {
         if (parameter != null) {
             closeReader = JavaUtils.isTrueExplicitly(parameter.getValue());
         }
+
+        // Read property "forceIncludeNullElements" in axis2.xml class.
+        boolean forceIncludeNullElements = false;
+        Parameter isForceIncludeNullElements = axisConfiguration.getParameter(Constants.Configuration.
+                ENABLE_FORCE_INCLUDE_NULL_ELEMENTS);
+        if (isForceIncludeNullElements != null) {
+                forceIncludeNullElements = JavaUtils.isTrueExplicitly(isForceIncludeNullElements.getValue());
+        }
+        BeanUtil.setIsForceIncludeNullElements(forceIncludeNullElements);
 
     }
 

@@ -472,5 +472,10 @@ public class Constants extends org.apache.axis2.namespace.Constants {
          *  This parameter enables message exchange pattern in and out for the Axis operation.
          */
         public static final String GET_HTTP_SC_OK_FOR_VOID_SERVICE_METHODS = "mepinandout";
+
+        /**
+         * Axis2.xml property to force include null values.
+         */
+        public static final String ENABLE_FORCE_INCLUDE_NULL_ELEMENTS = "forceIncludeNullElements";
     }
 }
