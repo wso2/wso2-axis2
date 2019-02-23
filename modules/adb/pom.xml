@@ -56,6 +56,11 @@
             <artifactId>axiom-dom</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.javax.rmi</groupId>
+            <artifactId>rmi</artifactId>
+            <version>1.0.1.wso2v1</version>
+        </dependency>
     </dependencies>
 
     <build>
