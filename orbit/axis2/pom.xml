@@ -582,8 +582,6 @@
         <xmlbeans.version>2.3.0</xmlbeans.version>
         <orbit.version.neethi>2.0.4.wso2v5</orbit.version.neethi>
         <maven.surefire.plugin.version>2.13</maven.surefire.plugin.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
 </project>
