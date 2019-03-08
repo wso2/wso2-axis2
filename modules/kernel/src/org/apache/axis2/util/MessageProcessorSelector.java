@@ -248,7 +248,9 @@ public class MessageProcessorSelector {
         String cType = type;
         if (msgContext.isDoingREST() && HTTPConstants.MEDIA_TYPE_TEXT_XML.equals(type)) {
             cType = HTTPConstants.MEDIA_TYPE_APPLICATION_XML;
-            msgContext.setProperty(Constants.Configuration.CONTENT_TYPE, HTTPConstants.MEDIA_TYPE_TEXT_XML);
+            if (msgContext.getProperty(Constants.Configuration.CONTENT_TYPE) == null) {
+                msgContext.setProperty(Constants.Configuration.CONTENT_TYPE, HTTPConstants.MEDIA_TYPE_TEXT_XML);
+            }
         }
         return cType;
     }
