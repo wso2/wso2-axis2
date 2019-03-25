@@ -562,7 +562,11 @@ public class AxisConfiguration extends AxisDescription {
                     "Transport Receiver can not be null for the transport "
                     + transport.getName());
         }
-        transportsIn.put(transport.getName(), transport);
+        TransportInDescription inDescription = transportsIn.putIfAbsent(transport.getName(), transport);
+        if (inDescription != null) {
+            throw new AxisFault("Transport already registered for " + inDescription.getName() + " with "
+                                + inDescription.getReceiver().getClass() );
+        }
     }
 
     /**
