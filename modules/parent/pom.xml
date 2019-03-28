@@ -756,9 +756,9 @@
                 <version>${jaxen.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.orbit.commons-httpclient</groupId>
+                <groupId>commons-httpclient</groupId>
                 <artifactId>commons-httpclient</artifactId>
-                <version>${commons-httpclient.version}</version>
+                <version>${commons.httpclient.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
