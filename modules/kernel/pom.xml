@@ -53,7 +53,7 @@
             <artifactId>servlet-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-httpclient</groupId>
+            <groupId>org.wso2.orbit.commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
         </dependency>
         <dependency>
