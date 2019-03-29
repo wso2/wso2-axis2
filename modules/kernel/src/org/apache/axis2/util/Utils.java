@@ -806,22 +806,4 @@ public class Utils {
             return serviceObject == null ? null : serviceObject.getClass();
         }
     }
-
-    /**
-     * this is to make is backward compatible. Get rid of this at the next major release.
-     * @param messageContext
-     * @return
-     */
-
-    public static boolean isClientThreadNonBlockingPropertySet(MessageContext messageContext){
-    	Object val =  messageContext.getProperty(
-                MessageContext.CLIENT_API_NON_BLOCKING);
-    	if(val != null && ((Boolean)val).booleanValue()){
-    		return true;
-    	}else{
-    		//put the string inline as this is to be removed
-    		val =  messageContext.getProperty("transportNonBlocking");
-    		return val != null && ((Boolean)val).booleanValue();
-    	}
-    }
 }

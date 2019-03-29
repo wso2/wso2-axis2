@@ -308,9 +308,7 @@ public class HTTPSender extends AbstractHTTPSender {
     private void handleResponse(MessageContext msgContext,
                                 HttpMethodBase method) throws IOException {
         int statusCode = method.getStatusCode();
-        HTTPStatusCodeFamily family = getHTTPStatusCodeFamily(statusCode);
         log.trace("Handling response - " + statusCode);
-        Set<Integer>nonErrorCodes = (Set<Integer>) msgContext.getProperty(HTTPConstants.NON_ERROR_HTTP_STATUS_CODES);    
         Set<Integer> errorCodes = new HashSet<Integer>();
         String strRetryErrorCodes = (String) msgContext.getProperty(HTTPConstants.ERROR_HTTP_STATUS_CODES); // Fixing
                                                                                                 // ESBJAVA-3178
@@ -323,45 +321,9 @@ public class HTTPSender extends AbstractHTTPSender {
                 }
             }
         }
-        if (HTTPStatusCodeFamily.SUCCESSFUL.equals(family)) {
-            // Save the HttpMethod so that we can release the connection when cleaning up
-            // HTTP 202 Accepted should support body based on ESBJAVA-4370 as spec does not strictly enforce
-            // no-entity-body with 202 Accepted response.
+        if (!errorCodes.contains(statusCode)) {
             msgContext.setProperty(HTTPConstants.HTTP_METHOD, method);
             processResponse(method, msgContext);
-        } else if (!errorCodes.contains(statusCode)
-                && (statusCode == HttpStatus.SC_INTERNAL_SERVER_ERROR
-                        || statusCode == HttpStatus.SC_BAD_REQUEST || statusCode == HttpStatus.SC_CONFLICT)) {
-            // Save the HttpMethod so that we can release the connection when cleaning up
-            msgContext.setProperty(HTTPConstants.HTTP_METHOD, method);
-            Header contenttypeHeader =
-                    method.getResponseHeader(HTTPConstants.HEADER_CONTENT_TYPE);
-            String value = null;
-            if (contenttypeHeader != null) {
-                value = contenttypeHeader.getValue();
-            }
-             OperationContext opContext = msgContext.getOperationContext();
-            if(opContext!=null){
-                MessageContext inMessageContext =
-                        opContext.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
-                if(inMessageContext!=null){
-                    inMessageContext.setProcessingFault(true);
-                }
-            }
-            if (value != null) {
-
-                processResponse(method, msgContext);
-            }
-            
-            if (org.apache.axis2.util.Utils.isClientThreadNonBlockingPropertySet(msgContext)) {
-            	 throw new AxisFault(Messages.getMessage("transportError",
-                         String.valueOf(statusCode),
-                         method.getStatusText()));
-            }
-        } else if (nonErrorCodes != null && nonErrorCodes.contains(statusCode)) {
-            msgContext.setProperty(HTTPConstants.HTTP_METHOD, method);
-            processResponse(method, msgContext);
-            return;
         } else {
             // Since we don't process the response, we must release the connection immediately
             method.releaseConnection();
@@ -373,36 +335,5 @@ public class HTTPSender extends AbstractHTTPSender {
             axisFault.setFaultCode(String.valueOf(method.getStatusCode()));
             throw axisFault;
         }
-    }
-
-    /**
-     * +     * Used to determine the family of HTTP status codes to which the given code
-     * +     * belongs.
-     * +     *
-     * +     * @param statusCode - The HTTP status code
-     * +
-     */
-    protected HTTPStatusCodeFamily getHTTPStatusCodeFamily(int statusCode) {
-        switch (statusCode / 100) {
-            case 1:
-                return HTTPStatusCodeFamily.INFORMATIONAL;
-            case 2:
-                return HTTPStatusCodeFamily.SUCCESSFUL;
-            case 3:
-                return HTTPStatusCodeFamily.REDIRECTION;
-            case 4:
-                return HTTPStatusCodeFamily.CLIENT_ERROR;
-            case 5:
-                return HTTPStatusCodeFamily.SERVER_ERROR;
-            default:
-                return HTTPStatusCodeFamily.OTHER;
-        }
-    }
-
-    /**
-     * The set of HTTP status code families.
-     */
-    protected enum HTTPStatusCodeFamily {
-        INFORMATIONAL, SUCCESSFUL, REDIRECTION, CLIENT_ERROR, SERVER_ERROR, OTHER
     }
 }

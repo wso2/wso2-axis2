@@ -432,15 +432,7 @@ public class AxisEngine {
                     throw new AxisFault("Transport out has not been set");
                 }
                 TransportSender sender = transportOut.getSender();
-                // This boolean property only used in client side fireAndForget invocation
-                //It will set a property into message context and if some one has set the
-                //property then transport sender will invoke in a diffrent thread
-                if (Utils.isClientThreadNonBlockingPropertySet(msgContext)) {
-                    msgContext.getConfigurationContext().getThreadPool().execute(
-                            new TransportNonBlockingInvocationWorker(msgContext, sender));
-                } else {
                     sender.invoke(msgContext);
-                }
                 //REVIEW: In the case of the TransportNonBlockingInvocationWorker, does this need to wait until that finishes?
                 flowComplete(msgContext);
             } else if (pi.equals(InvocationResponse.SUSPEND)) {
