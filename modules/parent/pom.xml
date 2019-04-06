@@ -75,7 +75,7 @@
         <bsf.version>2.4.0</bsf.version>
         <commons.codec.version>1.3</commons.codec.version>
         <commons.fileupload.version>1.3.1.wso2v1</commons.fileupload.version>
-        <wso2.orbit.commons.httpclient.version>3.1.0.wso2v6</wso2.orbit.commons.httpclient.version>
+        <commons.httpclient.version>3.1</commons.httpclient.version>
         <commons.io.version>2.0</commons.io.version>
         <commons.logging.version>1.1.1</commons.logging.version>
         <fi.version>1.2.7</fi.version>
@@ -756,9 +756,9 @@
                 <version>${jaxen.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.orbit.commons-httpclient</groupId>
+                <groupId>commons-httpclient</groupId>
                 <artifactId>commons-httpclient</artifactId>
-                <version>${wso2.orbit.commons.httpclient.version}</version>
+                <version>${commons.httpclient.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
