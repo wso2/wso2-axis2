@@ -191,17 +191,15 @@ public class BaseUtils {
     }
 
     public static boolean isUsingTransport(AxisService service, String transportName) {
-        boolean process = service.isEnableAllTransports();
-        if (process) {
-            return true;
-
-        } else {
-            List transports = service.getExposedTransports();
+        List transports = service.getExposedTransports();
+        if (!transports.isEmpty()) {
             for (Object transport : transports) {
                 if (transportName.equals(transport)) {
                     return true;
                 }
             }
+        } else if ("http".equals(transportName) || "https".equals(transportName)) {
+            return true;
         }
         return false;
     }
