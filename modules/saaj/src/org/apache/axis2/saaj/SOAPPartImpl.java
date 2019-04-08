@@ -63,6 +63,7 @@ import javax.xml.soap.SOAPPart;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -71,6 +72,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.XMLConstants;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -342,7 +344,10 @@ public class SOAPPartImpl extends SOAPPart {
                 reader = inputFactory.createXMLStreamReader(source);
             } else {
                 Result result = new StreamResult(baos);
-                Transformer xformer = TransformerFactory.newInstance().newTransformer();
+                TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+                Transformer xformer = transformerFactory.newTransformer();
+                xformer.setOutputProperty(OutputKeys.INDENT, "yes");
                 xformer.transform(source, result);
                 InputStream is = new ByteArrayInputStream(baos.toByteArray());
                 reader = inputFactory.createXMLStreamReader(is);
