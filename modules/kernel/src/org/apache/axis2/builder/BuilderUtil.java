@@ -66,6 +66,7 @@ import org.apache.ws.commons.schema.XmlSchemaSequence;
 import org.apache.ws.commons.schema.XmlSchemaType;
 
 import javax.activation.DataHandler;
+import javax.activation.DataSource;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
@@ -219,7 +220,9 @@ public class BuilderUtil {
                     dataHandler, true);
             OMElement omElement = soapFactory.createOMElement(key, ns, bodyFirstChild);
             omElement.addChild(dataText);
-            omElement.addAttribute("filename", ((DataHandler) parameter).getDataSource().getName(), ns);
+            DataSource dataSource = dataHandler.getDataSource();
+            omElement.addAttribute("filename", dataSource.getName(), ns);
+            omElement.addAttribute("content-type", dataSource.getContentType(), ns);
         } else {
             String textValue = parameter.toString();
             soapFactory.createOMElement(key, ns, bodyFirstChild).setText(
