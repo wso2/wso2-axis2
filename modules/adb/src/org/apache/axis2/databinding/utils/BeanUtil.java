@@ -291,16 +291,19 @@ public class BeanUtil {
     private static boolean isSkipWhenNull(Class<?> beanClass, String propertyName) {
 
         boolean isSkip = false;
-        try {
-            Field field = beanClass.getDeclaredField(propertyName);
-            if (field != null) {
-                IgnoreNullElement ignoreNullElement = field.getAnnotation(IgnoreNullElement.class);
-                if (ignoreNullElement != null) {
-                    isSkip = !isForceIncludeNullElements;
-                }
+        Field[] fields = beanClass.getDeclaredFields();
+        Field field = null;
+        for (Field tmpField : fields) {
+            if (tmpField.getName().equals(propertyName)) {
+                field = tmpField;
+                break;
             }
-        } catch (NoSuchFieldException e) {
-            log.error("Cannot find the field " + propertyName + " inside the class " + beanClass);
+        }
+        if (field != null) {
+            IgnoreNullElement ignoreNullElement = field.getAnnotation(IgnoreNullElement.class);
+            if (ignoreNullElement != null) {
+                isSkip = !isForceIncludeNullElements;
+            }
         }
         return isSkip;
     }
