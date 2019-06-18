@@ -668,6 +668,21 @@ public class BuilderUtil {
         }
     }
 
+    private static String getContentTypeForBuilderSelection(String type, MessageContext msgContext) {
+        /**
+         * Handle special case where content-type : text/xml and SOAPAction = null consider as
+         * POX (REST) message not SOAP 1.1.
+         *
+         * it's required use the Builder associate with "application/xml" here but should not
+         * change content type of current message.
+         *
+         */
+        if (msgContext.getSoapAction() == null && HTTPConstants.MEDIA_TYPE_TEXT_XML.equals(type) && msgContext.isDoingREST()) {
+            type = HTTPConstants.MEDIA_TYPE_APPLICATION_XML;
+        }
+        return type;
+    }
+
     public static StAXBuilder getBuilder(SOAPFactory soapFactory, InputStream in, String charSetEnc)
             throws XMLStreamException {
         StAXBuilder builder;
@@ -695,7 +710,8 @@ public class BuilderUtil {
         if (useFallbackParameter !=null){
         	useFallbackBuilder = JavaUtils.isTrueExplicitly(useFallbackParameter.getValue(),useFallbackBuilder);
         }
-        Builder builder = configuration.getMessageBuilder(type,useFallbackBuilder);
+        String cType = getContentTypeForBuilderSelection(type, msgContext);
+        Builder builder = configuration.getMessageBuilder(cType, useFallbackBuilder);
         if (builder != null) {
             // Check whether the request has a Accept header if so use that as the response
             // message type.
