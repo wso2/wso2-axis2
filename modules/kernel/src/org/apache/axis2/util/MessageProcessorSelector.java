@@ -246,7 +246,7 @@ public class MessageProcessorSelector {
          * change content type of current message.
          */
         String cType = type;
-        if (msgContext.isDoingREST() && HTTPConstants.MEDIA_TYPE_TEXT_XML.equals(type)) {
+        if (msgContext.isDoingREST() && HTTPConstants.MEDIA_TYPE_TEXT_XML.equals(type) && msgContext.getSoapAction() == null) {
             cType = HTTPConstants.MEDIA_TYPE_APPLICATION_XML;
             if (msgContext.getProperty(Constants.Configuration.CONTENT_TYPE) == null) {
                 msgContext.setProperty(Constants.Configuration.CONTENT_TYPE, HTTPConstants.MEDIA_TYPE_TEXT_XML);
