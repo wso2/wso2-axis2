@@ -87,6 +87,10 @@ public class BuilderUtil {
     private static final Log log = LogFactory.getLog(BuilderUtil.class);
 
     public static final int BOM_SIZE = 4;
+    /**
+     * Default content-type used in the file fields
+     */
+    private static final String DEFAULT_CONTENT_TYPE = "text/plain";
 
     public static SOAPEnvelope buildsoapMessage(MessageContext messageContext,
                                                 MultipleEntryHashMap requestParameterMap,
@@ -222,7 +226,11 @@ public class BuilderUtil {
             omElement.addChild(dataText);
             DataSource dataSource = dataHandler.getDataSource();
             omElement.addAttribute("filename", dataSource.getName(), ns);
-            omElement.addAttribute("content-type", dataSource.getContentType(), ns);
+            if (dataSource.getContentType() != null) {
+                omElement.addAttribute("content-type", dataSource.getContentType(), ns);
+            } else {
+                omElement.addAttribute("content-type", DEFAULT_CONTENT_TYPE, ns);
+            }
         } else {
             String textValue = parameter.toString();
             soapFactory.createOMElement(key, ns, bodyFirstChild).setText(
