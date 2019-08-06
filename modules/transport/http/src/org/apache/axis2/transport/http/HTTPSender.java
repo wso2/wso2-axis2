@@ -32,6 +32,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -100,6 +101,17 @@ public class HTTPSender extends AbstractHTTPSender {
         // Need to have this here because we can have soap action when using the soap response MEP
         String soapAction =
                 messageFormatter.formatSOAPAction(msgContext, format, soapActiionString);
+
+        Object followRedirect = msgContext.getProperty("FOLLOW_REDIRECT");
+        Object cookieStatus = msgContext.getProperty("DISABLE_COOKIE");
+
+        if (followRedirect != null) {
+            getMethod.setFollowRedirects(Boolean.parseBoolean(followRedirect.toString()));
+        }
+
+        if (cookieStatus != null && (Boolean.parseBoolean(cookieStatus.toString()))) {
+            getMethod.getParams().setCookiePolicy(CookiePolicy.IGNORE_COOKIES);
+        }
 
         if (soapAction != null && !msgContext.isDoingREST()) {
             getMethod.setRequestHeader(HTTPConstants.HEADER_SOAP_ACTION, soapAction);
@@ -187,6 +199,18 @@ public class HTTPSender extends AbstractHTTPSender {
         }
 
         String soapAction = messageFormatter.formatSOAPAction(msgContext, format, soapActionString);
+
+
+        Object followRedirect = msgContext.getProperty("FOLLOW_REDIRECT");
+        Object cookieStatus = msgContext.getProperty("DISABLE_COOKIE");
+
+        if (followRedirect != null) {
+            postMethod.setFollowRedirects(Boolean.parseBoolean(followRedirect.toString()));
+        }
+
+        if (cookieStatus != null && (Boolean.parseBoolean(cookieStatus.toString()))) {
+            postMethod.getParams().setCookiePolicy(CookiePolicy.IGNORE_COOKIES);
+        }
 
         if (soapAction != null && !msgContext.isDoingREST()) {
             postMethod.setRequestHeader(HTTPConstants.HEADER_SOAP_ACTION, soapAction);
