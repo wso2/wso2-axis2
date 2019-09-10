@@ -829,6 +829,7 @@ public class AxisServlet extends HttpServlet {
             messageContext = createMessageContext(this.request, this.response, false);
             messageContext.setProperty(org.apache.axis2.transport.http.HTTPConstants.HTTP_METHOD,
                     httpMethodString);
+            messageContext.setProperty(HTTPConstants.HTTP_SERVLETREQUEST_OBJECT, request);
         }
 
         public void processXMLRequest() throws IOException, ServletException {

@@ -146,6 +146,11 @@ public class HTTPConstants {
     public static String MC_HTTP_SERVLETREQUEST = "transport.http.servletRequest";
 
     /**
+     * Field HTTP_SERVLETREQUEST_OBJECT
+     */
+    public static String HTTP_SERVLETREQUEST_OBJECT = "transport.http.servletRequest.object";
+
+    /**
      * Field MC_HTTP_SERVLETPATHINFO
      */
     public static String MC_HTTP_SERVLETPATHINFO = "transport.http.servletPathInfo";

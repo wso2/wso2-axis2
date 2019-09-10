@@ -35,11 +35,13 @@ import org.apache.axis2.description.AxisEndpoint;
 import org.apache.axis2.description.WSDL20DefaultValueHolder;
 import org.apache.axis2.description.WSDL2Constants;
 import org.apache.axis2.i18n.Messages;
+import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.http.util.URIEncoderDecoder;
 import org.apache.axis2.util.MultipleEntryHashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,6 +50,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 import java.security.PrivilegedActionException;
+import java.util.Map;
 
 
 public class XFormURLEncodedBuilder implements Builder {
@@ -109,10 +112,18 @@ public class XFormURLEncodedBuilder implements Builder {
             query = requestURL.substring(index + 1);
         }
 
-        extractParametersFromRequest(parameterMap, query, queryParameterSeparator,
-                                     (String) messageContext.getProperty(
-                                             Constants.Configuration.CHARACTER_SET_ENCODING),
-                                     inputStream);
+        Object httpRequest = messageContext.getProperty(HTTPConstants.HTTP_SERVLETREQUEST_OBJECT);
+
+        if (httpRequest instanceof HttpServletRequest) {
+            Map<String, Object> parameters = ((HttpServletRequest) httpRequest).getParameterMap();
+            for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+                parameterMap.put(entry.getKey(), entry.getValue());
+            }
+
+        } else {
+            extractParametersFromRequest(parameterMap, query, queryParameterSeparator,
+                    (String) messageContext.getProperty(Constants.Configuration.CHARACTER_SET_ENCODING), inputStream);
+        }
 
         messageContext.setProperty(Constants.REQUEST_PARAMETER_MAP, parameterMap);
         return BuilderUtil.buildsoapMessage(messageContext, parameterMap,
