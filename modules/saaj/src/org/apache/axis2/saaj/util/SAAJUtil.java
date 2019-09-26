@@ -30,9 +30,15 @@ import org.apache.axiom.soap.impl.builder.MTOMStAXSOAPModelBuilder;
 import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import javax.activation.DataHandler;
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.AttachmentPart;
 import javax.xml.soap.MimeHeader;
 import javax.xml.soap.MimeHeaders;
@@ -40,6 +46,7 @@ import javax.xml.soap.SOAPException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Iterator;
 
 /** Utility class for the Axis2-WSS4J Module */
@@ -167,9 +174,8 @@ public class SAAJUtil {
         element.serialize(baos);
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
 
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setNamespaceAware(true);
-        return factory.newDocumentBuilder().parse(bais).getDocumentElement();
+        DocumentBuilder builder = getSecuredDocumentBuilder(false);
+        return builder.parse(bais).getDocumentElement();
     }
 
     /**
@@ -204,5 +210,29 @@ public class SAAJUtil {
         String ct1 = (contentType1 == null) ? "" : contentType1.trim().toLowerCase();
         String ct2 = (contentType2 == null) ? "" : contentType2.trim().toLowerCase();
         return ct1.equals(ct2);        
+    }
+
+    /**
+     * This method provides a secured document builder which will secure XXE attacks.
+     *
+     * @param setIgnoreComments whether to set setIgnoringComments in DocumentBuilderFactory.
+     * @return DocumentBuilder
+     * @throws ParserConfigurationException
+     */
+    public static DocumentBuilder getSecuredDocumentBuilder(boolean setIgnoreComments) throws
+            ParserConfigurationException {
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        documentBuilderFactory.setIgnoringComments(setIgnoreComments);
+        documentBuilderFactory.setNamespaceAware(true);
+        documentBuilderFactory.setExpandEntityReferences(false);
+        documentBuilderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+        documentBuilder.setEntityResolver(new EntityResolver() {
+            @Override
+            public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+                throw new SAXException("Possible XML External Entity (XXE) attack. Skip resolving entity");
+            }
+        });
+        return documentBuilder;
     }
 }
