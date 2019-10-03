@@ -599,6 +599,7 @@ class OutInAxisOperationClient extends OperationClient {
         if (responseMessageContext.getProperty("transport.http.statusCode") != null) {
             int statusCode = Integer.parseInt(responseMessageContext.getProperty("transport.http.statusCode").toString());
             return statusCode >= HttpStatus.SC_OK
+                    && statusCode != HttpStatus.SC_ACCEPTED
                     && statusCode != HttpStatus.SC_NO_CONTENT
                     && statusCode != HttpStatus.SC_NOT_MODIFIED
                     && statusCode != HttpStatus.SC_RESET_CONTENT
