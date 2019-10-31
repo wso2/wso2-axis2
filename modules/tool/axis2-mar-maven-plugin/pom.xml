@@ -24,7 +24,7 @@
     <parent>
         <groupId>org.apache.axis2</groupId>
         <artifactId>axis2-parent</artifactId>
-        <version>1.6.1-wso2v39</version>
+        <version>1.6.1-wso2v40-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <artifactId>axis2-mar-maven-plugin</artifactId>
@@ -70,7 +70,7 @@
         <connection>scm:svn:http://svn.apache.org/repos/asf/axis/axis2/java/core/branches/1_6/modules/tool/axis2-mar-maven-plugin</connection>
         <developerConnection>scm:svn:https://svn.apache.org/repos/asf/axis/axis2/java/core/branches/1_6/modules/tool/axis2-mar-maven-plugin</developerConnection>
         <url>http://svn.apache.org/viewvc/axis/axis2/java/core/branches/1_6/modules/tool/axis2-mar-maven-plugin</url>
-      <tag>v1.6.1-wso2v39</tag>
+      <tag>HEAD</tag>
   </scm>
     <build>
         <plugins>
