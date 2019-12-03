@@ -559,15 +559,14 @@ public class AxisServlet extends HttpServlet {
             closeReader = JavaUtils.isTrueExplicitly(parameter.getValue());
         }
 
-        // Read property "forceIncludeNullElements" in axis2.xml class.
+        // Read property "forceIncludeNullElements" in axis2.xml file.
         boolean forceIncludeNullElements = false;
         Parameter isForceIncludeNullElements = axisConfiguration.getParameter(Constants.Configuration.
                 ENABLE_FORCE_INCLUDE_NULL_ELEMENTS);
         if (isForceIncludeNullElements != null) {
-                forceIncludeNullElements = JavaUtils.isTrueExplicitly(isForceIncludeNullElements.getValue());
+            forceIncludeNullElements = JavaUtils.isTrueExplicitly(isForceIncludeNullElements.getValue());
         }
         BeanUtil.setIsForceIncludeNullElements(forceIncludeNullElements);
-
     }
 
     /**
