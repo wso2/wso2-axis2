@@ -546,7 +546,7 @@
                             javax.servlet; version="${imp.pkg.version.javax.servlet}",
                             javax.servlet.http; version="${imp.pkg.version.javax.servlet}",
                             javax.xml.stream.*; version="1.0.1",
-                            javax.xml.soap.*; version="1.0.0",
+                            javax.xml.soap.*; version="0.0.0",
                             org.apache.commons.io.*; version="0.0.0",
                             javax.mail.*; version="1.4.0",
                             javax.wsdl.*; version="1.6.2",
