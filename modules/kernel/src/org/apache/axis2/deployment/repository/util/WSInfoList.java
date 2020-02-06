@@ -23,6 +23,8 @@ package org.apache.axis2.deployment.repository.util;
 import org.apache.axis2.deployment.Deployer;
 import org.apache.axis2.deployment.DeploymentConstants;
 import org.apache.axis2.deployment.DeploymentEngine;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -33,6 +35,7 @@ import java.util.Map;
 
 public class WSInfoList implements DeploymentConstants {
 
+    private static final Log log = LogFactory.getLog(WSInfoList.class);
     /**
      * This is to store all the jar files in a specified folder (WEB_INF)
      */
@@ -112,9 +115,15 @@ public class WSInfoList implements DeploymentConstants {
                     found = true;
                 }
             }
-            if(!found){
-                tobeRemoved.add(fileName);
-                deploymentEngine.addWSToUndeploy(infoItem);
+            if (!found) {
+                int index = fileName.lastIndexOf(File.separator);
+                String filepath = fileName.substring(0, index);
+                File dir = new File(filepath);
+                if (dir.exists()) {
+                    tobeRemoved.add(fileName);
+                    log.debug(fileName + " was added to undeployable list");
+                    deploymentEngine.addWSToUndeploy(infoItem);
+                }
             }
         }
 
