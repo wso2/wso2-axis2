@@ -210,8 +210,10 @@ public class ApplicationXMLFormatter implements MessageFormatter {
                 log.debug("It is changed to " + contentType);
             }
         }
+        String setEncoding = (String) messageContext.getProperty(Constants.Configuration
+                                                                         .SET_CONTENT_TYPE_CHARACTER_ENCODING);
 
-        if (encoding != null) {
+        if (encoding != null && !"false".equals(setEncoding)) {
             contentType += "; charset=" + encoding;
         }
 
