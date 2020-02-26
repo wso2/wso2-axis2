@@ -70,7 +70,9 @@ public class PlainTextFormatter implements MessageFormatterEx {
             contentType = org.apache.axis2.namespace.Constants.MIME_CT_TEXT_PLAIN;
         }
 
-        if (encoding != null) {
+        String setEncoding = (String) messageContext.getProperty(Constants.Configuration.SET_CONTENT_TYPE_CHARACTER_ENCODING);
+
+        if (encoding != null && !"false".equals(setEncoding)) {
             contentType += "; charset=" + encoding;
         }
 

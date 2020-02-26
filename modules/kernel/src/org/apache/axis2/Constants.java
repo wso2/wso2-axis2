@@ -477,5 +477,11 @@ public class Constants extends org.apache.axis2.namespace.Constants {
          * axis2.xml property to force include null values.
          */
         public static final String ENABLE_FORCE_INCLUDE_NULL_ELEMENTS = "forceIncludeNullElements";
+
+        /**
+         * Property to set whether the user expects synapse to append a default charset encoding(UTF-8)
+         * to the outgoing request
+         */
+        public static final String SET_CONTENT_TYPE_CHARACTER_ENCODING = "setCharacterEncoding";
     }
 }

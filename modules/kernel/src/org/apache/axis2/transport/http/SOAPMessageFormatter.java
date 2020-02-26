@@ -122,10 +122,12 @@ public class SOAPMessageFormatter implements MessageFormatter {
         if (log.isDebugEnabled()) {
             log.debug("contentType from the OMOutputFormat =" + contentType);
         }
-         if (encoding != null && contentType != null &&
-        		contentType.indexOf(HTTPConstants.MEDIA_TYPE_MULTIPART_RELATED)==-1) {
-             contentType += "; charset=" + encoding;
-         }
+        String setEncoding = (String) msgCtxt.getProperty(Constants.Configuration
+                                                                  .SET_CONTENT_TYPE_CHARACTER_ENCODING);
+        if (encoding != null && contentType != null && !"false".equals(setEncoding) &&
+            contentType.indexOf(HTTPConstants.MEDIA_TYPE_MULTIPART_RELATED)==-1) {
+            contentType += "; charset=" + encoding;
+        }
 
         // action header is not mandated in SOAP 1.2. So putting it, if
         // available
