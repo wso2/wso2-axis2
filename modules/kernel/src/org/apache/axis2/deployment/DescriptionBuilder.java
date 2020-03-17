@@ -41,6 +41,7 @@ import org.apache.axis2.i18n.Messages;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.util.Loader;
 import org.apache.axis2.util.XMLUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Policy;
@@ -56,6 +57,12 @@ import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.regex.Pattern;
+
+import static org.apache.axis2.Constants.ENV_VAR_PLACEHOLDER_PREFIX;
+import static org.apache.axis2.Constants.PLACEHOLDER_SUFFIX;
+import static org.apache.axis2.Constants.PROPERTY_PLACEHOLDER_PREFIX;
+import static org.apache.axis2.Constants.SYS_PROPERTY_PLACEHOLDER_PREFIX;
 
 /**
  * This class does the common tasks for all *Builder class.
@@ -691,15 +698,43 @@ public class DescriptionBuilder implements DeploymentConstants {
     }
 
     protected String replaceSystemProperty(String text) {
+        String[] sysRefs = StringUtils.substringsBetween(text, SYS_PROPERTY_PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX);
+        String[] envRefs = StringUtils.substringsBetween(text, ENV_VAR_PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX);
+
+        // Resolves system property references ($sys{ref}) in an individual string.
+        if (sysRefs != null) {
+            for (String ref : sysRefs) {
+                String property = System.getProperty(ref);
+                if (StringUtils.isNotEmpty(property)) {
+                    text = text.replaceAll(Pattern.quote(SYS_PROPERTY_PLACEHOLDER_PREFIX + ref + PLACEHOLDER_SUFFIX), property);
+                } else {
+                    throw new RuntimeException("Error while retrieving " + ref + " system property");
+                }
+            }
+            return text;
+        }
+        // Resolves environment variable references ($env{ref}) in an individual string.
+        if (envRefs != null) {
+            for (String ref : envRefs) {
+                String resolvedValue = System.getenv(ref);
+                if (StringUtils.isNotEmpty(resolvedValue)) {
+                    text = text.replaceAll(Pattern.quote(ENV_VAR_PLACEHOLDER_PREFIX + ref + PLACEHOLDER_SUFFIX), resolvedValue);
+                } else {
+                    throw new RuntimeException("Error while retrieving " + ref + " environment variable");
+                }
+            }
+            return text;
+        }
+
         int indexOfStartingChars = -1;
         int indexOfClosingBrace;
 
         // The following condition deals with properties.
         // Properties are specified as ${system.property},
         // and are assumed to be System properties
-        while (indexOfStartingChars < text.indexOf("${")
-                && (indexOfStartingChars = text.indexOf("${")) != -1
-                && (indexOfClosingBrace = text.indexOf('}')) != -1) {
+        while (indexOfStartingChars < text.indexOf(PROPERTY_PLACEHOLDER_PREFIX)
+                && (indexOfStartingChars = text.indexOf(PROPERTY_PLACEHOLDER_PREFIX)) != -1
+                && (indexOfClosingBrace = text.indexOf(PLACEHOLDER_SUFFIX)) != -1) {
             String sysProp = text.substring(indexOfStartingChars + 2,
                     indexOfClosingBrace);
             String propValue = System.getProperty(sysProp);
