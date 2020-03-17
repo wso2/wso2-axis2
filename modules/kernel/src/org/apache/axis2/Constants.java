@@ -330,7 +330,7 @@ public class Constants extends org.apache.axis2.namespace.Constants {
      */
     public static final String SYS_PROPERTY_PLACEHOLDER_PREFIX = "$sys{";
     public static final String ENV_VAR_PLACEHOLDER_PREFIX = "$env{";
-    public static final String PROPERTY_PLACEHOLDER_PREFIX = "${";
+    public static final String DYNAMIC_PROPERTY_PLACEHOLDER_PREFIX = "${";
     public static final String PLACEHOLDER_SUFFIX = "}";
 
     public static interface Configuration {

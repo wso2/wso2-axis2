@@ -61,7 +61,7 @@ import java.util.regex.Pattern;
 
 import static org.apache.axis2.Constants.ENV_VAR_PLACEHOLDER_PREFIX;
 import static org.apache.axis2.Constants.PLACEHOLDER_SUFFIX;
-import static org.apache.axis2.Constants.PROPERTY_PLACEHOLDER_PREFIX;
+import static org.apache.axis2.Constants.DYNAMIC_PROPERTY_PLACEHOLDER_PREFIX;
 import static org.apache.axis2.Constants.SYS_PROPERTY_PLACEHOLDER_PREFIX;
 
 /**
@@ -708,7 +708,7 @@ public class DescriptionBuilder implements DeploymentConstants {
                 if (StringUtils.isNotEmpty(property)) {
                     text = text.replaceAll(Pattern.quote(SYS_PROPERTY_PLACEHOLDER_PREFIX + ref + PLACEHOLDER_SUFFIX), property);
                 } else {
-                    throw new RuntimeException("Error while retrieving " + ref + " system property");
+                    log.warn("System property is not available for " + ref);
                 }
             }
             return text;
@@ -720,7 +720,7 @@ public class DescriptionBuilder implements DeploymentConstants {
                 if (StringUtils.isNotEmpty(resolvedValue)) {
                     text = text.replaceAll(Pattern.quote(ENV_VAR_PLACEHOLDER_PREFIX + ref + PLACEHOLDER_SUFFIX), resolvedValue);
                 } else {
-                    throw new RuntimeException("Error while retrieving " + ref + " environment variable");
+                    log.warn("Environment variable is not available for " + ref);
                 }
             }
             return text;
@@ -732,8 +732,8 @@ public class DescriptionBuilder implements DeploymentConstants {
         // The following condition deals with properties.
         // Properties are specified as ${system.property},
         // and are assumed to be System properties
-        while (indexOfStartingChars < text.indexOf(PROPERTY_PLACEHOLDER_PREFIX)
-                && (indexOfStartingChars = text.indexOf(PROPERTY_PLACEHOLDER_PREFIX)) != -1
+        while (indexOfStartingChars < text.indexOf(DYNAMIC_PROPERTY_PLACEHOLDER_PREFIX)
+                && (indexOfStartingChars = text.indexOf(DYNAMIC_PROPERTY_PLACEHOLDER_PREFIX)) != -1
                 && (indexOfClosingBrace = text.indexOf(PLACEHOLDER_SUFFIX)) != -1) {
             String sysProp = text.substring(indexOfStartingChars + 2,
                     indexOfClosingBrace);
