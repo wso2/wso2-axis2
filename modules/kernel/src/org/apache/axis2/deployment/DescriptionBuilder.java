@@ -698,30 +698,26 @@ public class DescriptionBuilder implements DeploymentConstants {
     }
 
     protected String replaceSystemProperty(String text) {
-        String[] sysRefs = StringUtils.substringsBetween(text, SYS_PROPERTY_PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX);
-        String[] envRefs = StringUtils.substringsBetween(text, ENV_VAR_PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX);
+        String sysRefs = StringUtils.substringBetween(text, SYS_PROPERTY_PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX);
+        String envRefs = StringUtils.substringBetween(text, ENV_VAR_PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX);
 
         // Resolves system property references ($sys{ref}) in an individual string.
         if (sysRefs != null) {
-            for (String ref : sysRefs) {
-                String property = System.getProperty(ref);
-                if (StringUtils.isNotEmpty(property)) {
-                    text = text.replaceAll(Pattern.quote(SYS_PROPERTY_PLACEHOLDER_PREFIX + ref + PLACEHOLDER_SUFFIX), property);
-                } else {
-                    log.warn("System property is not available for " + ref);
-                }
+            String property = System.getProperty(sysRefs);
+            if (StringUtils.isNotEmpty(property)) {
+                text = text.replaceAll(Pattern.quote(SYS_PROPERTY_PLACEHOLDER_PREFIX + sysRefs + PLACEHOLDER_SUFFIX), property);
+            } else {
+                log.error("System property is not available for " + sysRefs);
             }
             return text;
         }
         // Resolves environment variable references ($env{ref}) in an individual string.
         if (envRefs != null) {
-            for (String ref : envRefs) {
-                String resolvedValue = System.getenv(ref);
-                if (StringUtils.isNotEmpty(resolvedValue)) {
-                    text = text.replaceAll(Pattern.quote(ENV_VAR_PLACEHOLDER_PREFIX + ref + PLACEHOLDER_SUFFIX), resolvedValue);
-                } else {
-                    log.warn("Environment variable is not available for " + ref);
-                }
+            String resolvedValue = System.getenv(envRefs);
+            if (StringUtils.isNotEmpty(resolvedValue)) {
+                text = text.replaceAll(Pattern.quote(ENV_VAR_PLACEHOLDER_PREFIX + envRefs + PLACEHOLDER_SUFFIX), resolvedValue);
+            } else {
+                log.error("Environment variable is not available for " + envRefs);
             }
             return text;
         }
