@@ -334,7 +334,28 @@ public class HTTPSender extends AbstractHTTPSender {
         int statusCode = method.getStatusCode();
         HTTPStatusCodeFamily family = getHTTPStatusCodeFamily(statusCode);
         log.trace("Handling response - " + statusCode);
-        Set<Integer>nonErrorCodes = (Set<Integer>) msgContext.getProperty(HTTPConstants.NON_ERROR_HTTP_STATUS_CODES);    
+
+        Set<Integer> nonErrorCodes = new HashSet<>();
+        Object nonErrorCodesInMsgCtx = msgContext.getProperty(HTTPConstants.NON_ERROR_HTTP_STATUS_CODES);
+        if (nonErrorCodesInMsgCtx != null) {
+            if (nonErrorCodesInMsgCtx instanceof Set){
+                // Added for backward compatibility
+                // Check if non error status codes are configured as a Set
+                nonErrorCodes = (Set<Integer>) nonErrorCodesInMsgCtx;
+            } else if (nonErrorCodesInMsgCtx instanceof String){
+                // Retrieve non error status codes set as a string property
+                String strNonErrorCodes = ((String) nonErrorCodesInMsgCtx).trim();
+                if (!strNonErrorCodes.isEmpty()) {
+                    for (String strRetryErrorCode : strNonErrorCodes.split(",")) {
+                        try {
+                            nonErrorCodes.add(Integer.valueOf(strRetryErrorCode));
+                        } catch (NumberFormatException nfe) {
+                            log.warn(strRetryErrorCode + " is not a valid status code");
+                        }
+                    }
+                }
+            }
+        }
         Set<Integer> errorCodes = new HashSet<Integer>();
         String strRetryErrorCodes = (String) msgContext.getProperty(HTTPConstants.ERROR_HTTP_STATUS_CODES); // Fixing
                                                                                                 // ESBJAVA-3178
