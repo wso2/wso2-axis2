@@ -612,6 +612,9 @@ public class AxisConfigBuilder extends DescriptionBuilder {
         while (trs_senders.hasNext()) {
             TransportInDescription transportIN;
             OMElement transport = (OMElement) trs_senders.next();
+
+            // resolving all env or system variables in transportReceiver
+            Utils.resolveOMElementChildValues(transport);
             // getting transport Name
             OMAttribute trsName = transport.getAttribute(new QName(ATTRIBUTE_NAME));
             if (trsName != null) {
@@ -664,6 +667,8 @@ public class AxisConfigBuilder extends DescriptionBuilder {
             TransportOutDescription transportout;
             OMElement transport = (OMElement) trs_senders.next();
 
+            // resolving all env or system variables in transportSender
+            Utils.resolveOMElementChildValues(transport);
             // getting transport Name
             OMAttribute trsName = transport.getAttribute(new QName(ATTRIBUTE_NAME));
 
@@ -814,12 +819,10 @@ public class AxisConfigBuilder extends DescriptionBuilder {
                     OMElement keyPasswordElement = ksEle.getFirstChildWithName(new QName("KeyPassword"));
                     if(storePasswordElement != null){
                         String storePassword = MiscellaneousUtil.resolve(storePasswordElement,secretResolver);
-                        storePassword = replaceSystemProperty(storePassword);
                         ksEle.getFirstChildWithName(new QName("Password")).setText(storePassword );
                     }
                     if (keyPasswordElement != null) {
                         String keyPassword = MiscellaneousUtil.resolve(keyPasswordElement, secretResolver);
-                        keyPassword = replaceSystemProperty(keyPassword);
                         ksEle.getFirstChildWithName(new QName("KeyPassword")).setText(keyPassword);
                     }
                 }
@@ -836,12 +839,10 @@ public class AxisConfigBuilder extends DescriptionBuilder {
                             OMElement keyPasswordElement = keyStore.getFirstChildWithName(new QName("KeyPassword"));
                             if (storePasswordElement != null) {
                                 String storePassword = MiscellaneousUtil.resolve(storePasswordElement, secretResolver);
-                                storePassword = replaceSystemProperty(storePassword);
                                 keyStore.getFirstChildWithName(new QName("Password")).setText(storePassword);
                             }
                             if (keyPasswordElement != null) {
                                 String keyPassword = MiscellaneousUtil.resolve(keyPasswordElement, secretResolver);
-                                keyPassword = replaceSystemProperty(keyPassword);
                                 keyStore.getFirstChildWithName(new QName("KeyPassword")).setText(keyPassword);
                             }
                         }
@@ -851,7 +852,6 @@ public class AxisConfigBuilder extends DescriptionBuilder {
                             if (storePasswordElement != null) {
                                 String storePassword = MiscellaneousUtil.resolve(storePasswordElement
                                         , secretResolver);
-                                storePassword = replaceSystemProperty(storePassword);
                                 trustStore.getFirstChildWithName(new QName("Password")).setText(storePassword);
                             }
                         }
@@ -866,7 +866,6 @@ public class AxisConfigBuilder extends DescriptionBuilder {
                     OMElement storePasswordElement = tsEle.getFirstChildWithName(new QName("Password"));
                     if (storePasswordElement != null) {
                         String storePassword = MiscellaneousUtil.resolve(storePasswordElement, secretResolver);
-                        storePassword = replaceSystemProperty(storePassword);
                         tsEle.getFirstChildWithName(new QName("Password")).setText(storePassword);
                     }
                 }
@@ -874,7 +873,6 @@ public class AxisConfigBuilder extends DescriptionBuilder {
 
             if(emailPasswordParam != null) {
                 String emailPassword = MiscellaneousUtil.resolve(emailPasswordParam.getParameterElement(), secretResolver);
-                emailPassword = replaceSystemProperty(emailPassword);
                 emailPasswordParam.setValue(emailPassword);
             }
         }
