@@ -131,5 +131,8 @@ public class BaseConstants {
     /** A message level property indicating a request to rollback the transaction associated with the message */
     public static final String SET_ROLLBACK_ONLY = "SET_ROLLBACK_ONLY";
     /** A message level property indicating a commit is required after the next immidiate send over a transport */
-    public static final String JTA_COMMIT_AFTER_SEND = "JTA_COMMIT_AFTER_SEND";    
+    public static final String JTA_COMMIT_AFTER_SEND = "JTA_COMMIT_AFTER_SEND";
+
+    /** The message context property name which holds the transaction is counted internally or not */
+    public static final String INTERNAL_TRANSACTION_COUNTED = "INTERNAL_TRANSACTION_COUNTED";
 }
