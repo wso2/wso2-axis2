@@ -308,6 +308,16 @@ public class HTTPSender extends AbstractHTTPSender {
         }
 
         String soapAction = messageFormatter.formatSOAPAction(msgContext, format, soapActionString);
+
+        Object followRedirect = msgContext.getProperty("FOLLOW_REDIRECT");
+        Object cookieStatus = msgContext.getProperty("DISABLE_COOKIE");
+
+        if (followRedirect != null) {
+            patchMethod.setFollowRedirects(Boolean.parseBoolean(followRedirect.toString()));
+        }
+        if (cookieStatus != null && (Boolean.parseBoolean(cookieStatus.toString()))) {
+            patchMethod.getParams().setCookiePolicy(CookiePolicy.IGNORE_COOKIES);
+        }
         if (soapAction != null && !msgContext.isDoingREST()) {
             patchMethod.setRequestHeader(HTTPConstants.HEADER_SOAP_ACTION, soapAction);
         }
