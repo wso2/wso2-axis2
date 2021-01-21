@@ -46,13 +46,9 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PushbackInputStream;
+import javax.xml.namespace.QName;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.xml.namespace.QName;
 
 public class OutInAxisOperation extends TwoChannelAxisOperation {
 
@@ -601,21 +597,7 @@ class OutInAxisOperationClient extends OperationClient {
      */
     private boolean canResponseHaveBody(MessageContext responseMessageContext) {
         if (responseMessageContext.getProperty("transport.http.statusCode") != null) {
-            int statusCode =
-                    Integer.parseInt(responseMessageContext.getProperty("transport.http.statusCode").toString());
-            if (statusCode == HttpStatus.SC_CREATED || statusCode == HttpStatus.SC_ACCEPTED) {
-                InputStream inputStream = (InputStream) responseMessageContext.getProperty(MessageContext.TRANSPORT_IN);
-                PushbackInputStream pushbackInputStream = new PushbackInputStream(inputStream);
-                int data = 0;
-                try {
-                    data = pushbackInputStream.read();
-                    pushbackInputStream.unread(data);
-                } catch (IOException e) {
-                    return false;
-                }
-                responseMessageContext.setProperty(MessageContext.TRANSPORT_IN, pushbackInputStream);
-                return data != -1;
-            }
+            int statusCode = Integer.parseInt(responseMessageContext.getProperty("transport.http.statusCode").toString());
             return statusCode >= HttpStatus.SC_OK
                     && statusCode != HttpStatus.SC_NO_CONTENT
                     && statusCode != HttpStatus.SC_NOT_MODIFIED
