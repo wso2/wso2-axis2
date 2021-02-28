@@ -84,6 +84,8 @@ public abstract class AbstractHTTPSender {
     protected static final String PROTOCOL_HTTP = "http";
     protected static final String PROTOCOL_HTTPS = "https";
 
+    protected final List<String> preserveHeadersList = populatePreserveHeaderList();
+
     /**
      * proxydiscription
      */
@@ -801,11 +803,12 @@ public abstract class AbstractHTTPSender {
         Iterator iter = headers.keySet().iterator();
         while (iter.hasNext()) {
             String headerName = (String) iter.next();
-            if (HTTP.CONN_DIRECTIVE.equalsIgnoreCase(headerName) ||
-                HTTP.TRANSFER_ENCODING.equalsIgnoreCase(headerName) ||
-                HTTP.DATE_HEADER.equalsIgnoreCase(headerName) ||
-                HTTP.CONTENT_TYPE.equalsIgnoreCase(headerName) ||
-                HTTP.CONTENT_LEN.equalsIgnoreCase(headerName)) {
+
+            if ((HTTP.CONN_DIRECTIVE.equalsIgnoreCase(headerName) ||
+                    HTTP.TRANSFER_ENCODING.equalsIgnoreCase(headerName) ||
+                    HTTP.DATE_HEADER.equalsIgnoreCase(headerName) ||
+                    HTTP.CONTENT_TYPE.equalsIgnoreCase(headerName) ||
+                    HTTP.CONTENT_LEN.equalsIgnoreCase(headerName)) && !isPreserveHttpHeader(headerName)) {
                 iter.remove();
             }
         }
@@ -834,5 +837,17 @@ public abstract class AbstractHTTPSender {
 
         return userAgentString;
     }
-    
+
+    private List<String> populatePreserveHeaderList() {
+        List<String> preserveHttpHeaders = new ArrayList<String>();
+        String preserveHeaderSysProp = System.getProperty("http.headers.preserve");
+        if (preserveHeaderSysProp != null && !preserveHeaderSysProp.isEmpty()) {
+            preserveHttpHeaders.addAll(Arrays.asList(preserveHeaderSysProp.trim().toUpperCase().split(",")));
+        }
+        return preserveHttpHeaders;
+    }
+
+    private boolean isPreserveHttpHeader(String headerName) {
+        return preserveHeadersList.contains(headerName.toUpperCase());
+    }
 }
