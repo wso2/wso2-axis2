@@ -284,7 +284,7 @@ public class MultipartFormDataFormatter implements MessageFormatter {
                     // Gets the first child object
                     OMTextImpl firstChild = (OMTextImpl) ele.getFirstOMChild();
                     // Checks whether the first object is a binary
-                    if (firstChild.isBinary()) {
+                    if (firstChild != null && firstChild.isBinary()) {
                         if (firstChild.getDataHandler() != null) {
                             if (((DataHandler) firstChild.getDataHandler())
                                     .getDataSource() instanceof DiskFileDataSource) {
