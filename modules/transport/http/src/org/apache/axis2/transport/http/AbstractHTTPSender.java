@@ -83,6 +83,7 @@ public abstract class AbstractHTTPSender {
 
     protected static final String PROTOCOL_HTTP = "http";
     protected static final String PROTOCOL_HTTPS = "https";
+    protected static final String REQUEST_HOST_HEADER = "REQUEST_HOST_HEADER";
 
     /**
      * proxydiscription
@@ -708,7 +709,9 @@ public abstract class AbstractHTTPSender {
 
         setTimeouts(msgContext, method);
         setKeepAlive(msgContext, method);
-
+        if (msgContext.getProperty(REQUEST_HOST_HEADER) != null) {
+            config.setHost((String) msgContext.getProperty(REQUEST_HOST_HEADER), config.getPort());
+        }
         httpClient.executeMethod(config, method, httpState);
     }
 
