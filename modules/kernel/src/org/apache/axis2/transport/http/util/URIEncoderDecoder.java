@@ -174,7 +174,7 @@ public class URIEncoderDecoder {
      * @param s java.lang.String The encoded string.
      * @return java.lang.String The decoded version.
      */
-    public static String decode(String s) throws UnsupportedEncodingException {
+    public static String decode(String s, String encoding) throws UnsupportedEncodingException {
         StringBuffer result = new StringBuffer();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         for (int i = 0; i < s.length();) {
@@ -208,4 +208,25 @@ public class URIEncoderDecoder {
         return result.toString();
     }
 
+    /**
+     * Decodes the string argument which is assumed to be encoded in the
+     * <code>x-www-form-urlencoded</code> MIME content type using the UTF-8
+     * encoding scheme.
+     * <p/>
+     * '%' and two following hex digit characters are converted to the
+     * equivalent byte value. All other characters are passed through
+     * unmodified.
+     * <p/>
+     * <p/>
+     * e.g. "A%20B%20C %24%25" -> "A B C $%"
+     * <p/>
+     * Called from URI.getXYZ() methods
+     * <p/>
+     *
+     * @param s java.lang.String The encoded string.
+     * @return java.lang.String The decoded version.
+     */
+    public static String decode(String s) throws UnsupportedEncodingException {
+        return decode(s, encoding);
+    }
 }
