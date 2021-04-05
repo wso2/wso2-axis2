@@ -32,21 +32,59 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
+import javax.xml.soap.MessageFactory;
+import javax.xml.soap.SOAPException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
+import java.io.StringReader;
 
 public class SOAPBuilder implements Builder {
+    private static final Log log = LogFactory.getLog(SOAPBuilder.class);
 
     public OMElement processDocument(InputStream inputStream, String contentType,
                                      MessageContext messageContext) throws AxisFault {
         SOAPFactory soapFactory = null;
         SOAPEnvelope envelope = null;
+        StringReader stringReader = null;
         try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = inputStream.read(buffer)) > -1 ) {
+                baos.write(buffer, 0, len);
+            }
+            baos.flush();
             String charSetEncoding = (String) messageContext
                     .getProperty(Constants.Configuration.CHARACTER_SET_ENCODING);
-            
+            try {
+                MessageFactory.newInstance().createMessage(null, new ByteArrayInputStream(baos.toByteArray()))
+                        .getSOAPBody();
+                inputStream = new ByteArrayInputStream(baos.toByteArray());
+            } catch (SOAPException e) {
+                if (e.getCause().getMessage()
+                        .contains("Unable to create envelope from given source because the root element is not named " +
+                                "\"Envelope\"")) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Wrapping the message into the SOAP envelope.");
+                    }
+                    SOAPEnvelope soapEnvelope = OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope();
+                    stringReader = new StringReader(baos.toString());
+                    OMElement omElement = OMXMLBuilderFactory.createOMBuilder(stringReader).getDocumentElement();
+                    soapEnvelope.getBody().addChild(omElement);
+                    inputStream = new ByteArrayInputStream(soapEnvelope.toString().getBytes(charSetEncoding));
+                } else {
+                    inputStream = new ByteArrayInputStream(baos.toByteArray());
+                }
+            } finally {
+                baos.close();
+                stringReader.close();
+            }
             // Apply a detachable inputstream.  This can be used later
             // to (a) get the length of the incoming message or (b)
             // free transport resources.
