@@ -25,7 +25,7 @@
     <description>
         org.wso2.carbon.axis2. This bundle will export packages for Axis2 WS engine.
     </description>
-    <version>1.6.1-wso2v30-SNAPSHOT</version>
+    <version>1.6.1-wso2v61-SNAPSHOT</version>
     <url>http://wso2.org</url>
 
     <repositories>
@@ -73,7 +73,7 @@
         <repository>
             <id>nexus-releases</id>
             <name>WSO2 Nexus Release Repository</name>
-            <url>http://maven.wso2.org/nexus/service/local/staging/deploy/maven2/</url>
+            <url>https://maven.wso2.org/nexus/service/local/staging/deploy/maven2/</url>
         </repository>
         <snapshotRepository>
             <id>wso2-maven2-snapshot-repository</id>
@@ -546,7 +546,7 @@
                             javax.servlet; version="${imp.pkg.version.javax.servlet}",
                             javax.servlet.http; version="${imp.pkg.version.javax.servlet}",
                             javax.xml.stream.*; version="1.0.1",
-                            javax.xml.soap.*; version="1.0.0",
+                            javax.xml.soap.*; version="0.0.0",
                             org.apache.commons.io.*; version="0.0.0",
                             javax.mail.*; version="1.4.0",
                             javax.wsdl.*; version="1.6.2",
@@ -572,8 +572,8 @@
     </build>
 
     <properties>
-        <version.axis2>1.6.1-wso2v30-SNAPSHOT</version.axis2>
-        <transport.version>1.6.1-wso2v30-SNAPSHOT</transport.version>
+        <version.axis2>1.6.1-wso2v61-SNAPSHOT</version.axis2>
+        <transport.version>1.6.1-wso2v61-SNAPSHOT</transport.version>
         <exp.pkg.version.axis2>${version.axis2}</exp.pkg.version.axis2>
         <imp.pkg.version.axiom>[1.2.11, 1.3.0)</imp.pkg.version.axiom>
         <imp.pkg.version.neethi>[2.0.4.wso2v4, 3.0.0)</imp.pkg.version.neethi>

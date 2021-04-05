@@ -213,9 +213,9 @@ public abstract class AbstractTransportSender extends AbstractHandler implements
     protected boolean waitForSynchronousResponse(MessageContext msgCtx) {
         boolean waitingState = false;
         if (msgCtx.getOperationContext() != null) {
-            String MEP = msgCtx.getOperationContext().getAxisOperation().getMessageExchangePattern();
-            waitingState = "http://www.w3.org/ns/wsdl/out-in".equals(MEP) ||
-                    "http://www.w3.org/ns/wsdl/in-out".equals(MEP);
+            String messageExchangePattern = msgCtx.getOperationContext().getAxisOperation().getMessageExchangePattern();
+            waitingState = WSDL2Constants.MEP_URI_OUT_IN.equals(messageExchangePattern) ||
+                    WSDL2Constants.MEP_URI_IN_OUT.equals(messageExchangePattern);
         }
         return waitingState;
     }

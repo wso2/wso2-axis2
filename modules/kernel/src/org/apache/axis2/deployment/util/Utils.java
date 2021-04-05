@@ -53,6 +53,7 @@ import org.apache.axis2.util.PolicyUtil;
 import org.apache.axis2.util.FaultyServiceData;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.axis2.wsdl.WSDLUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.PolicyComponent;
@@ -72,8 +73,14 @@ import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import static org.apache.axis2.Constants.DYNAMIC_PROPERTY_PLACEHOLDER_PREFIX;
+import static org.apache.axis2.Constants.ENV_VAR_PLACEHOLDER_PREFIX;
+import static org.apache.axis2.Constants.PLACEHOLDER_SUFFIX;
+import static org.apache.axis2.Constants.SYS_PROPERTY_PLACEHOLDER_PREFIX;
 
 public class Utils {
 
@@ -2068,5 +2075,87 @@ public class Utils {
             log.debug(Messages.getMessage(DeploymentErrorMsgs.DEPLOYING_EXCEPTION, e.getMessage()), e);
             throw new DeploymentException(e);
         }
+    }
+
+    /**
+     * Resolves env or system property values in OMElement nodes.
+     *
+     * @param element OMElement which need to resolve
+     */
+    public static void resolveOMElementChildValues(OMElement element) {
+        Iterator elementIterator = element.getChildElements();
+        while (elementIterator.hasNext()) {
+            OMElement childElement = (OMElement) elementIterator.next();
+            OMElement childValue = childElement.getFirstElement();
+
+            if (childValue != null) {
+                resolveOMElementChildValues(childElement);
+            } else {
+                if (childElement.getText() != null) {
+                    String resolvedValue = replaceSystemProperty(childElement.getText());
+                    childElement.setText(resolvedValue);
+                }
+            }
+        }
+    }
+
+    /**
+     * Replace the ${ref}, $sys{ref} and $env{ref} pattern OMText node values with env or system property values.
+     *
+     * @param text OMText node value
+     * @return resolved node value
+     */
+    public static String replaceSystemProperty(String text) {
+        String sysRefs = StringUtils.substringBetween(text, SYS_PROPERTY_PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX);
+        String envRefs = StringUtils.substringBetween(text, ENV_VAR_PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX);
+
+        // Resolves system property references ($sys{ref}) in an individual string.
+        if (sysRefs != null) {
+            String property = System.getProperty(sysRefs);
+            if (StringUtils.isNotEmpty(property)) {
+                text = text.replaceAll(Pattern.quote(SYS_PROPERTY_PLACEHOLDER_PREFIX + sysRefs + PLACEHOLDER_SUFFIX),
+                        property);
+            } else {
+                log.error("System property is not available for " + sysRefs);
+            }
+            return text;
+        }
+        // Resolves environment variable references ($env{ref}) in an individual string.
+        if (envRefs != null) {
+            String resolvedValue = System.getenv(envRefs);
+            if (StringUtils.isNotEmpty(resolvedValue)) {
+                text = text.replaceAll(Pattern.quote(ENV_VAR_PLACEHOLDER_PREFIX + envRefs + PLACEHOLDER_SUFFIX),
+                        resolvedValue);
+            } else {
+                log.error("Environment variable is not available for " + envRefs);
+            }
+            return text;
+        }
+
+        int indexOfStartingChars = -1;
+        int indexOfClosingBrace;
+
+        // The following condition deals with properties.
+        // Properties are specified as ${system.property},
+        // and are assumed to be System properties
+        while (indexOfStartingChars < text.indexOf(DYNAMIC_PROPERTY_PLACEHOLDER_PREFIX)
+                && (indexOfStartingChars = text.indexOf(DYNAMIC_PROPERTY_PLACEHOLDER_PREFIX)) != -1
+                && (indexOfClosingBrace = text.indexOf(PLACEHOLDER_SUFFIX)) != -1) {
+            String sysProp = text.substring(indexOfStartingChars + 2,
+                    indexOfClosingBrace);
+            String propValue = System.getProperty(sysProp);
+            if (propValue == null) {
+                propValue = System.getenv(sysProp);
+            }
+            if (propValue != null) {
+                text = text.substring(0, indexOfStartingChars) + propValue
+                        + text.substring(indexOfClosingBrace + 1);
+            }
+            if (sysProp.equals("carbon.home") && propValue != null
+                    && propValue.equals(".")) {
+                text = new File(".").getAbsolutePath() + File.separator + text;
+            }
+        }
+        return text;
     }
 }

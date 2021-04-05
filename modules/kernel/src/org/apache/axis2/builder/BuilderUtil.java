@@ -66,6 +66,7 @@ import org.apache.ws.commons.schema.XmlSchemaSequence;
 import org.apache.ws.commons.schema.XmlSchemaType;
 
 import javax.activation.DataHandler;
+import javax.activation.DataSource;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
@@ -86,6 +87,10 @@ public class BuilderUtil {
     private static final Log log = LogFactory.getLog(BuilderUtil.class);
 
     public static final int BOM_SIZE = 4;
+    /**
+     * Default content-type used in the file fields
+     */
+    private static final String DEFAULT_CONTENT_TYPE = "text/plain";
 
     public static SOAPEnvelope buildsoapMessage(MessageContext messageContext,
                                                 MultipleEntryHashMap requestParameterMap,
@@ -219,7 +224,13 @@ public class BuilderUtil {
                     dataHandler, true);
             OMElement omElement = soapFactory.createOMElement(key, ns, bodyFirstChild);
             omElement.addChild(dataText);
-            omElement.addAttribute("filename", ((DataHandler) parameter).getDataSource().getName(), ns);
+            DataSource dataSource = dataHandler.getDataSource();
+            omElement.addAttribute("filename", dataSource.getName(), ns);
+            if (dataSource.getContentType() != null) {
+                omElement.addAttribute("content-type", dataSource.getContentType(), ns);
+            } else {
+                omElement.addAttribute("content-type", DEFAULT_CONTENT_TYPE, ns);
+            }
         } else {
             String textValue = parameter.toString();
             soapFactory.createOMElement(key, ns, bodyFirstChild).setText(
@@ -668,6 +679,21 @@ public class BuilderUtil {
         }
     }
 
+    private static String getContentTypeForBuilderSelection(String type, MessageContext msgContext) {
+        /**
+         * Handle special case where content-type : text/xml and SOAPAction = null consider as
+         * POX (REST) message not SOAP 1.1.
+         *
+         * it's required use the Builder associate with "application/xml" here but should not
+         * change content type of current message.
+         *
+         */
+        if (msgContext.getSoapAction() == null && HTTPConstants.MEDIA_TYPE_TEXT_XML.equals(type) && msgContext.isDoingREST()) {
+            type = HTTPConstants.MEDIA_TYPE_APPLICATION_XML;
+        }
+        return type;
+    }
+
     public static StAXBuilder getBuilder(SOAPFactory soapFactory, InputStream in, String charSetEnc)
             throws XMLStreamException {
         StAXBuilder builder;
@@ -695,7 +721,8 @@ public class BuilderUtil {
         if (useFallbackParameter !=null){
         	useFallbackBuilder = JavaUtils.isTrueExplicitly(useFallbackParameter.getValue(),useFallbackBuilder);
         }
-        Builder builder = configuration.getMessageBuilder(type,useFallbackBuilder);
+        String cType = getContentTypeForBuilderSelection(type, msgContext);
+        Builder builder = configuration.getMessageBuilder(cType, useFallbackBuilder);
         if (builder != null) {
             // Check whether the request has a Accept header if so use that as the response
             // message type.

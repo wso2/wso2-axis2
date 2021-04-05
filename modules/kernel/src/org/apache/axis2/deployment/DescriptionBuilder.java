@@ -25,6 +25,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.builder.Builder;
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.deployment.util.Utils;
 import org.apache.axis2.description.AxisOperation;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Flow;
@@ -49,6 +50,7 @@ import org.apache.neethi.PolicyReference;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
+import java.io.File;
 import java.io.InputStream;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
@@ -533,7 +535,7 @@ public class DescriptionBuilder implements DeploymentConstants {
                 parameter.setValue(parameterElement);
                 parameter.setParameterType(Parameter.OM_PARAMETER);
             } else {
-                String paratextValue = parameterElement.getText();
+                String paratextValue = Utils.replaceSystemProperty(parameterElement.getText());
 
                 parameter.setValue(paratextValue);
                 parameter.setParameterType(Parameter.TEXT_PARAMETER);

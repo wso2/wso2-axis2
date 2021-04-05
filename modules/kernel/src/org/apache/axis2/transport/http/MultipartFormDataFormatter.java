@@ -265,7 +265,7 @@ public class MultipartFormDataFormatter implements MessageFormatter {
                             contentType, charset);
                 } else if ((ele.getAttribute(FILENAME_ATTRIBUTE_QNAME) != null)) {
                     String fieldName = getAttributeValue(ele.getAttribute(FILE_FIELD_NAME_ATTRIBUTE_QNAME),
-                            DEFAULT_FILE_FIELD_NAME);
+                            ele.getLocalName());
                     String filename = getAttributeValue(ele.getAttribute(FILENAME_ATTRIBUTE_QNAME), DEFAULT_FILE_NAME);
                     String contentType = getAttributeValue(ele.getAttribute(CONTENT_TYPE_ATTRIBUTE_QNAME),
                             DEFAULT_CONTENT_TYPE);
@@ -284,7 +284,7 @@ public class MultipartFormDataFormatter implements MessageFormatter {
                     // Gets the first child object
                     OMTextImpl firstChild = (OMTextImpl) ele.getFirstOMChild();
                     // Checks whether the first object is a binary
-                    if (firstChild.isBinary()) {
+                    if (firstChild != null && firstChild.isBinary()) {
                         if (firstChild.getDataHandler() != null) {
                             if (((DataHandler) firstChild.getDataHandler())
                                     .getDataSource() instanceof DiskFileDataSource) {
@@ -303,7 +303,12 @@ public class MultipartFormDataFormatter implements MessageFormatter {
                         }
                     }
                     if (part == null) {
-                        part = new StringPart(ele.getQName().getLocalPart(), ele.getText());
+                        if (ele.getQName().getPrefix() != null && !ele.getQName().getPrefix().isEmpty()) {
+                            part = new StringPart(ele.getQName().getPrefix() + ":" + ele.getQName().getLocalPart(),
+                                    ele.getText());
+                        } else {
+                            part = new StringPart(ele.getQName().getLocalPart(), ele.getText());
+                        }
                     }
                 }
                 parts.add(part);

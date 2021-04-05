@@ -55,6 +55,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.securevault.SecretResolver;
 import org.wso2.securevault.SecretResolverFactory;
+import org.wso2.securevault.commons.MiscellaneousUtil;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -611,6 +612,9 @@ public class AxisConfigBuilder extends DescriptionBuilder {
         while (trs_senders.hasNext()) {
             TransportInDescription transportIN;
             OMElement transport = (OMElement) trs_senders.next();
+
+            // resolving all env or system variables in transportReceiver
+            Utils.resolveOMElementChildValues(transport);
             // getting transport Name
             OMAttribute trsName = transport.getAttribute(new QName(ATTRIBUTE_NAME));
             if (trsName != null) {
@@ -663,6 +667,8 @@ public class AxisConfigBuilder extends DescriptionBuilder {
             TransportOutDescription transportout;
             OMElement transport = (OMElement) trs_senders.next();
 
+            // resolving all env or system variables in transportSender
+            Utils.resolveOMElementChildValues(transport);
             // getting transport Name
             OMAttribute trsName = transport.getAttribute(new QName(ATTRIBUTE_NAME));
 
@@ -800,21 +806,6 @@ public class AxisConfigBuilder extends DescriptionBuilder {
 
         SecretResolver secretResolver = axisConfig.getSecretResolver();
         if(secretResolver.isInitialized()){
-            String keyStorePassToken = null;
-            String keyStoreKeyPassToken = null;
-            String trustStorePassToken = null;
-            String emailSenderPassword = null;
-            if (transport instanceof TransportOutDescription){
-                keyStorePassToken = "Axis2.Https.Sender.KeyStore.Password";
-                keyStoreKeyPassToken = "Axis2.Https.Sender.KeyStore.KeyPassword";
-                trustStorePassToken = "Axis2.Https.Sender.TrustStore.Password";
-                emailSenderPassword = "Axis2.Mailto.Parameter.Password";
-            }
-            if (transport instanceof TransportInDescription){
-                keyStorePassToken = "Axis2.Https.Listener.KeyStore.Password";
-                keyStoreKeyPassToken = "Axis2.Https.Listener.KeyStore.KeyPassword";
-                trustStorePassToken = "Axis2.Https.Listener.TrustStore.Password";
-            }
 
             Parameter keyParam    = transport.getParameter("keystore");
             Parameter trustParam  = transport.getParameter("truststore");
@@ -826,13 +817,12 @@ public class AxisConfigBuilder extends DescriptionBuilder {
                 if(ksEle != null){
                     OMElement storePasswordElement = ksEle.getFirstChildWithName(new QName("Password"));
                     OMElement keyPasswordElement = ksEle.getFirstChildWithName(new QName("KeyPassword"));
-                    if(secretResolver.isTokenProtected(keyStorePassToken) && storePasswordElement != null){
-                        String storePassword = secretResolver.resolve(keyStorePassToken);
+                    if(storePasswordElement != null){
+                        String storePassword = MiscellaneousUtil.resolve(storePasswordElement,secretResolver);
                         ksEle.getFirstChildWithName(new QName("Password")).setText(storePassword );
-
                     }
-                    if(secretResolver.isTokenProtected(keyStoreKeyPassToken) && keyPasswordElement != null){
-                        String keyPassword  = secretResolver.resolve(keyStoreKeyPassToken);
+                    if (keyPasswordElement != null) {
+                        String keyPassword = MiscellaneousUtil.resolve(keyPasswordElement, secretResolver);
                         ksEle.getFirstChildWithName(new QName("KeyPassword")).setText(keyPassword);
                     }
                 }
@@ -840,52 +830,49 @@ public class AxisConfigBuilder extends DescriptionBuilder {
 
             if(customSSLProfiles != null) {
                 Iterator iterator = customSSLProfiles.getParameterElement().getChildElements();
-                while(iterator.hasNext()) {
+                while (iterator.hasNext()) {
                     OMElement profile = (OMElement) iterator.next();
-                    if(profile != null) {
-                        String profileName = profile.getAttributeValue(new QName("name"));
-                        String profileKeyStoreToken = "Axis2.Https.Sender.CustomSSLProfile." + profileName + ".KeyStore.Password";
-                        String profileKeyToken = "Axis2.Https.Sender.CustomSSLProfile." + profileName + ".KeyStore.KeyPassword";
-                        String profileKeyTrustToken = "Axis2.Https.Sender.CustomSSLProfile." + profileName + ".TrustStore.Password";
+                    if (profile != null) {
                         OMElement keyStore = profile.getFirstChildWithName(new QName("KeyStore"));
-                        if(keyStore != null){
+                        if (keyStore != null) {
                             OMElement storePasswordElement = keyStore.getFirstChildWithName(new QName("Password"));
                             OMElement keyPasswordElement = keyStore.getFirstChildWithName(new QName("KeyPassword"));
-                            if(secretResolver.isTokenProtected(profileKeyStoreToken) && storePasswordElement != null){
-                                 String storePassword = secretResolver.resolve(profileKeyStoreToken);
-                                 keyStore.getFirstChildWithName(new QName("Password")).setText(storePassword );
+                            if (storePasswordElement != null) {
+                                String storePassword = MiscellaneousUtil.resolve(storePasswordElement, secretResolver);
+                                keyStore.getFirstChildWithName(new QName("Password")).setText(storePassword);
                             }
-                            if(secretResolver.isTokenProtected(profileKeyToken) && keyPasswordElement != null){
-                                String keyPassword  = secretResolver.resolve(profileKeyToken);
+                            if (keyPasswordElement != null) {
+                                String keyPassword = MiscellaneousUtil.resolve(keyPasswordElement, secretResolver);
                                 keyStore.getFirstChildWithName(new QName("KeyPassword")).setText(keyPassword);
                             }
-                                                                                                                        }
+                        }
                         OMElement trustStore = profile.getFirstChildWithName(new QName("TrustStore"));
-                        if(trustStore != null){
+                        if (trustStore != null) {
                             OMElement storePasswordElement = trustStore.getFirstChildWithName(new QName("Password"));
-                                if(secretResolver.isTokenProtected(profileKeyTrustToken) && storePasswordElement != null){
-                                        String storePassword = secretResolver.resolve(profileKeyTrustToken);
-                                        trustStore.getFirstChildWithName(new QName("Password")).setText(storePassword );
-                                    }
-                                }
+                            if (storePasswordElement != null) {
+                                String storePassword = MiscellaneousUtil.resolve(storePasswordElement
+                                        , secretResolver);
+                                trustStore.getFirstChildWithName(new QName("Password")).setText(storePassword);
                             }
                         }
+                    }
                 }
+            }
 
 
             if (trustParam != null) {
                 OMElement tsEle = trustParam.getParameterElement().getFirstElement();
                 if(tsEle != null){
                     OMElement storePasswordElement = tsEle.getFirstChildWithName(new QName("Password"));
-                    if(secretResolver.isTokenProtected(trustStorePassToken) && storePasswordElement != null){
-                        String storePassword = secretResolver.resolve(trustStorePassToken);
-                        tsEle.getFirstChildWithName(new QName("Password")).setText(storePassword );
+                    if (storePasswordElement != null) {
+                        String storePassword = MiscellaneousUtil.resolve(storePasswordElement, secretResolver);
+                        tsEle.getFirstChildWithName(new QName("Password")).setText(storePassword);
                     }
                 }
             }
 
-            if(secretResolver.isTokenProtected(emailSenderPassword) && emailPasswordParam != null) {
-                String emailPassword = secretResolver.resolve(emailSenderPassword);
+            if(emailPasswordParam != null) {
+                String emailPassword = MiscellaneousUtil.resolve(emailPasswordParam.getParameterElement(), secretResolver);
                 emailPasswordParam.setValue(emailPassword);
             }
         }

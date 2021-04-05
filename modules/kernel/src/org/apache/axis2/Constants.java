@@ -325,6 +325,14 @@ public class Constants extends org.apache.axis2.namespace.Constants {
 
     public static final String CUSTOM_SCHEMA_NAME_PREFIX ="customSchemaNamePrefix" ;
 
+    /**
+     * Constants used to resolve environment variables and system properties
+     */
+    public static final String SYS_PROPERTY_PLACEHOLDER_PREFIX = "$sys{";
+    public static final String ENV_VAR_PLACEHOLDER_PREFIX = "$env{";
+    public static final String DYNAMIC_PROPERTY_PLACEHOLDER_PREFIX = "${";
+    public static final String PLACEHOLDER_SUFFIX = "}";
+
     public static interface Configuration {
         public static final String ENABLE_REST = "enableREST";
         public static final String ENABLE_HTTP_CONTENT_NEGOTIATION = "httpContentNegotiation";
@@ -474,8 +482,14 @@ public class Constants extends org.apache.axis2.namespace.Constants {
         public static final String GET_HTTP_SC_OK_FOR_VOID_SERVICE_METHODS = "mepinandout";
 
         /**
-         * Axis2.xml property to force include null values.
+         * axis2.xml property to force include null values.
          */
         public static final String ENABLE_FORCE_INCLUDE_NULL_ELEMENTS = "forceIncludeNullElements";
+
+        /**
+         * Property to set whether the user expects synapse to append a default charset encoding(UTF-8)
+         * to the outgoing request
+         */
+        public static final String SET_CONTENT_TYPE_CHARACTER_ENCODING = "setCharacterEncoding";
     }
 }

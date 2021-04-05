@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.axis2</groupId>
     <artifactId>axis2-parent</artifactId>
-    <version>1.6.1-wso2v30-SNAPSHOT</version>
+    <version>1.6.1-wso2v61-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Apache Axis2 - Parent</name>
     <inceptionYear>2004</inceptionYear>
@@ -68,8 +68,8 @@
     <properties>
         <neethi.version>2.0.4</neethi.version>
         <woden.version>1.0M9</woden.version>
-        <axiom.version>1.2.11-wso2v11</axiom.version>
-        <xmlschema.version>1.4.7.wso2v3</xmlschema.version>
+        <axiom.version>1.2.11-wso2v17</axiom.version>
+        <xmlschema.version>1.4.7.wso2v6</xmlschema.version>
         <ant.version>1.7.0</ant.version>
         <antlr.version>2.7.7</antlr.version>
         <bsf.version>2.4.0</bsf.version>
@@ -86,8 +86,8 @@
         <geronimo.spec.metadata.version>1.1.2</geronimo.spec.metadata.version>
         <geronimo.spec.saaj.version>1.0.1</geronimo.spec.saaj.version>
         <geronimo.spec.jaxws.version>1.0</geronimo.spec.jaxws.version>
-        <google.gson.version>2.1</google.gson.version>
-        <httpcore.version>4.2.3</httpcore.version>
+        <google.gson.version>2.8.5</google.gson.version>
+        <httpcore.version>4.4.14</httpcore.version>
         <intellij.version>5.0</intellij.version>
         <jalopy.version>1.5rc3</jalopy.version>
         <jaxb.api.version>2.1</jaxb.api.version>
@@ -1065,12 +1065,12 @@
         <repository>
             <id>nexus-releases</id>
             <name>WSO2 Nexus Release Repository</name>
-            <url>http://maven.wso2.org/nexus/service/local/staging/deploy/maven2/</url>
+            <url>https://maven.wso2.org/nexus/service/local/staging/deploy/maven2/</url>
         </repository>
         <snapshotRepository>
             <id>wso2.snapshots</id>
             <name>Apache Snapshot Repository</name>
-            <url>http://maven.wso2.org/nexus/content/repositories/snapshots/</url>
+            <url>https://maven.wso2.org/nexus/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
     <build>
@@ -1144,7 +1144,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>2.0.4</version>
+                    <version>2.1</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>

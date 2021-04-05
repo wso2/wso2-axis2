@@ -25,7 +25,7 @@
     <description>
         A single JAR file containing all the client side libraries
     </description>
-    <version>1.6.1-wso2v30-SNAPSHOT</version>
+    <version>1.6.1-wso2v61-SNAPSHOT</version>
     <url>http://wso2.org</url>
 
     <repositories>
@@ -62,7 +62,7 @@
         <repository>
             <id>nexus-releases</id>
             <name>WSO2 Nexus Release Repository</name>
-            <url>http://maven.wso2.org/nexus/service/local/staging/deploy/maven2/</url>
+            <url>https://maven.wso2.org/nexus/service/local/staging/deploy/maven2/</url>
         </repository>
         <snapshotRepository>
             <id>wso2-maven2-snapshot-repository</id>
@@ -248,7 +248,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents.wso2</groupId>
             <artifactId>httpcore</artifactId>
-            <version>4.3.0.wso2v1</version>
+            <version>4.4.14.wso2v1</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.orbit.commons-fileupload</groupId>
@@ -346,14 +346,14 @@
     </build>
 
     <properties>
-        <orbit.version.axis2>1.6.1-wso2v30-SNAPSHOT</orbit.version.axis2>
-        <version.axis2>1.6.1-wso2v30-SNAPSHOT</version.axis2>
+        <orbit.version.axis2>1.6.1-wso2v61-SNAPSHOT</orbit.version.axis2>
+        <version.axis2>1.6.1-wso2v61-SNAPSHOT</version.axis2>
         <exp.pkg.version.axis2>${orbit.version.axis2}</exp.pkg.version.axis2>
         <imp.pkg.version.axiom>[1.2.11, 1.3.0)</imp.pkg.version.axiom>
         <exp.pkg.version.neethi>2.0.4.wso2v5</exp.pkg.version.neethi>
         <imp.pkg.version.neethi>[2.0.4.wso2v4, 3.0.0)</imp.pkg.version.neethi>
         <imp.pkg.version.javax.servlet>[2.6.0, 3.0.0)</imp.pkg.version.javax.servlet>
-        <securevault.version>1.0.0</securevault.version>
+        <securevault.version>1.1.2</securevault.version>
         <orbit.version.commons.fileuploader>1.3.1.wso2v1</orbit.version.commons.fileuploader>
         <orbit.version.spring>3.1.0.wso2v3</orbit.version.spring>
         <orbit.activation.version>1.1.1.wso2v1</orbit.activation.version>

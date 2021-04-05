@@ -463,7 +463,7 @@ public class ConverterUtil {
             if ("1".equals(s) || s.toLowerCase().equals("true")) {
                 returnValue = true;
             } else if (!"0".equals(s) && !s.toLowerCase().equals("false")) {
-                throw new RuntimeException("in valid string -" + s + " for boolean value");
+                throw new RuntimeException("Invalid string -" + s + " for boolean value");
             }
         }
         return returnValue;
@@ -597,11 +597,11 @@ public class ConverterUtil {
                         timeZoneOffSet = timeZoneOffSet * -1;
                     }
                 } else {
-                    throw new RuntimeException("In valid string sufix");
+                    throw new RuntimeException("Invalid string sufix");
                 }
             }
         } else {
-            throw new RuntimeException("In valid string to parse");
+            throw new RuntimeException("Invalid string to parse");
         }
 
         Calendar calendar = Calendar.getInstance();
@@ -964,7 +964,7 @@ public class ConverterUtil {
                             timeZoneOffSet = timeZoneOffSet * -1;
                         }
                     } else {
-                        throw new NumberFormatException("in valid time zone attribute");
+                        throw new NumberFormatException("Invalid time zone attribute");
                     }
                 }
             }

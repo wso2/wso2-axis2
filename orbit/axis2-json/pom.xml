@@ -22,7 +22,7 @@
     <artifactId>axis2-json</artifactId>
     <packaging>bundle</packaging>
     <name>axis2.json.wso2</name>
-    <version>1.6.1-wso2v30-SNAPSHOT</version>
+    <version>1.6.1-wso2v61-SNAPSHOT</version>
     <description>
         org.wso2.carbon.axis2.json. This bundle will export packages for Axis2-json.
     </description>
@@ -49,7 +49,7 @@
         <repository>
             <id>nexus-releases</id>
             <name>WSO2 Nexus Release Repository</name>
-            <url>http://maven.wso2.org/nexus/service/local/staging/deploy/maven2/</url>
+            <url>https://maven.wso2.org/nexus/service/local/staging/deploy/maven2/</url>
         </repository>
         <snapshotRepository>
             <id>wso2-maven2-snapshot-repository</id>
@@ -114,7 +114,7 @@
         </plugins>
     </build>
     <properties>
-        <version.axis2.json>1.6.1-wso2v30-SNAPSHOT</version.axis2.json>
+        <version.axis2.json>1.6.1-wso2v61-SNAPSHOT</version.axis2.json>
         <exp.pkg.version.axis2>${version.axis2.json}</exp.pkg.version.axis2>
         <maven.surefire.plugin.version>2.13</maven.surefire.plugin.version>
     </properties>

@@ -309,7 +309,8 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
                             }
                             flushObject = null;
                         } else {
-                            throw new XMLStreamException("Invalid Staring element");
+                            throw new XMLStreamException("The schema element: " + localName + " not found" +
+                                    " in the result set. Instead found element: " + stackObj.getName() );
                         }
                     }
                 } else {
@@ -323,10 +324,12 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
                                 processedJsonObjects.push(stackObj);
                             }
                         } else {
-                            throw new XMLStreamException("Invalid Staring element");
+                            throw new XMLStreamException("The schema element: " + localName + " not found" +
+                                    " in the result set. Instead found element: " + stackObj.getName() );
                         }
                     } else {
-                        throw new XMLStreamException("Invalid Starting  element");
+                        throw new XMLStreamException("The schema element: " + localName +
+                                " not found in the result set");
                     }
                 }
             } else {
@@ -370,12 +373,13 @@ public class GsonXMLStreamWriter implements XMLStreamWriter {
                         }
                     }
                     else {
-                        throw new XMLStreamException("Invalid Staring element");
+                        throw new XMLStreamException("The schema element: " + localName +
+                                " not found in the result set");
                     }
                 }
             }
         } catch (IOException e) {
-            throw new XMLStreamException(" Json Writer throw an error");
+            throw new XMLStreamException("Error while writing the schema element: " + localName);
         }
     }
 
