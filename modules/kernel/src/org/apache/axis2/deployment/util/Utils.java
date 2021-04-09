@@ -53,7 +53,6 @@ import org.apache.axis2.util.PolicyUtil;
 import org.apache.axis2.util.FaultyServiceData;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.axis2.wsdl.WSDLUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.PolicyComponent;
@@ -2100,19 +2099,42 @@ public class Utils {
     }
 
     /**
+     * Method returns the string in between open and close strings from text.
+     *
+     * @param text main text string
+     * @param open opening string
+     * @param close closing string
+     * @return string inbetween open and close
+     */
+    private static String subStringBetween(String text, String open, String close) {
+        if (text != null && open != null && close != null) {
+            int start = text.indexOf(open);
+            if (start != -1) {
+                int end = text.indexOf(close, start + open.length());
+                if (end != -1) {
+                    return text.substring(start + open.length(), end);
+                }
+            }
+            return null;
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Replace the ${ref}, $sys{ref} and $env{ref} pattern OMText node values with env or system property values.
      *
      * @param text OMText node value
      * @return resolved node value
      */
     public static String replaceSystemProperty(String text) {
-        String sysRefs = StringUtils.substringBetween(text, SYS_PROPERTY_PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX);
-        String envRefs = StringUtils.substringBetween(text, ENV_VAR_PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX);
+        String sysRefs = subStringBetween(text, SYS_PROPERTY_PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX);
+        String envRefs = subStringBetween(text, ENV_VAR_PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX);
 
         // Resolves system property references ($sys{ref}) in an individual string.
         if (sysRefs != null) {
             String property = System.getProperty(sysRefs);
-            if (StringUtils.isNotEmpty(property)) {
+            if (property != null && !property.isEmpty()) {
                 text = text.replaceAll(Pattern.quote(SYS_PROPERTY_PLACEHOLDER_PREFIX + sysRefs + PLACEHOLDER_SUFFIX),
                         property);
             } else {
@@ -2123,7 +2145,7 @@ public class Utils {
         // Resolves environment variable references ($env{ref}) in an individual string.
         if (envRefs != null) {
             String resolvedValue = System.getenv(envRefs);
-            if (StringUtils.isNotEmpty(resolvedValue)) {
+            if (resolvedValue != null && !resolvedValue.isEmpty()) {
                 text = text.replaceAll(Pattern.quote(ENV_VAR_PLACEHOLDER_PREFIX + envRefs + PLACEHOLDER_SUFFIX),
                         resolvedValue);
             } else {
