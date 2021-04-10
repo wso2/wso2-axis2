@@ -116,6 +116,9 @@ class OutInAxisOperationClient extends OperationClient {
 
     private static Log log = LogFactory.getLog(OutInAxisOperationClient.class);
 
+    // System property to allow empty body response for HTTP SC 200, 201, 202
+    private static boolean isEmptyBodyForHttpEnabled = Boolean.getBoolean("allowEmptyBodyForHttp2xx");
+
     OutInAxisOperationClient(OutInAxisOperation axisOp, ServiceContext sc,
                              Options options) {
         super(axisOp, sc, options);
@@ -603,7 +606,7 @@ class OutInAxisOperationClient extends OperationClient {
         if (responseMessageContext.getProperty("transport.http.statusCode") != null) {
             int statusCode =
                     Integer.parseInt(responseMessageContext.getProperty("transport.http.statusCode").toString());
-            if (statusCode == HttpStatus.SC_CREATED || statusCode == HttpStatus.SC_ACCEPTED) {
+            if (isEmptyBodyForHttpEnabled && (statusCode == HttpStatus.SC_OK || statusCode == HttpStatus.SC_CREATED || statusCode == HttpStatus.SC_ACCEPTED)) {
                 InputStream inputStream = (InputStream) responseMessageContext.getProperty(MessageContext.TRANSPORT_IN);
                 PushbackInputStream pushbackInputStream = new PushbackInputStream(inputStream);
                 int data = 0;
