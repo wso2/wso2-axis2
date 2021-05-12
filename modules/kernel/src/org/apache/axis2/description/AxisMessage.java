@@ -135,11 +135,13 @@ public class AxisMessage extends AxisDescription {
     public XmlSchemaElement getSchemaElement() {
         XmlSchemaElement xmlSchemaElement = null;
         AxisService service = getAxisOperation().getAxisService();
-        ArrayList schemas = service.getSchema();
-        for (Object schema : schemas) {
-            xmlSchemaElement = getSchemaElement((XmlSchema)schema);
-            if (xmlSchemaElement != null) {
-                break;
+        if (service != null) {
+            ArrayList schemas = service.getSchema();
+            for (Object schema : schemas) {
+                xmlSchemaElement = getSchemaElement((XmlSchema)schema);
+                if (xmlSchemaElement != null) {
+                    break;
+                }
             }
         }
         return xmlSchemaElement;
