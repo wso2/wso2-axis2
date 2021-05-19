@@ -712,7 +712,7 @@ public abstract class AbstractHTTPSender {
         setTimeouts(msgContext, method);
         setKeepAlive(msgContext, method);
         if (msgContext.getProperty(REQUEST_HOST_HEADER) != null) {
-            config.setHost((String) msgContext.getProperty(REQUEST_HOST_HEADER), config.getPort());
+            config.setHost((String) msgContext.getProperty(REQUEST_HOST_HEADER), config.getPort(), config.getProtocol());
         }
         httpClient.executeMethod(config, method, httpState);
     }
