@@ -34,12 +34,16 @@ import org.apache.axis2.util.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import javax.mail.Header;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class SOAPMessageFormatter implements MessageFormatter {
 
@@ -235,9 +239,26 @@ public class SOAPMessageFormatter implements MessageFormatter {
             }
             
             Attachments attachments = msgCtxt.getAttachmentMap();
+            Map headersMap = attachments.getHeaders();
             for (String contentID : attachments.getAllContentIDs()) {
                 if (!contentID.equalsIgnoreCase(attachments.getSOAPPartContentID())) {
-                    attachmentsWriter.writePart(attachments.getDataHandler(contentID), contentID);
+                    List<String> headersList = new ArrayList<>();
+                    Object o = headersMap.get(contentID);
+                    if (o instanceof List) {
+                        List currentHeaders = (List) o;
+                        for (Object currentHeader : currentHeaders) {
+                            if (currentHeader instanceof Header) {
+                                Header header = (Header) currentHeader;
+                                headersList.add(header.getName() + ": " + header.getValue());
+
+                            }
+                        }
+                    }
+                    if (headersList.isEmpty()) {
+                        attachmentsWriter.writePart(attachments.getDataHandler(contentID), contentID);
+                    } else {
+                        attachmentsWriter.writePart(attachments.getDataHandler(contentID), contentID, headersList);
+                    }
                 }
             }
             
