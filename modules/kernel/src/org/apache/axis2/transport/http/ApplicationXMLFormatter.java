@@ -20,7 +20,9 @@
 package org.apache.axis2.transport.http;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMOutputFormat;
+import org.apache.axiom.om.impl.llom.OMProcessingInstructionImpl;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPFault;
 import org.apache.axiom.soap.SOAPFaultDetail;
@@ -39,6 +41,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.Objects;
 
 /**
  * Formates the request message as application/xml
@@ -48,7 +51,6 @@ public class ApplicationXMLFormatter implements MessageFormatter {
     private static final Log log = LogFactory.getLog(ApplicationXMLFormatter.class);
 
     private static final String WRITE_XML_DECLARATION = "WRITE_XML_DECLARATION";
-    private static final String XML_DECLARATION_ENCODING = "XML_DECLARATION_ENCODING";
     private static final String XML_DECLARATION_STANDALONE = "XML_DECLARATION_STANDALONE";
 
     public byte[] getBytes(MessageContext messageContext, OMOutputFormat format) throws AxisFault {
@@ -125,7 +127,7 @@ public class ApplicationXMLFormatter implements MessageFormatter {
         try {
             OMElement omElement = null;
             writeXMLDeclaration(messageContext, outputStream, format);
-
+            writeXmlProcessingInstructions(messageContext, outputStream);
             if (messageContext.getFLOW() == MessageContext.OUT_FAULT_FLOW) {
                 SOAPFault fault = messageContext.getEnvelope().getBody().getFault();
                 SOAPFaultDetail soapFaultDetail = fault.getDetail();
@@ -165,8 +167,9 @@ public class ApplicationXMLFormatter implements MessageFormatter {
     private void writeXMLDeclaration(MessageContext messageContext, OutputStream outputStream, OMOutputFormat format) {
         String xmlDeclaration;
         String writeXmlDeclaration = (String) messageContext.getProperty(WRITE_XML_DECLARATION);
-        if (writeXmlDeclaration != null && "true".equalsIgnoreCase(writeXmlDeclaration)) {
-            String xmlDeclarationEncoding = (String) messageContext.getProperty(XML_DECLARATION_ENCODING);
+        if ("true".equalsIgnoreCase(writeXmlDeclaration)) {
+            String xmlDeclarationEncoding =
+                    (String) messageContext.getProperty(Constants.Configuration.XML_DECLARATION_ENCODING);
             if (xmlDeclarationEncoding == null) {
                 xmlDeclarationEncoding = (format.getCharSetEncoding() != null) ?
                         format.getCharSetEncoding() :
@@ -185,6 +188,35 @@ public class ApplicationXMLFormatter implements MessageFormatter {
                 outputStream.write(xmlDeclaration.getBytes());
             } catch (IOException e) {
                 log.error("Error while writing the XML declaration ", e);
+            }
+        }
+    }
+
+    private void writeXmlProcessingInstructions(MessageContext messageContext, OutputStream outputStream) {
+        String preserveXmlProcessingInstructions =
+                (String) messageContext.getProperty(Constants.Configuration.PRESERVE_XML_PROCESSING_INSTRUCTIONS);
+        if ("true".equalsIgnoreCase(preserveXmlProcessingInstructions)) {
+            Object instructionElements =
+                    messageContext.getProperty(Constants.Configuration.XML_PROCESSING_INSTRUCTION_ELEMENTS);
+            while (instructionElements instanceof OMProcessingInstructionImpl) {
+                OMProcessingInstructionImpl instructionOMNode = (OMProcessingInstructionImpl) instructionElements;
+                String value = instructionOMNode.getValue();
+                String target = instructionOMNode.getTarget();
+
+                String nodeString = "<?" + target + " " + value + "?>";
+                try {
+                    outputStream.write(nodeString.getBytes());
+                } catch (IOException e) {
+                    log.error("Error while writing the XML declaration ", e);
+                }
+
+                OMNode nextOMSibling = instructionOMNode.getNextOMSibling();
+
+                if (Objects.nonNull(nextOMSibling) && !nextOMSibling.equals(instructionOMNode)) {
+                    instructionElements = nextOMSibling;
+                } else {
+                    instructionElements = null;
+                }
             }
         }
     }
