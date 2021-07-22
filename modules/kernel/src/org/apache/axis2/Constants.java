@@ -405,6 +405,14 @@ public class Constants extends org.apache.axis2.namespace.Constants {
          */
         public static final String CHARACTER_SET_ENCODING = "CHARACTER_SET_ENCODING";
 
+        public static final String XML_DECLARATION_ENCODING = "XML_DECLARATION_ENCODING";
+
+        public static final String XML_PROCESSING_INSTRUCTION_ELEMENTS = "XML_PROCESSING_INSTRUCTION_ELEMENTS";
+
+        public static final String PRESERVE_XML_PROCESSING_INSTRUCTIONS = "PRESERVE_XML_PROCESSING_INSTRUCTIONS";
+
+        public static final String WRITE_XML_DECLARATION = "WRITE_XML_DECLARATION";
+
         /**
          * If this is set to a Boolean 'true' value, the replyTo value will not be replaced in
          * an OutIn invocation. This is useful for modules that hope to get the reply message in

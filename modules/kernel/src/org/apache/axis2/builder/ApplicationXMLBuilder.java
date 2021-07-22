@@ -20,10 +20,14 @@
 package org.apache.axis2.builder;
 
 import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMContainer;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.impl.OMNodeEx;
 import org.apache.axiom.om.impl.builder.StAXBuilder;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+import org.apache.axiom.om.impl.llom.OMProcessingInstructionImpl;
 import org.apache.axiom.om.util.StAXParserConfiguration;
 import org.apache.axiom.om.util.StAXUtils;
 import org.apache.axiom.soap.SOAPBody;
@@ -32,18 +36,22 @@ import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.context.MessageContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
+import java.util.Objects;
 
 /**
  * This builder is used when the serialization of the message is application/xml.
  */
 public class ApplicationXMLBuilder implements Builder {
 
+    private static final Log log = LogFactory.getLog(ApplicationXMLBuilder.class);
     private final XMLInputFactory inputFactory = XMLInputFactory.newInstance();
 
     public ApplicationXMLBuilder() {
@@ -77,8 +85,20 @@ public class ApplicationXMLBuilder implements Builder {
                         xmlReader = StAXUtils.createXMLStreamReader(StAXParserConfiguration.SOAP,
                                 pushbackInputStream, (String) messageContext.getProperty(Constants.Configuration.CHARACTER_SET_ENCODING));
                     }
+                    String charEncodingSchema = xmlReader.getCharacterEncodingScheme();
+                    if (Objects.nonNull(charEncodingSchema) && !charEncodingSchema.equals(
+                            messageContext.getProperty(Constants.Configuration.CHARACTER_SET_ENCODING))) {
+                        messageContext.setProperty(Constants.Configuration.XML_DECLARATION_ENCODING, charEncodingSchema);
+                    }
                     StAXBuilder builder = new StAXOMBuilder(xmlReader);
                     OMNodeEx documentElement = (OMNodeEx) builder.getDocumentElement();
+
+                    try {
+                        preserveXmlProcessingInstructions(documentElement, messageContext);
+                    } catch (OMException e) {
+                        log.error("Error while preserving XML Processing Instructions.", e);
+                    }
+
                     documentElement.setParent(null);
                     SOAPBody body = soapEnvelope.getBody();
                     body.addChild(documentElement);
@@ -93,5 +113,39 @@ public class ApplicationXMLBuilder implements Builder {
         return soapEnvelope;
     }
 
+    private void preserveXmlProcessingInstructions(OMNodeEx documentElement, MessageContext messageContext)
+            throws OMException {
+        String preserveXmlProcessingInstructions =
+                (String) messageContext.getProperty(Constants.Configuration.PRESERVE_XML_PROCESSING_INSTRUCTIONS);
+        if ("true".equalsIgnoreCase(preserveXmlProcessingInstructions)) {
+            OMContainer parent = documentElement.getParent();
+            OMNode element = null;
+            if (Objects.nonNull(parent)) {
+                OMNode currentChild = parent.getFirstOMChild();
+                while (Objects.nonNull(currentChild)) {
+                    if (currentChild instanceof OMProcessingInstructionImpl) {
+                        if (element == null) {
+                            element = currentChild;
+                        } else {
+                            try {
+                                element.insertSiblingAfter(currentChild);
+                            } catch (OMException e) {
+                                log.error("Error while preserving the XML Processing Instruction.", e);
+                            }
+                        }
+                    }
+                    OMNode nextChild = currentChild.getNextOMSibling();
+                    if (Objects.nonNull(nextChild) && !nextChild.equals(currentChild)) {
+                        currentChild = nextChild;
+                    } else {
+                        currentChild = null;
+                    }
+                }
+            }
+            if (element != null) {
+                messageContext.setProperty(Constants.Configuration.XML_PROCESSING_INSTRUCTION_ELEMENTS, element);
+            }
+        }
+    }
 
 }
