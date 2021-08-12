@@ -20,7 +20,7 @@
 package org.apache.axis2.util;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,7 +32,7 @@ public class MultipleEntryHashMap {
     private Map table;
 
     public MultipleEntryHashMap() {
-        this.table = new Hashtable(1);
+        this.table = new LinkedHashMap(1);
     }
 
     /**
