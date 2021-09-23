@@ -774,8 +774,10 @@ public abstract class AbstractHTTPSender {
                     }
 
                     if (!headerAdded) {
-                        method.addRequestHeader(((Map.Entry) headerEntry).getKey().toString(),
-                                ((Map.Entry) headerEntry).getValue().toString());
+                        if (((Map.Entry) headerEntry).getValue() != null) {
+                            method.addRequestHeader(((Map.Entry) headerEntry).getKey().toString(),
+                                    ((Map.Entry) headerEntry).getValue().toString());
+                        }
                     }
                 }
             }
