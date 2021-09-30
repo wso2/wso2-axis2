@@ -112,6 +112,7 @@
                             !org.apache.axis2.json.*; version="${exp.pkg.version.axis2}"
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
+                        <Private-Package></Private-Package>
                     </instructions>
                 </configuration>
             </plugin>
