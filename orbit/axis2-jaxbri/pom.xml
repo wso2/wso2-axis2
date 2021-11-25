@@ -113,6 +113,7 @@
                             org.apache.axis2.jaxbri.*; version=${exp.pkg.version.axis2},
                         </Export-Package>
                         <Import-Package>!org.apache.axis2.jaxbri.*</Import-Package>
+                        <Private-Package />
 			            <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>
