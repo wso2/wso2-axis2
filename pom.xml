@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.axis2</groupId>
     <artifactId>axis2</artifactId>
-    <version>1.6.1-wso2v74-SNAPSHOT</version>
+    <version>1.6.1-wso2v74</version>
     <packaging>pom</packaging>
     <name>Apache Axis2 - Root</name>
     <inceptionYear>2004</inceptionYear>
@@ -38,7 +38,7 @@
         <connection>scm:git:https://github.com/wso2/wso2-axis2.git</connection>
         <developerConnection>scm:git:https://github.com/wso2/wso2-axis2.git</developerConnection>
         <url>https://github.com/wso2/wso2-axis2.git</url>
-        <tag>HEAD</tag>
+        <tag>v1.6.1-wso2v74</tag>
     </scm>
 
     <!--issueManagement>
