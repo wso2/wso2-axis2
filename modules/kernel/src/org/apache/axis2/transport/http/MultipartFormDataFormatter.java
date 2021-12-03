@@ -26,6 +26,7 @@ import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.builder.BuilderUtil;
 import org.apache.axis2.builder.DiskFileDataSource;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.transport.MessageFormatter;
@@ -269,7 +270,17 @@ public class MultipartFormDataFormatter implements MessageFormatter {
                     String filename = getAttributeValue(ele.getAttribute(FILENAME_ATTRIBUTE_QNAME), DEFAULT_FILE_NAME);
                     String contentType = getAttributeValue(ele.getAttribute(CONTENT_TYPE_ATTRIBUTE_QNAME),
                             DEFAULT_CONTENT_TYPE);
-                    String charset = getAttributeValue(ele.getAttribute(CHARSET_ATTRIBUTE_QNAME), DEFAULT_CHARSET);
+                    String charset = BuilderUtil.extractCharSetValue(contentType);
+
+                    if (charset.isEmpty()) {
+                        charset = getAttributeValue(ele.getAttribute(CHARSET_ATTRIBUTE_QNAME), DEFAULT_CHARSET);
+                    } else {
+                        // charset has been included to content type header and there can be situations where
+                        // "charset" is not the last parameter of the Content-Type header
+                        contentType = contentType.replace(
+                                HTTPConstants.CHAR_SET_ENCODING + "=" + charset, "");
+                        contentType = contentType.replace(";" , "");
+                    }
 
                     Boolean decodeMultipartData = (Boolean) messageContext.getProperty(DECODE_MULTIPART_DATA_PARAM);
                     if (decodeMultipartData != null && decodeMultipartData) {
@@ -303,11 +314,12 @@ public class MultipartFormDataFormatter implements MessageFormatter {
                         }
                     }
                     if (part == null) {
+                        String charset = getAttributeValue(ele.getAttribute(CHARSET_ATTRIBUTE_QNAME), "US-ASCII");
                         if (ele.getQName().getPrefix() != null && !ele.getQName().getPrefix().isEmpty()) {
                             part = new StringPart(ele.getQName().getPrefix() + ":" + ele.getQName().getLocalPart(),
-                                    ele.getText());
+                                    ele.getText(), charset);
                         } else {
-                            part = new StringPart(ele.getQName().getLocalPart(), ele.getText());
+                            part = new StringPart(ele.getQName().getLocalPart(), ele.getText(), charset);
                         }
                     }
                 }

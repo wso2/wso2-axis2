@@ -20,6 +20,7 @@
 package org.apache.axis2.builder;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -137,10 +138,11 @@ public class MultipartFormDataBuilder implements Builder {
         return upload.parseRequest(requestContext);
     }
 
-    private String getTextParameter(DiskFileItem diskFileItem,
+    private Map<String, String> getTextParameter(DiskFileItem diskFileItem,
                                     String characterEncoding) throws Exception {
 
         String encoding = diskFileItem.getCharSet();
+        Map<String, String> textParameterMap = new HashMap<>();
 
         if (encoding == null) {
             encoding = characterEncoding;
@@ -153,7 +155,9 @@ public class MultipartFormDataBuilder implements Builder {
             textValue = new String(diskFileItem.get(), encoding);
         }
 
-        return textValue;
+        textParameterMap.put("value", textValue);
+        textParameterMap.put("charset", encoding);
+        return textParameterMap;
     }
 
     private DataHandler getFileParameter(DiskFileItem diskFileItem)
