@@ -367,7 +367,7 @@
         <orbit.version.spring>3.1.0.wso2v3</orbit.version.spring>
         <orbit.activation.version>1.1.1.wso2v1</orbit.activation.version>
         <version.apache.felix.framework>1.4.0</version.apache.felix.framework>
-        <xmlbeans.version>3.0.0</xmlbeans.version>
+        <xmlbeans.version>3.1.0</xmlbeans.version>
         <orbit.version.neethi>2.0.4.wso2v5</orbit.version.neethi>
         <maven.surefire.plugin.version>2.13</maven.surefire.plugin.version>
     </properties>
