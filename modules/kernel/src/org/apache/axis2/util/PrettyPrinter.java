@@ -55,12 +55,6 @@ public class PrettyPrinter {
         System.setOut(new PrintStream(new ByteArrayOutputStream()));
         System.setErr(new PrintStream(new ByteArrayOutputStream()));
         try {
-            Class clazzConfigurator = Loader.loadClass("org.apache.log4j.PropertyConfigurator");
-            Method configure = clazzConfigurator.getMethod("configure", new Class[]{Properties.class});
-            Properties properties = new Properties();
-            properties.setProperty("log4j.logger.de.hunsicker.jalopy.io",
-                    System.getProperty("log4j.logger.de.hunsicker.jalopy.io", "FATAL"));
-            configure.invoke(null, new Object[]{properties});
 
             // Create an instance of the Jalopy bean
             Class clazz = Loader.loadClass("de.hunsicker.jalopy.Jalopy");
