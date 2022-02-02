@@ -80,6 +80,7 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -231,6 +232,14 @@ public class BuilderUtil {
             } else {
                 omElement.addAttribute("content-type", DEFAULT_CONTENT_TYPE, ns);
             }
+            omElement.addAttribute("filename", ((DataHandler) parameter).getDataSource().getName(), ns);
+        } else if (parameter instanceof Map) {
+            HashMap textParameterObj = (HashMap) parameter;
+            String testVal = (String) textParameterObj.get("value");
+            String charsetVal = (String) textParameterObj.get("charset");
+            OMElement omElement = soapFactory.createOMElement(key, ns, bodyFirstChild);
+            omElement.setText(testVal);
+            omElement.addAttribute("charset", charsetVal, ns);
         } else {
             String textValue = parameter.toString();
             soapFactory.createOMElement(key, ns, bodyFirstChild).setText(
@@ -400,6 +409,17 @@ public class BuilderUtil {
             }
             return MessageContext.DEFAULT_CHAR_SET_ENCODING;
         }
+        return extractCharSetValue(contentType);
+    }
+
+    /**
+     *
+     * Extracts the character set encoding from the Content-type header without default value
+     * @param contentType a content-type (from HTTP or MIME, for instance)
+     * @return the character set value
+     */
+    public static String extractCharSetValue(String contentType) {
+        int index = contentType.indexOf(HTTPConstants.CHAR_SET_ENCODING);
 
         // If there are spaces around the '=' sign
         int indexOfEq = contentType.indexOf("=", index);
