@@ -120,6 +120,18 @@ public class Constants extends org.apache.axis2.namespace.Constants {
     public static final String TRANSPORT_HTTP = "http";
     public static final String TRANSPORT_HTTPS = "https";
 
+    /**
+     * Field TRANSPORT_NETTY
+     */
+    public static final String TRANSPORT_HTTPWS = "httpws";
+    public static final String TRANSPORT_HTTPSWSS = "httpswss";
+
+    /**
+     * Property names specific to HTTP transport on Netty
+     */
+    public static final String HTTP_CARBON_MESSAGE = "HTTP_CARBON_MESSAGE";
+    public static final String HTTP_CLIENT_REQUEST_CARBON_MESSAGE = "HTTP_CLIENT_REQUEST_CARBON_MESSAGE";
+
     //Parameter name of Service impl class
     public static final String SERVICE_CLASS = "ServiceClass";
     public static final String SERVICE_OBJECT_SUPPLIER = "ServiceObjectSupplier";

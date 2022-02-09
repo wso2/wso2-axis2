@@ -143,6 +143,9 @@ public class LocalTransportReceiver {
                 msgCtx.setProperty(MessageContext.TRANSPORT_HEADERS, headers);
             }
 
+            msgCtx.setProperty(Constants.HTTP_CLIENT_REQUEST_CARBON_MESSAGE,
+                    inMessageContext.getProperty(Constants.HTTP_CLIENT_REQUEST_CARBON_MESSAGE));
+
             msgCtx.setTo(to);
             msgCtx.setWSAAction(action);
             msgCtx.setServerSide(true);

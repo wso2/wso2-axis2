@@ -33,6 +33,7 @@ import org.apache.commons.logging.LogFactory;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Objects;
 
 /**
  * Utility methods for various clients to use.
@@ -78,6 +79,16 @@ public class ClientUtils {
             }
             String uri = epr.getAddress();
             String transport = Utils.getURIScheme(uri);
+            // Check if the message context contains the "HTTP_CARBON_MESSAGE" property to see if this message
+            // came from the HTTP transport based on Netty. Depending on that, we need to change the "transport"
+            // variable as below to pick the correct TransportOutDescription from the AxisConfiguration.
+            if (Objects.nonNull(msgctx.getProperty(Constants.HTTP_CARBON_MESSAGE))) {
+                if (Constants.TRANSPORT_HTTP.equalsIgnoreCase(transport)) {
+                    transport = Constants.TRANSPORT_HTTPWS;
+                } else if (Constants.TRANSPORT_HTTPS.equalsIgnoreCase(transport)) {
+                    transport = Constants.TRANSPORT_HTTPSWSS;
+                }
+            }
             if (transport != null && ac.getTransportOut(transport) != null) {
                 return ac.getTransportOut(transport);
             } else {
