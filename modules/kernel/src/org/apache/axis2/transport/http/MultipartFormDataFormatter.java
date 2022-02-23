@@ -37,6 +37,8 @@ import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
+import org.apache.axis2.builder.BuilderUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -272,7 +274,7 @@ public class MultipartFormDataFormatter implements MessageFormatter {
                             DEFAULT_CONTENT_TYPE);
                     String charset = BuilderUtil.extractCharSetValue(contentType);
 
-                    if (charset.isEmpty()) {
+                    if (StringUtils.isEmpty(charset)) {
                         charset = getAttributeValue(ele.getAttribute(CHARSET_ATTRIBUTE_QNAME), DEFAULT_CHARSET);
                     } else {
                         // charset has been included to content type header and there can be situations where
@@ -314,7 +316,8 @@ public class MultipartFormDataFormatter implements MessageFormatter {
                         }
                     }
                     if (part == null) {
-                        String charset = getAttributeValue(ele.getAttribute(CHARSET_ATTRIBUTE_QNAME), "US-ASCII");
+                        String charset = getAttributeValue(ele.getAttribute(CHARSET_ATTRIBUTE_QNAME),
+                                "US-ASCII");
                         if (ele.getQName().getPrefix() != null && !ele.getQName().getPrefix().isEmpty()) {
                             part = new StringPart(ele.getQName().getPrefix() + ":" + ele.getQName().getLocalPart(),
                                     ele.getText(), charset);
