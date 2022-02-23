@@ -93,4 +93,32 @@ public class MultipartFormDataFormatterTest extends TestCase {
 
         assertEquals(fileContent, content);
     }
+
+    public void testContentTypeApplicationPdfWithoutCharset() throws Exception {
+        MultipartFormDataFormatter formatter = new MultipartFormDataFormatter();
+        MessageContext mc = new MessageContext();
+        SOAPFactory factory = OMAbstractFactory.getSOAP11Factory();
+        SOAPEnvelope defaultEnvelope = factory.getDefaultEnvelope();
+
+        OMElement rootElement = factory.createOMElement("root", null);
+        OMElement partKeyElement = factory.createOMElement("filename", null);
+        partKeyElement.addAttribute("filename", "sample-file.pdf", null);
+        partKeyElement.addAttribute("content-type", "application/pdf", null);
+        rootElement.addChild(partKeyElement);
+
+        defaultEnvelope.getBody().addChild(rootElement);
+
+        mc.setEnvelope(defaultEnvelope);
+
+        OMOutputFormat format = new OMOutputFormat();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        formatter.writeTo(mc, format, baos, true);
+
+        MimeMultipart mp = new MimeMultipart(new ByteArrayDataSource(baos.toByteArray(), format.getContentType()));
+
+        assertEquals(1, mp.getCount());
+        BodyPart bodyPart = mp.getBodyPart(0);
+        assertEquals("sample-file.pdf", bodyPart.getFileName());
+        assertEquals("application/pdf; charset=ISO-8859-1", bodyPart.getContentType());
+    }
 }
