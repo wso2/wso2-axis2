@@ -421,6 +421,12 @@ public class BuilderUtil {
     public static String extractCharSetValue(String contentType) {
         int index = contentType.indexOf(HTTPConstants.CHAR_SET_ENCODING);
 
+        // When the charset not includes in the content type, the charset
+        // will be set to DEFAULT_CHARSET in createMultipatFormDataRequest function
+        if (index == -1) {
+            return null;
+        }
+
         // If there are spaces around the '=' sign
         int indexOfEq = contentType.indexOf("=", index);
 
