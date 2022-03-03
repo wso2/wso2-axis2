@@ -27,6 +27,7 @@ import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.builder.BuilderUtil;
+import org.apache.axis2.Constants;
 import org.apache.axis2.builder.DiskFileDataSource;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.transport.MessageFormatter;
@@ -137,6 +138,8 @@ public class MultipartFormDataFormatter implements MessageFormatter {
      * Default charset used in file fields
      */
     private static final String DEFAULT_CHARSET = "ISO-8859-1";
+
+    private static final String STRING_PART_DEFAULT_CHARSET = "US-ASCII";
 
     /**
      * Flag to decide if multipart data should be decoded/not decoded before sending out
@@ -316,8 +319,7 @@ public class MultipartFormDataFormatter implements MessageFormatter {
                         }
                     }
                     if (part == null) {
-                        String charset = getAttributeValue(ele.getAttribute(CHARSET_ATTRIBUTE_QNAME),
-                                "US-ASCII");
+                        String charset = getCharSet(messageContext, ele);
                         if (ele.getQName().getPrefix() != null && !ele.getQName().getPrefix().isEmpty()) {
                             part = new StringPart(ele.getQName().getPrefix() + ":" + ele.getQName().getLocalPart(),
                                     ele.getText(), charset);
@@ -331,6 +333,19 @@ public class MultipartFormDataFormatter implements MessageFormatter {
         }
         Part[] partsArray = new Part[parts.size()];
         return parts.toArray(partsArray);
+    }
+
+    private String getCharSet(MessageContext msgCtx, OMElement element) {
+
+        final OMAttribute charsetAttribute = element.getAttribute(CHARSET_ATTRIBUTE_QNAME);
+        if (charsetAttribute != null) {
+            return charsetAttribute.getAttributeValue();
+        }
+        final Object charsetProperty = msgCtx.getProperty(Constants.Configuration.CHARACTER_SET_ENCODING);
+        if (charsetProperty != null) {
+            return (String) charsetProperty;
+        }
+        return STRING_PART_DEFAULT_CHARSET;
     }
 
     private String getAttributeValue(OMAttribute filenameAttribute, String defaultValue) {
