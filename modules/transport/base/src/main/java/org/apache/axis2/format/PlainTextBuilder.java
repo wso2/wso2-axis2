@@ -33,6 +33,8 @@ import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.ds.WrappedTextNodeOMDataSourceFromDataSource;
 import org.apache.axiom.om.ds.WrappedTextNodeOMDataSourceFromReader;
 import org.apache.axiom.om.impl.llom.OMSourcedElementImpl;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.builder.BuilderUtil;
 import org.apache.axis2.context.MessageContext;
@@ -76,6 +78,11 @@ public class PlainTextBuilder implements TextMessageBuilder, DataSourceMessageBu
         QName wrapperQName = getWrapperQName(msgContext);
         Reader reader;
         try {
+            if (inputStream == null) {
+                SOAPFactory soapFactory = OMAbstractFactory.getSOAP11Factory();
+                SOAPEnvelope envelope = soapFactory.getDefaultEnvelope();
+                return envelope;
+            }
             reader = new InputStreamReader(inputStream, charSetEnc);
         } catch (UnsupportedEncodingException ex) {
             throw new AxisFault("Unsupported encoding: " + charSetEnc, ex);
