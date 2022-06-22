@@ -325,6 +325,9 @@ public class MultipartFormDataFormatter implements MessageFormatter {
                                     ele.getText(), charset);
                         } else {
                             part = new StringPart(ele.getQName().getLocalPart(), ele.getText(), charset);
+                            if (ele.getAttributeValue(CONTENT_TYPE_ATTRIBUTE_QNAME) != null) {
+                                ((StringPart) part).setContentType(ele.getAttributeValue(CONTENT_TYPE_ATTRIBUTE_QNAME));
+                            }
                         }
                     }
                 }
