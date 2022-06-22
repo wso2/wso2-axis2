@@ -155,8 +155,11 @@ public class MultipartFormDataBuilder implements Builder {
             textValue = new String(diskFileItem.get(), encoding);
         }
 
+        String partContentType = diskFileItem.getContentType();
+
         textParameterMap.put("value", textValue);
         textParameterMap.put("charset", encoding);
+        textParameterMap.put("contentType", partContentType);
         return textParameterMap;
     }
 

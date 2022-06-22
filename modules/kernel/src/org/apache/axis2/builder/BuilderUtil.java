@@ -92,6 +92,10 @@ public class BuilderUtil {
      * Default content-type used in the file fields
      */
     private static final String DEFAULT_CONTENT_TYPE = "text/plain";
+    /**
+     * Reserved XML element name for content-type
+     */
+    private static final String CONTENT_TYPE = "content-type";
 
     public static SOAPEnvelope buildsoapMessage(MessageContext messageContext,
                                                 MultipleEntryHashMap requestParameterMap,
@@ -228,18 +232,22 @@ public class BuilderUtil {
             DataSource dataSource = dataHandler.getDataSource();
             omElement.addAttribute("filename", dataSource.getName(), ns);
             if (dataSource.getContentType() != null) {
-                omElement.addAttribute("content-type", dataSource.getContentType(), ns);
+                omElement.addAttribute(CONTENT_TYPE, dataSource.getContentType(), ns);
             } else {
-                omElement.addAttribute("content-type", DEFAULT_CONTENT_TYPE, ns);
+                omElement.addAttribute(CONTENT_TYPE, DEFAULT_CONTENT_TYPE, ns);
             }
             omElement.addAttribute("filename", ((DataHandler) parameter).getDataSource().getName(), ns);
         } else if (parameter instanceof Map) {
             HashMap textParameterObj = (HashMap) parameter;
             String testVal = (String) textParameterObj.get("value");
             String charsetVal = (String) textParameterObj.get("charset");
+            String partContentType = (String) textParameterObj.get("contentType");
             OMElement omElement = soapFactory.createOMElement(key, ns, bodyFirstChild);
             omElement.setText(testVal);
             omElement.addAttribute("charset", charsetVal, ns);
+            if (partContentType != null) {
+                omElement.addAttribute(CONTENT_TYPE, partContentType, ns);
+            }
         } else {
             String textValue = parameter.toString();
             soapFactory.createOMElement(key, ns, bodyFirstChild).setText(
