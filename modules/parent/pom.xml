@@ -102,7 +102,7 @@
         <maven.artifact.version>2.0.8</maven.artifact.version>
         <maven.plugin.testing.version>1.1</maven.plugin.testing.version>
         <maven.version>2.0.7</maven.version>
-        <plexus.utils.version>1.4.9</plexus.utils.version>
+        <plexus.utils.version>3.0.16</plexus.utils.version>
         <rhino.version>1.6R7</rhino.version>
         <servlet.api.version>2.3</servlet.api.version>
         <spring.version>2.5.1</spring.version>
