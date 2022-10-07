@@ -286,7 +286,7 @@ public class AxisEngine {
         return pi;
     }
 
-    private static void flowComplete(MessageContext msgContext) {
+    protected static void flowComplete(MessageContext msgContext) {
         Iterator<Handler> invokedPhaseIterator = msgContext.getExecutedPhases();
 
         while (invokedPhaseIterator.hasNext()) {
