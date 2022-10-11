@@ -210,7 +210,9 @@ public class MultipartFormDataFormatter implements MessageFormatter {
 
         String contentType = HTTPConstants.MEDIA_TYPE_MULTIPART_FORM_DATA;
         String encoding = format.getCharSetEncoding();
-        if (encoding != null) {
+        String setEncoding = (String) messageContext.getProperty(Constants.Configuration
+                .SET_CONTENT_TYPE_CHARACTER_ENCODING);
+        if (encoding != null && !"false".equalsIgnoreCase(setEncoding)) {
             contentType += "; charset=" + encoding;
         }
         contentType = contentType + "; " + "boundary=" + format.getMimeBoundary();
