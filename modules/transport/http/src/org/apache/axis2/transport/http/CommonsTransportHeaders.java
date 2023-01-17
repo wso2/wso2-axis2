@@ -22,21 +22,26 @@ package org.apache.axis2.transport.http;
 import org.apache.commons.httpclient.Header;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 public class CommonsTransportHeaders implements Map {
     private Header[] headers;
 
-    HashMap headerMap = null;
+    Map headerMap = null;
 
     public CommonsTransportHeaders(Header[] headers) {
         this.headers = headers;
     }
 
     private void init() {
-        headerMap = new HashMap();
+        headerMap = new TreeMap<String, String>(new Comparator<String>() {
+            public int compare(String o1, String o2) {
+                return o1.compareToIgnoreCase(o2);
+            }
+        });
         for (int i = 0; i < headers.length; i++) {
             if (headerMap.containsKey(headers[i].getName())) {
                 String headerValue = (String) headerMap.get(headers[i].getName());
