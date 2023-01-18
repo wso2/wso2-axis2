@@ -24,7 +24,7 @@ import org.apache.commons.httpclient.Header;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.HashMap;
+import java.util.Map;
 
 public class CommonsTransportHeadersTest extends TestCase {
     Header[] headers;
@@ -51,7 +51,7 @@ public class CommonsTransportHeadersTest extends TestCase {
         initHeaders();
         // This is to get init() method called.
         commonsTransportHeaders.isEmpty();
-        HashMap headerMap = commonsTransportHeaders.headerMap;
+        Map headerMap = commonsTransportHeaders.headerMap;
         Assert.assertTrue(headerMap.containsKey("name"));
         Assert.assertEquals(headerMap.get("name"), value);
     }
