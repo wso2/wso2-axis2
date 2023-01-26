@@ -288,6 +288,10 @@ public class RepositoryListener implements DeploymentConstants {
             if (directory.exists()) {
                 File[] files = directory.listFiles();
                 if (files == null) {
+                    /*
+                    * files will be null if an IO error occurs when listing files of the directory,
+                    * during cases such as reaching the ULIMIT.
+                    */
                     log.warn("IO error occurred when listing files of the directory");
                     wsInfoList.setServiceUnDeploymentAllowed(false);
                 } else {
