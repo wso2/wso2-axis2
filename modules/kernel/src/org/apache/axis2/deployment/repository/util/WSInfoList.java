@@ -46,6 +46,8 @@ public class WSInfoList implements DeploymentConstants {
      */
     public Map currentJars = new HashMap();
 
+    private Boolean isServiceUnDeploymentAllowed = true;
+
     /**
      * Reference to DeploymentEngine to make update
      */
@@ -55,6 +57,10 @@ public class WSInfoList implements DeploymentConstants {
 
     public WSInfoList(DeploymentEngine deploy_engine) {
         deploymentEngine = deploy_engine;
+    }
+
+    public void setServiceUnDeploymentAllowed(Boolean isServiceUnDeploymentAllowed) {
+        this.isServiceUnDeploymentAllowed = isServiceUnDeploymentAllowed;
     }
 
     /**
@@ -99,40 +105,44 @@ public class WSInfoList implements DeploymentConstants {
         } else{
             return;
         }
-        Iterator infoItems = currentJars.keySet().iterator();
-        List tobeRemoved = new ArrayList();
-        while (infoItems.hasNext()) {
-            String  fileName = (String) infoItems.next();
-            WSInfo infoItem = (WSInfo) currentJars.get(fileName);
-            if (infoItem.getType() == WSInfo.TYPE_MODULE) {
-                continue;
-            }
-            //seems like someone has deleted the file , so need to undeploy
-            boolean found = false;
-            for (int i = 0; i < jarList.size(); i++) {
-                String s = (String) jarList.get(i);
-                if(fileName.equals(s)){
-                    found = true;
+        if (isServiceUnDeploymentAllowed) {
+            Iterator infoItems = currentJars.keySet().iterator();
+            List tobeRemoved = new ArrayList();
+            while (infoItems.hasNext()) {
+                String  fileName = (String) infoItems.next();
+                WSInfo infoItem = (WSInfo) currentJars.get(fileName);
+                if (infoItem.getType() == WSInfo.TYPE_MODULE) {
+                    continue;
+                }
+                //seems like someone has deleted the file , so need to undeploy
+                boolean found = false;
+                for (int i = 0; i < jarList.size(); i++) {
+                    String s = (String) jarList.get(i);
+                    if(fileName.equals(s)){
+                        found = true;
+                    }
+                }
+                if (!found) {
+                    int index = fileName.lastIndexOf(File.separator);
+                    String filepath = fileName.substring(0, index);
+                    File dir = new File(filepath);
+                    if (dir.exists()) {
+                        tobeRemoved.add(fileName);
+                        log.debug(fileName + " was added to undeployable list");
+                        deploymentEngine.addWSToUndeploy(infoItem);
+                    }
                 }
             }
-            if (!found) {
-                int index = fileName.lastIndexOf(File.separator);
-                String filepath = fileName.substring(0, index);
-                File dir = new File(filepath);
-                if (dir.exists()) {
-                    tobeRemoved.add(fileName);
-                    log.debug(fileName + " was added to undeployable list");
-                    deploymentEngine.addWSToUndeploy(infoItem);
-                }
-            }
-        }
 
-        for (int i = 0; i < tobeRemoved.size(); i++) {
-            String fileName = (String) tobeRemoved.get(i);
-            currentJars.remove(fileName);
+            for (int i = 0; i < tobeRemoved.size(); i++) {
+                String fileName = (String) tobeRemoved.get(i);
+                currentJars.remove(fileName);
+            }
+            tobeRemoved.clear();
+            jarList.clear();
+        } else {
+            log.warn("Service un-deployment has been stopped");
         }
-        tobeRemoved.clear();
-        jarList.clear();
         locked = false;
     }
 
