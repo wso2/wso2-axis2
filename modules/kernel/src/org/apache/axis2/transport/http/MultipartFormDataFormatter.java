@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
 import org.apache.axis2.AxisFault;
@@ -256,7 +257,7 @@ public class MultipartFormDataFormatter implements MessageFormatter {
                 Iterator<?> iter2 = ele.getChildElements();
                 // Checks whether the element is a complex type
                 if (iter2.hasNext()) {
-                    OMElement omElement = omFactory.createOMElement(ele.getQName().getLocalPart(), null);
+                    OMElement omElement = createOMElementWithNamespaces(omFactory, ele);
                     omElement.addChild(processComplexType(omElement, ele.getChildElements(), omFactory, false));
                     part = new ComplexPart(ele.getQName().getLocalPart(), omElement.toString());
                 } else if (FILE_FIELD_QNAME.equals(ele.getQName())) {
@@ -353,6 +354,23 @@ public class MultipartFormDataFormatter implements MessageFormatter {
         return STRING_PART_DEFAULT_CHARSET;
     }
 
+    /**
+     * Creates a new OMElement with the same local part as the given element, and all the namespaces declared in the given element.
+     *
+     * @param omFactory the OMFactory used to create the new OMElement
+     * @param element   the OMElement from which to get the local part and declared namespaces
+     * @return a new OMElement with the same local part and all the namespaces declared in the given element
+     */
+    private OMElement createOMElementWithNamespaces(OMFactory omFactory, OMElement element) {
+        OMElement omElement = omFactory.createOMElement(element.getQName().getLocalPart(), null);
+        Iterator<OMNamespace> namespaces = element.getAllDeclaredNamespaces();
+        while (namespaces.hasNext()) {
+            OMNamespace ns = namespaces.next();
+            omElement.declareNamespace(ns);
+        }
+        return omElement;
+    }
+
     private String getAttributeValue(OMAttribute filenameAttribute, String defaultValue) {
         String filename = defaultValue;
 
@@ -373,12 +391,11 @@ public class MultipartFormDataFormatter implements MessageFormatter {
         OMElement omElement = null;
         while (iter.hasNext()) {
             OMElement ele = (OMElement) iter.next();
-            omElement = omFactory.createOMElement(ele.getQName().getLocalPart(), null);
+            omElement = createOMElementWithNamespaces(omFactory, ele);
             Iterator iter2 = ele.getChildElements();
             if (iter2.hasNext()) {
                 parent.addChild(processComplexType(omElement, ele.getChildElements(), omFactory, true));
             } else {
-                omElement = omFactory.createOMElement(ele.getQName().getLocalPart(), null);
                 omElement.setText(ele.getText());
                 parent.addChild(omElement);
             }
