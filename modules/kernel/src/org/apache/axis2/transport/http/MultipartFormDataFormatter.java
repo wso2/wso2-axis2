@@ -396,7 +396,6 @@ public class MultipartFormDataFormatter implements MessageFormatter {
             if (iter2.hasNext()) {
                 parent.addChild(processComplexType(omElement, ele.getChildElements(), omFactory, true));
             } else {
-                omElement = createOMElementWithNamespaces(omFactory, ele);
                 omElement.setText(ele.getText());
                 parent.addChild(omElement);
             }
