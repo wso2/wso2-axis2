@@ -62,4 +62,13 @@ public interface TransportSender extends Handler {
             throws AxisFault;
 
     public void stop();
+
+    /**
+     * This method is used by the Application layer to notify the transport layer about errors.
+     *
+     * @param msgContext The outgoing message context sent via the sender
+     */
+    default void onAppError(MessageContext msgContext) {
+        // Do nothing
+    }
 }
