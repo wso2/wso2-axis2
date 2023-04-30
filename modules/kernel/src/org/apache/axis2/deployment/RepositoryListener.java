@@ -292,7 +292,7 @@ public class RepositoryListener implements DeploymentConstants {
                     * files will be null if an IO error occurs when listing files of the directory,
                     * during cases such as reaching the ULIMIT.
                     */
-                    log.warn("IO error occurred when listing files of the directory");
+                    log.warn("IO error occurred when listing files of the directory: " + directory.getPath());
                     wsInfoList.setServiceUnDeploymentAllowed(false);
                 } else {
                     wsInfoList.setServiceUnDeploymentAllowed(true);
