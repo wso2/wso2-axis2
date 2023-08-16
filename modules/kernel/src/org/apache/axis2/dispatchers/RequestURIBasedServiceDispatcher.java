@@ -57,7 +57,8 @@ public class RequestURIBasedServiceDispatcher extends AbstractServiceDispatcher 
 
             //Get the service/operation part from the request URL
             String serviceOpPart = Utils.getServiceAndOperationPart(filePart,
-                    messageContext.getConfigurationContext().getServiceContextPath());
+                    messageContext.getConfigurationContext().getServiceContextPath(),
+                    messageContext.getConfigurationContext().isStrictServicePathValidationEnabled());
 
             if (serviceOpPart != null) {
             	

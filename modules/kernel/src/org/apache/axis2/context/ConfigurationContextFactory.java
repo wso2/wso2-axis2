@@ -155,6 +155,13 @@ public class ConfigurationContextFactory {
             configContext.setServicePath(Constants.DEFAULT_SERVICES_PATH);
         }
 
+        // Checking for context path validation
+        Parameter servicePathValidation = axisConfig.getParameter(Constants.PARAM_SERVICE_PATH_VALIDATION);
+        if (servicePathValidation != null) {
+            boolean spathValidation = Boolean.parseBoolean(((String) servicePathValidation.getValue()).trim());
+            configContext.setStrictServicePathValidation(spathValidation);
+        }
+
         Parameter contextPath = axisConfig.getParameter(Constants.PARAM_CONTEXT_ROOT);
         if (contextPath != null) {
             String cpath = ((String) contextPath.getValue()).trim();

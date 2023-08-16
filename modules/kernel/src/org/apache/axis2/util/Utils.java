@@ -260,7 +260,25 @@ public class Utils {
      * @return - service/operation part
      */
     public static String getServiceAndOperationPart(String path, String servicePath) {
+        return getServiceAndOperationPart(path, servicePath, false);
+    }
+
+    /**
+     * Gives the service/operation part from the incoming EPR
+     * Ex: ..services/foo/bar/Version/getVersion -> foo/bar/Version/getVersion
+     * @param path - incoming EPR
+     * @param servicePath - Ex: 'services'
+     * @param servicePathValidation - whether to validate the service path or not
+     * @return - service/operation part
+     */
+    public static String getServiceAndOperationPart(String path, String servicePath, boolean servicePathValidation) {
         if (path == null) {
+            return null;
+        }
+
+        if (servicePathValidation && !path.startsWith(servicePath)) {
+            // Cannot add logs here since this method is called from several axis2 phases
+            // and inbound endpoints. If we add logs here, it will be printed for valid cases as well.
             return null;
         }
 

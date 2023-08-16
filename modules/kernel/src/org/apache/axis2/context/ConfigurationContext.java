@@ -86,6 +86,7 @@ public class ConfigurationContext extends AbstractContext {
     private String servicePath;
 
     private String cachedServicePath = null;
+    private boolean strictServicePathValidation = false;
     protected List<ContextListener> contextListeners;
     private boolean stopped = false;
     
@@ -888,6 +889,22 @@ public class ConfigurationContext extends AbstractContext {
      */
     public void setServicePath(String servicePath) {
         this.servicePath = servicePath;
+    }
+
+    /**
+     * Set the ServicePathValidation parameter
+     * @param strictServicePathValidation service path validation enabled or not
+     */
+    public void setStrictServicePathValidation(boolean strictServicePathValidation) {
+        this.strictServicePathValidation = strictServicePathValidation;
+    }
+
+    /**
+     * Get the ServicePathValidation parameter
+     * @return  service path validation enabled or not
+     */
+    public boolean isStrictServicePathValidationEnabled() {
+        return strictServicePathValidation;
     }
 
     /**
