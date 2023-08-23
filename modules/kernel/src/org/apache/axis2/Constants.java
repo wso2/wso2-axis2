@@ -85,6 +85,10 @@ public class Constants extends org.apache.axis2.namespace.Constants {
      */
     public static final String PARAM_SERVICE_PATH = "servicePath";
     /**
+     * Parameter to enable strict service path validation
+     */
+    public static final String PARAM_SERVICE_PATH_VALIDATION = "strictServicePathValidation";
+    /**
      * Parameter name for transport session management
      */
     public static final String MANAGE_TRANSPORT_SESSION = "manageTransportSession";
