@@ -329,6 +329,10 @@ public class Constants extends org.apache.axis2.namespace.Constants {
 
     public static final String CUSTOM_SCHEMA_NAME_PREFIX ="customSchemaNamePrefix" ;
 
+    public static final String SOAP_11 = "soap11";
+    public static final String SOAP_12 = "soap12";
+
+
     /**
      * Constants used to resolve environment variables and system properties
      */
