@@ -81,6 +81,33 @@ public class ComplexPart extends PartBase {
     /**
      * Constructor.
      *
+     * @param name    The name of the part
+     * @param value   the string to post
+     * @param charset the charset to be used to encode the string, if <code>null</code>
+     *                the {@link #DEFAULT_CHARSET default} is used
+     * @param contentType   the content type of the part
+     */
+    public ComplexPart(String name, String value, String charset, String contentType) {
+
+        super(
+                name,
+                contentType,
+                charset == null ? DEFAULT_CHARSET : charset,
+                DEFAULT_TRANSFER_ENCODING
+        );
+        if (value == null) {
+            throw new IllegalArgumentException("Value may not be null");
+        }
+        if (value.indexOf(0) != -1) {
+            // See RFC 2048, 2.8. "8bit Data"
+            throw new IllegalArgumentException("NULs may not be present in string parts");
+        }
+        this.value = value;
+    }
+
+    /**
+     * Constructor.
+     *
      * @param name  The name of the part
      * @param value the string to post
      */

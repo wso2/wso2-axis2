@@ -39,7 +39,6 @@ import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
-import org.apache.axis2.builder.BuilderUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -248,9 +247,21 @@ public class MultipartFormDataFormatter implements MessageFormatter {
      */
     private Part[] createMultipatFormDataRequest(MessageContext messageContext, OMElement dataOut) {
         List<Part> parts = new ArrayList<Part>();
+        String soapVersion = (String) messageContext.getProperty("soapVersion");
         if (dataOut != null) {
             Iterator<?> iter1 = dataOut.getChildElements();
-            OMFactory omFactory = OMAbstractFactory.getOMFactory();
+            OMFactory omFactory = null;
+            if (soapVersion != null) {
+                if (soapVersion.equals(Constants.SOAP_11)) {
+                    omFactory = OMAbstractFactory.getSOAP11Factory();
+                } else if (soapVersion.equals(Constants.SOAP_12)) {
+                    omFactory = OMAbstractFactory.getSOAP12Factory();
+                } else {
+                    omFactory = OMAbstractFactory.getOMFactory();
+                }
+            } else {
+                omFactory = OMAbstractFactory.getOMFactory();
+            }
             while (iter1.hasNext()) {
                 Part part = null;
                 OMElement ele = (OMElement) iter1.next();
@@ -259,7 +270,22 @@ public class MultipartFormDataFormatter implements MessageFormatter {
                 if (iter2.hasNext()) {
                     OMElement omElement = createOMElementWithNamespaces(omFactory, ele);
                     omElement.addChild(processComplexType(omElement, ele.getChildElements(), omFactory, false));
-                    part = new ComplexPart(ele.getQName().getLocalPart(), omElement.toString());
+                    if (soapVersion != null) {
+                        String contentType = getAttributeValue(ele.getAttribute(CONTENT_TYPE_ATTRIBUTE_QNAME),
+                                DEFAULT_CONTENT_TYPE);
+                        String charset = BuilderUtil.extractCharSetValue(contentType);
+                        if (soapVersion.equals(Constants.SOAP_11)) {
+                            part = new ComplexPart(ele.getQName().getLocalPart(), omElement.toString(), charset,
+                                    "text/xml");
+                        } else if (soapVersion.equals(Constants.SOAP_12)) {
+                            part = new ComplexPart(ele.getQName().getLocalPart(), omElement.toString(), charset,
+                                    "application/soap+xml");
+                        } else {
+                            part = new ComplexPart(ele.getQName().getLocalPart(), omElement.toString());
+                        }
+                    } else {
+                        part = new ComplexPart(ele.getQName().getLocalPart(), omElement.toString());
+                    }
                 } else if (FILE_FIELD_QNAME.equals(ele.getQName())) {
 
                     String fieldName = getAttributeValue(ele.getAttribute(FILE_FIELD_NAME_ATTRIBUTE_QNAME),
@@ -362,11 +388,13 @@ public class MultipartFormDataFormatter implements MessageFormatter {
      * @return a new OMElement with the same local part and all the namespaces declared in the given element
      */
     private OMElement createOMElementWithNamespaces(OMFactory omFactory, OMElement element) {
-        OMElement omElement = omFactory.createOMElement(element.getQName().getLocalPart(), null);
+        OMElement omElement = omFactory.createOMElement(element.getQName().getLocalPart(), element.getNamespace());
         Iterator<OMNamespace> namespaces = element.getAllDeclaredNamespaces();
         while (namespaces.hasNext()) {
             OMNamespace ns = namespaces.next();
-            omElement.declareNamespace(ns);
+            if (!omElement.getNamespace().equals(ns)) {
+                omElement.declareNamespace(ns);
+            }
         }
         return omElement;
     }
