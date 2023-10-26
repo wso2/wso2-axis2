@@ -212,7 +212,7 @@ public class MultipartFormDataFormatter implements MessageFormatter {
         String encoding = format.getCharSetEncoding();
         String setEncoding = (String) messageContext.getProperty(Constants.Configuration
                 .SET_CONTENT_TYPE_CHARACTER_ENCODING);
-        if (encoding != null && "true".equalsIgnoreCase(setEncoding)) {
+        if (encoding != null && !"false".equalsIgnoreCase(setEncoding)) {
             contentType += "; charset=" + encoding;
         }
         contentType = contentType + "; " + "boundary=" + format.getMimeBoundary();
