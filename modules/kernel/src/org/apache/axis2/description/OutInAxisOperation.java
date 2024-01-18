@@ -45,7 +45,6 @@ import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.httpclient.HttpStatus;
 
 import java.io.IOException;
 import java.io.InputStream;
