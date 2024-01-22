@@ -276,7 +276,7 @@ public class Utils {
             return null;
         }
 
-        if (servicePathValidation && !path.startsWith(servicePath)) {
+        if (servicePathValidation && !extractServicePath(path).startsWith(servicePath)) {
             // Cannot add logs here since this method is called from several axis2 phases
             // and inbound endpoints. If we add logs here, it will be printed for valid cases as well.
             return null;
@@ -305,6 +305,30 @@ public class Utils {
             }
         }
         return serviceOpPart;
+    }
+
+    /**
+     +     * Gives the service part from the incoming EPR
+     +     * @param path - incoming EPR
+     +     * @return - service part
+     +     */
+    private static String extractServicePath(String path) {
+
+        if ((path.startsWith("https://") || path.startsWith("http://"))
+                && path.chars().filter(ch -> ch == '/').count() >= 3) {
+            // loop through the chars of path, find index of 3rd '/' and return the substring
+            // ex: http://localhost:8290/services/bla -> /services/bla
+            int index = 0;
+            int count = 0;
+            while (count < 3) {
+                index = path.indexOf('/', index + 1);
+                count++;
+            }
+            return path.substring(index);
+        } else if (path.startsWith("local://")) {
+            return path.substring("local:/".length());
+        }
+        return path;
     }
 
     /**
