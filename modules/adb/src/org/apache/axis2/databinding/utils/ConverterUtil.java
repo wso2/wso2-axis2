@@ -986,12 +986,7 @@ public class ConverterUtil {
             }
             calendar.set(Calendar.MILLISECOND, (int)miliSecond);
             calendar.set(Calendar.ZONE_OFFSET, timeZoneOffSet);
-            // set the day light offset only if the time zone is present
-            if (source.length() > 19){
-                calendar.set(Calendar.DST_OFFSET, 0);
-            }
-
-
+            calendar.set(Calendar.DST_OFFSET, 0);
         } else {
             throw new NumberFormatException("date string can not be less than 19 characters");
         }
