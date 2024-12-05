@@ -368,7 +368,7 @@
         <exp.pkg.version.neethi>2.0.4.wso2v5</exp.pkg.version.neethi>
         <imp.pkg.version.neethi>[2.0.4.wso2v4, 3.0.0)</imp.pkg.version.neethi>
         <imp.pkg.version.javax.servlet>[2.6.0, 3.0.0)</imp.pkg.version.javax.servlet>
-        <securevault.version>1.1.2</securevault.version>
+        <securevault.version>1.1.10</securevault.version>
         <orbit.version.commons.fileuploader>1.5.0.wso2v2</orbit.version.commons.fileuploader>
         <orbit.version.spring>3.1.0.wso2v3</orbit.version.spring>
         <orbit.activation.version>1.1.1.wso2v1</orbit.activation.version>
