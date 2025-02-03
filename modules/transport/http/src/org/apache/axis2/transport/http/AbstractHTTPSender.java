@@ -774,6 +774,10 @@ public abstract class AbstractHTTPSender {
                     }
 
                     if (!headerAdded) {
+                        if (isPreserveHttpHeader(HTTPConstants.HEADER_USER_AGENT) && HTTPConstants.HEADER_USER_AGENT
+                                .equalsIgnoreCase(((Map.Entry) headerEntry).getKey().toString())) {
+                            isCustomUserAgentSet = true;
+                        }
                         if (((Map.Entry) headerEntry).getValue() != null) {
                             method.addRequestHeader(((Map.Entry) headerEntry).getKey().toString(),
                                     ((Map.Entry) headerEntry).getValue().toString());
