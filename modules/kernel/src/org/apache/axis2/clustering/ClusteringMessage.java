@@ -17,13 +17,16 @@
 */
 package org.apache.axis2.clustering;
 
+import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
+
 /**
  * This is a special ClusteringCommand which is used for messaging. If there is a response,
  * the response can be retrieved from this command
  */
 public abstract class ClusteringMessage extends ClusteringCommand {
 
-    private final String uuid = java.util.UUID.randomUUID().toString();
+    private final String uuid = generateFastUUID();
     private final long timestamp = System.currentTimeMillis();
 
     /**
@@ -51,5 +54,12 @@ public abstract class ClusteringMessage extends ClusteringCommand {
     @Override
     public int hashCode() {
         return uuid.hashCode();
+    }
+
+    private static String generateFastUUID() {
+
+        long most = ThreadLocalRandom.current().nextLong();
+        long least = ThreadLocalRandom.current().nextLong();
+        return new UUID(most, least).toString();
     }
 }
