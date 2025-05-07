@@ -43,6 +43,7 @@ public class HTTPProxyConfigurationUtil {
     protected static final String HTTP_PROXY_HOST = "http.proxyHost";
     protected static final String HTTP_PROXY_PORT = "http.proxyPort";
     protected static final String HTTP_NON_PROXY_HOSTS = "http.nonProxyHosts";
+    protected static final String HTTP_TARGET_PROXY_HOSTS = "http.targetProxyHosts";
 
     protected static final String ATTR_PROXY = "Proxy";
     protected static final String PROXY_HOST_ELEMENT = "ProxyHost";
@@ -83,7 +84,7 @@ public class HTTPProxyConfigurationUtil {
      */
     public static void configure(MessageContext messageContext,
                                  HttpClient httpClient,
-                                 HostConfiguration config) throws AxisFault {
+                                 HostConfiguration config, URL targetURL) throws AxisFault {
 
         Credentials proxyCredentials = null;
         String proxyHost = null;
@@ -143,13 +144,30 @@ public class HTTPProxyConfigurationUtil {
 
         }
 
-        // Overriding proxy settings if proxy is available from JVM settings
-        String host = System.getProperty(HTTP_PROXY_HOST);
+        // Retrieve parameter value from AxisConfiguration
+        Parameter hostParam = messageContext.getConfigurationContext().getAxisConfiguration()
+                .getTransportOut(targetURL.getProtocol()).getParameter(HTTP_PROXY_HOST);
+        String host = (hostParam != null) ? (String) hostParam.getValue() : null;
+
+        // Override with system property if present
+        String hostProp = System.getProperty(HTTP_PROXY_HOST);
+        if (hostProp != null && !hostProp.isEmpty()) {
+            host = hostProp;
+        }
         if(host != null) {
             proxyHost = host;
         }
 
-        String port = System.getProperty(HTTP_PROXY_PORT);
+        // Retrieve parameter value from AxisConfiguration
+        Parameter portParam = messageContext.getConfigurationContext().getAxisConfiguration()
+                .getTransportOut(targetURL.getProtocol()).getParameter(HTTP_PROXY_PORT);
+        String port = (portParam != null) ? (String) portParam.getValue() : null;
+
+        // Override with system property if present
+        String portProp = System.getProperty(HTTP_PROXY_PORT);
+        if (portProp != null && !portProp.isEmpty()) {
+            port = portProp;
+        }
         if(port != null) {
             proxyPort = Integer.parseInt(port);
         }
@@ -238,7 +256,7 @@ public class HTTPProxyConfigurationUtil {
      * @param targetURL      URL of the edpoint which we are sending the request
      * @return true if proxy is enabled, false otherwise
      */
-    public static boolean isProxyEnabled(MessageContext messageContext, URL targetURL) {
+    public static boolean isProxyEnabled(MessageContext messageContext, URL targetURL) throws AxisFault {
         boolean proxyEnabled = false;
 
         Parameter param = messageContext.getConfigurationContext().getAxisConfiguration()
@@ -247,57 +265,79 @@ public class HTTPProxyConfigurationUtil {
         //If configuration is over ridden
         Object obj = messageContext.getProperty(HTTPConstants.PROXY);
 
-        //From Java Networking Properties
-        String sp = System.getProperty(HTTP_PROXY_HOST);
+        // Retrieve parameter value from AxisConfiguration
+        Parameter spParam = messageContext.getConfigurationContext().getAxisConfiguration()
+                .getTransportOut(targetURL.getProtocol()).getParameter(HTTP_PROXY_HOST);
+        String sp = (spParam != null) ? (String) spParam.getValue() : null;
+
+        // Override with system property if present
+        String spProp = System.getProperty(HTTP_PROXY_HOST);
+        if (spProp != null && !spProp.isEmpty()) {
+            sp = spProp;
+        }
 
         if (param != null || obj != null || sp != null) {
             proxyEnabled = true;
         }
 
-        boolean isNonProxyHost = validateNonProxyHosts(targetURL.getHost());
-
-        return proxyEnabled && !isNonProxyHost;
-    }
-
-    /**
-     * Validates for names that shouldn't be listered as proxies.
-     * The http.nonProxyHosts can be set to specify the hosts which should be
-     * connected to directly (not through the proxy server).
-     * The value of the http.nonProxyHosts property can be a list of hosts,
-     * each separated by a |; it can also take a regular expression for matches;
-     * for example: *.sfbay.sun.com would match any fully qualified hostname in the sfbay domain.
-     * <p/>
-     * For more information refer to : http://java.sun.com/features/2002/11/hilevel_network.html
-     * <p/>
-     * false : validation fail : User can use the proxy
-     * true : validation pass ; User can't use the proxy
-     *
-     * @return boolean
-     */
-    private static boolean validateNonProxyHosts(String host) {
-        //From system property http.nonProxyHosts
-        String nonProxyHosts = System.getProperty(HTTP_NON_PROXY_HOSTS);
-        return isHostInNonProxyList(host, nonProxyHosts);
-    }
-
-    /**
-     * Check if the specified host is in the list of non proxy hosts.
-     *
-     * @param host          host name
-     * @param nonProxyHosts string containing the list of non proxy hosts
-     * @return true/false
-     */
-    public static boolean isHostInNonProxyList(String host, String nonProxyHosts) {
-        if ((nonProxyHosts == null) || (host == null)) {
-            return false;
+        Parameter targetProxyHostsParam = messageContext.getConfigurationContext().getAxisConfiguration()
+                .getTransportOut(targetURL.getProtocol()).getParameter(HTTP_TARGET_PROXY_HOSTS);
+        String targetProxyHosts = targetProxyHostsParam != null ? (String) targetProxyHostsParam.getValue() : null;
+        // Override with system property if present
+        String targetProxyHostsProp = System.getProperty(HTTP_TARGET_PROXY_HOSTS);
+        if (targetProxyHostsProp != null && !targetProxyHostsProp.isEmpty()) {
+            targetProxyHosts = targetProxyHostsProp;
         }
 
-        /*
-         * The http.nonProxyHosts system property is a list enclosed in
-         * double quotes with items separated by a vertical bar.
-         */
-        StringTokenizer tokenizer = new StringTokenizer(nonProxyHosts, "|\"");
+        Parameter nonProxyHostsParam = messageContext.getConfigurationContext().getAxisConfiguration()
+                .getTransportOut(targetURL.getProtocol()).getParameter(HTTP_NON_PROXY_HOSTS);
+        String nonProxyHosts = nonProxyHostsParam != null ? (String) nonProxyHostsParam.getValue() : null;
+        // Override with system property if present
+        String nonProxyHostsProp = System.getProperty(HTTP_NON_PROXY_HOSTS);
+        if (nonProxyHostsProp != null && !nonProxyHostsProp.isEmpty()) {
+            nonProxyHosts = nonProxyHostsProp;
+        }
 
+        String host = targetURL.getHost();
+
+        // Check if host is in both lists
+        boolean inProxyList = isHostInPatternList(host, targetProxyHosts);
+        boolean inNonProxyList = isHostInPatternList(host, nonProxyHosts);
+
+        if (inProxyList && inNonProxyList) {
+            throw new AxisFault(
+                    "Host: " + host + " is defined in both proxy and non-proxy lists. Please resolve the conflict.");
+        }
+
+        // Proceed based on the lists
+        if (targetProxyHosts != null && !targetProxyHosts.isEmpty()) {
+            return proxyEnabled && inProxyList;
+        } else {
+            return proxyEnabled && !inNonProxyList;
+        }
+    }
+
+    /**
+     * Determines if the specified host matches any pattern in the given pattern list.
+     * <p>
+     * The pattern list is expected to be a string where patterns are separated by a vertical bar ("|")
+     * or enclosed in double quotes. Each pattern is checked against the host using {@link #match(String, String, boolean)}.
+     * The pattern list can use wildcards (such as "*.example.com") to match any host in a domain.
+     * <p>
+     * This method is typically used to check if a host should be treated as a proxy target (inclusion list) or
+     * if it should bypass the proxy (exclusion list, such as the {@code http.nonProxyHosts} property).
+     * <p>
+     * If either the host or the pattern list is {@code null}, this method returns {@code false}.
+     *
+     * @param host        the host to check; may be {@code null}
+     * @param patternList the pattern list to check against; may be {@code null}
+     * @return {@code true} if the host matches any pattern in the list, {@code false} otherwise
+     */
+    public static boolean isHostInPatternList(String host, String patternList) {
+        if (patternList == null || host == null) {
+            return false;
+        }
+        StringTokenizer tokenizer = new StringTokenizer(patternList, "|\"");
         while (tokenizer.hasMoreTokens()) {
             String pattern = tokenizer.nextToken();
             if (match(pattern, host, false)) {

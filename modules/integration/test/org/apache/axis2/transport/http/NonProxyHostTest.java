@@ -25,9 +25,9 @@ import org.apache.axis2.transport.http.util.HTTPProxyConfigurationUtil;
 public class NonProxyHostTest extends TestCase {
     public void testForAxis2_3453() {
         String nonProxyHosts = "sealbook.ncl.ac.uk|*.sealbook.ncl.ac.uk|eskdale.ncl.ac.uk|*.eskdale.ncl.ac.uk|giga25.ncl.ac.uk|*.giga25.ncl.ac.uk";
-        assertTrue(HTTPProxyConfigurationUtil.isHostInNonProxyList("sealbook.ncl.ac.uk", nonProxyHosts));
-        assertFalse(HTTPProxyConfigurationUtil.isHostInNonProxyList("xsealbook.ncl.ac.uk", nonProxyHosts));
-        assertTrue(HTTPProxyConfigurationUtil.isHostInNonProxyList("local","local|*.local|169.254/16|*.169.254/16"));
-        assertFalse(HTTPProxyConfigurationUtil.isHostInNonProxyList("localhost","local|*.local|169.254/16|*.169.254/16"));
+        assertTrue(HTTPProxyConfigurationUtil.isHostInPatternList("sealbook.ncl.ac.uk", nonProxyHosts));
+        assertFalse(HTTPProxyConfigurationUtil.isHostInPatternList("xsealbook.ncl.ac.uk", nonProxyHosts));
+        assertTrue(HTTPProxyConfigurationUtil.isHostInPatternList("local","local|*.local|169.254/16|*.169.254/16"));
+        assertFalse(HTTPProxyConfigurationUtil.isHostInPatternList("localhost","local|*.local|169.254/16|*.169.254/16"));
     }
 }
