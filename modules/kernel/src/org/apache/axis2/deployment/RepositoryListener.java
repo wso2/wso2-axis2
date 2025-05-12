@@ -35,6 +35,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLDecoder;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Map;
 
@@ -296,6 +297,12 @@ public class RepositoryListener implements DeploymentConstants {
                     wsInfoList.setServiceUnDeploymentAllowed(false);
                 } else {
                     wsInfoList.setServiceUnDeploymentAllowed(true);
+                    if (extension.equals("car")) {
+                        File[] cAppFiles = Arrays.stream(files)
+                                .filter(file -> file.getName().endsWith(".car"))
+                                .toArray(File[]::new);
+                        files = Utils.getCAppProcessingOrder(cAppFiles);
+                    }
                     if (files != null && files.length > 0) {
                         for (int i = 0; i < files.length; i++) {
                             File file = files[i];

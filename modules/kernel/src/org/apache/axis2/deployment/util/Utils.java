@@ -57,8 +57,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.PolicyComponent;
 import org.apache.ws.commons.schema.utils.NamespaceMap;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
@@ -74,6 +80,7 @@ import java.security.PrivilegedExceptionAction;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 import static org.apache.axis2.Constants.DYNAMIC_PROPERTY_PLACEHOLDER_PREFIX;
@@ -2179,5 +2186,174 @@ public class Utils {
             }
         }
         return text;
+    }
+
+    public static Map<String, List<String>> createCAppDependencyGraph(File[] carFiles) {
+        Map<String, List<String>> dependencyGraph = new LinkedHashMap<>();
+        for (File carFile : carFiles) {
+            String carFileName = carFile.getName();
+            List<String> dependencies = getCAppDependencies(carFile);
+            for (String dependency : dependencies) {
+                if (dependencyGraph.containsKey(dependency)) {
+                    dependencyGraph.get(dependency).add(carFileName);
+                } else {
+                    List<String> dependentFiles = new ArrayList<>();
+                    dependentFiles.add(carFileName);
+                    dependencyGraph.put(dependency, dependentFiles);
+                }
+            }
+            dependencyGraph.putIfAbsent(carFileName, new ArrayList<>());
+        }
+        return dependencyGraph;
+    }
+
+    public static File[] getCAppProcessingOrder(File[] cAppFiles) {
+        Map<String, List<String>> cAppDependencyGraph = Utils.createCAppDependencyGraph(cAppFiles);
+        List<String> graphProcessingOrder = Utils.getDependencyGraphProcessingOrder(cAppDependencyGraph);
+        File[] orderedFiles = new File[cAppFiles.length];
+        int index = 0;
+        for (String fileName : graphProcessingOrder) {
+            boolean fileFound = false;
+            for (File file : cAppFiles) {
+                if (file.getName().equals(fileName)) {
+                    orderedFiles[index++] = file;
+                    fileFound = true;
+                    break;
+                }
+            }
+            if (!fileFound) {
+                throw new IllegalArgumentException("No cAppFile found for fileName: " + fileName);
+            }
+        }
+        return orderedFiles;
+    }
+
+    public static List<String> getDependencyGraphProcessingOrder(Map<String, List<String>> graph) throws IllegalArgumentException {
+        Map<String, Integer> inDegree = new LinkedHashMap<>();
+        for (String node : graph.keySet()) {
+            inDegree.put(node, 0);
+        }
+        for (List<String> dependencies : graph.values()) {
+            for (String dependency : dependencies) {
+                inDegree.put(dependency, inDegree.getOrDefault(dependency, 0) + 1);
+            }
+        }
+
+        Queue<String> queue = new LinkedList<>();
+        for (Map.Entry<String, Integer> entry : inDegree.entrySet()) {
+            if (entry.getValue() == 0) {
+                queue.add(entry.getKey());
+            }
+        }
+
+        List<String> sortedOrder = new ArrayList<>();
+        while (!queue.isEmpty()) {
+            String current = queue.poll();
+            sortedOrder.add(current);
+
+            for (String neighbor : graph.getOrDefault(current, Collections.emptyList())) {
+                inDegree.put(neighbor, inDegree.get(neighbor) - 1);
+                if (inDegree.get(neighbor) == 0) {
+                    queue.add(neighbor);
+                }
+            }
+        }
+
+        if (sortedOrder.size() != inDegree.size()) {
+            throw new IllegalArgumentException("Cycle detected in the dependency graph");
+        }
+        return sortedOrder;
+    }
+
+    public static List<String> getCAppDependencies(File carFile) {
+        List<String> dependencies = new ArrayList<>();
+        try {
+            String descriptorXml = readDescriptorXmlFromCApp(carFile.getAbsolutePath());
+            if (descriptorXml == null || descriptorXml.isEmpty()) {
+                return dependencies; // No descriptor.xml means no dependencies
+            }
+
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.parse(new InputSource(new StringReader(descriptorXml)));
+
+            NodeList dependencyNodes = document.getElementsByTagName("dependency");
+            for (int i = 0; i < dependencyNodes.getLength(); i++) {
+                Node dependencyNode = dependencyNodes.item(i);
+                String artifactId = dependencyNode.getAttributes().getNamedItem("artifactId").getNodeValue();
+                String version = dependencyNode.getAttributes().getNamedItem("version").getNodeValue();
+                dependencies.add(artifactId + "_" + version + ".car");
+            }
+        } catch (Exception e) {
+            System.err.println("Error reading dependencies from " + carFile.getName() + ": " + e.getMessage());
+        }
+        return dependencies;
+    }
+
+    /**
+     * Reads the content of descriptor.xml from a CApp (Carbon Application) file.
+     *
+     * @param cAppFilePath Path to the .car (CApp) file
+     * @return Content of descriptor.xml as a String, or null if not found or error occurs
+     */
+    public static String readDescriptorXmlFromCApp(String cAppFilePath) {
+        File cappFile = new File(cAppFilePath);
+
+        if (!cappFile.exists()) {
+            System.err.println("CApp file not found: " + cAppFilePath);
+            return null;
+        }
+
+        try (ZipFile zip = new ZipFile(cappFile)) {
+            ZipEntry entry = zip.getEntry("descriptor.xml");
+            if (entry != null) {
+                try (InputStream stream = zip.getInputStream(entry);
+                     BufferedReader reader = new BufferedReader(new InputStreamReader(stream))) {
+
+                    StringBuilder content = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        content.append(line).append("\n");
+                    }
+                    return content.toString();
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading CApp file: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static void extractCAppFile(File carFile) {
+        File extractDir = new File(carFile.getParent(), "extracted/" + carFile.getName());
+        if (!extractDir.exists() && !extractDir.mkdirs()) {
+            System.err.println("Failed to create extraction directory: " + extractDir.getAbsolutePath());
+            return;
+        }
+
+        try (ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(carFile))) {
+            ZipEntry entry;
+            while ((entry = zipInputStream.getNextEntry()) != null) {
+                File extractedFile = new File(extractDir, entry.getName());
+                if (entry.isDirectory()) {
+                    if (!extractedFile.mkdirs()) {
+                        System.err.println("Failed to create directory: " + extractedFile.getAbsolutePath());
+                    }
+                } else {
+                    try (FileOutputStream outputStream = new FileOutputStream(extractedFile)) {
+                        byte[] buffer = new byte[1024];
+                        int length;
+                        while ((length = zipInputStream.read(buffer)) > 0) {
+                            outputStream.write(buffer, 0, length);
+                        }
+                    }
+                }
+                zipInputStream.closeEntry();
+            }
+        } catch (IOException e) {
+            System.err.println("Error extracting .car file: " + carFile.getName() + ": " + e.getMessage());
+        }
     }
 }
