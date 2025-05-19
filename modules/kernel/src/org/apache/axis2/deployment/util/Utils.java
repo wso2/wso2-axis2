@@ -2191,18 +2191,17 @@ public class Utils {
     public static Map<String, List<String>> createCAppDependencyGraph(File[] carFiles) {
         Map<String, List<String>> dependencyGraph = new LinkedHashMap<>();
         for (File carFile : carFiles) {
-            String carFileName = carFile.getName();
-            List<String> dependencies = getCAppDependencies(carFile);
-            for (String dependency : dependencies) {
+            DescriptorInfo cAppDescriptorInfo = getCAppDescriptorInfo(carFile);
+            for (String dependency : cAppDescriptorInfo.getCAppDependencies()) {
                 if (dependencyGraph.containsKey(dependency)) {
-                    dependencyGraph.get(dependency).add(carFileName);
+                    dependencyGraph.get(dependency).add(cAppDescriptorInfo.getCAppId());
                 } else {
                     List<String> dependentFiles = new ArrayList<>();
-                    dependentFiles.add(carFileName);
+                    dependentFiles.add(cAppDescriptorInfo.getCAppId());
                     dependencyGraph.put(dependency, dependentFiles);
                 }
             }
-            dependencyGraph.putIfAbsent(carFileName, new ArrayList<>());
+            dependencyGraph.putIfAbsent(cAppDescriptorInfo.getCAppId(), new ArrayList<>());
         }
         return dependencyGraph;
     }
@@ -2212,17 +2211,29 @@ public class Utils {
         List<String> graphProcessingOrder = Utils.getDependencyGraphProcessingOrder(cAppDependencyGraph);
         File[] orderedFiles = new File[cAppFiles.length];
         int index = 0;
-        for (String fileName : graphProcessingOrder) {
+        for (String fileIdentifier : graphProcessingOrder) {
             boolean fileFound = false;
-            for (File file : cAppFiles) {
-                if (file.getName().equals(fileName)) {
-                    orderedFiles[index++] = file;
-                    fileFound = true;
-                    break;
+            if (fileIdentifier.endsWith(".car")) {
+                for (File file : cAppFiles) {
+                    if (file.getName().equals(fileIdentifier)) {
+                        orderedFiles[index++] = file;
+                        fileFound = true;
+                        break;
+                    }
+                }
+            } else {
+                for (File file : cAppFiles) {
+                    DescriptorInfo descriptorInfo = getCAppDescriptorInfo(file);
+                    if (descriptorInfo.getCAppId().equals(fileIdentifier)) {
+                        orderedFiles[index++] = file;
+                        fileFound = true;
+                        break;
+                    }
                 }
             }
+
             if (!fileFound) {
-                throw new IllegalArgumentException("No cAppFile found for fileName: " + fileName);
+                throw new IllegalArgumentException("No cAppFile found for fileName: " + fileIdentifier);
             }
         }
         return orderedFiles;
@@ -2263,6 +2274,37 @@ public class Utils {
             throw new IllegalArgumentException("Cycle detected in the dependency graph");
         }
         return sortedOrder;
+    }
+
+    public static DescriptorInfo getCAppDescriptorInfo(File carFile) {
+        DescriptorInfo descriptorInfo = new DescriptorInfo(carFile.getName());
+        try {
+            String descriptorXml = readDescriptorXmlFromCApp(carFile.getAbsolutePath());
+            if (descriptorXml == null || descriptorXml.isEmpty()) {
+                return descriptorInfo;
+            }
+
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.parse(new InputSource(new StringReader(descriptorXml)));
+
+            NodeList idElements = document.getElementsByTagName("id");
+            if (idElements.getLength() > 0) {
+                descriptorInfo.setCAppId(idElements.item(0).getTextContent());
+            }
+
+            NodeList dependencyNodes = document.getElementsByTagName("dependency");
+            for (int i = 0; i < dependencyNodes.getLength(); i++) {
+                Node dependencyNode = dependencyNodes.item(i);
+                String groupId = dependencyNode.getAttributes().getNamedItem("groupId").getNodeValue();
+                String artifactId = dependencyNode.getAttributes().getNamedItem("artifactId").getNodeValue();
+                String version = dependencyNode.getAttributes().getNamedItem("version").getNodeValue();
+                descriptorInfo.addDependency(groupId + "_" + artifactId + "_" + version);
+            }
+        } catch (Exception e) {
+            System.err.println("Error reading descriptor.xml from " + carFile.getName() + ": " + e.getMessage());
+        }
+        return descriptorInfo;
     }
 
     public static List<String> getCAppDependencies(File carFile) {
