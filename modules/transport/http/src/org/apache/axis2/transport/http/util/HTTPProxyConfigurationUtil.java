@@ -27,6 +27,7 @@ import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.http.HttpTransportProperties;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -119,6 +120,19 @@ public class HTTPProxyConfigurationUtil {
 
         }
 
+        // Retrieve proxy parameter values from axis2 blocking mode transport sender configuration
+        Parameter hostParam = messageContext.getConfigurationContext().getAxisConfiguration()
+                .getTransportOut(targetURL.getProtocol()).getParameter(HTTP_PROXY_HOST);
+        if (hostParam != null) {
+            proxyHost = (String) hostParam.getValue();
+        }
+
+        Parameter portParam = messageContext.getConfigurationContext().getAxisConfiguration()
+                .getTransportOut(targetURL.getProtocol()).getParameter(HTTP_PROXY_PORT);
+        if (portParam != null) {
+            proxyPort = Integer.parseInt((String)portParam.getValue());
+        }
+
         // If there is runtime proxy settings, these settings will override settings from axis2.xml
         HttpTransportProperties.ProxyProperties proxyProperties =
                 (HttpTransportProperties.ProxyProperties) messageContext.getProperty(HTTPConstants.PROXY);
@@ -144,31 +158,14 @@ public class HTTPProxyConfigurationUtil {
 
         }
 
-        // Retrieve parameter value from AxisConfiguration
-        Parameter hostParam = messageContext.getConfigurationContext().getAxisConfiguration()
-                .getTransportOut(targetURL.getProtocol()).getParameter(HTTP_PROXY_HOST);
-        String host = (hostParam != null) ? (String) hostParam.getValue() : null;
-
-        // Override with system property if present
-        String hostProp = System.getProperty(HTTP_PROXY_HOST);
-        if (hostProp != null && !hostProp.isEmpty()) {
-            host = hostProp;
-        }
-        if(host != null) {
+        // Overriding proxy settings if proxy is available from JVM settings
+        String host = System.getProperty(HTTP_PROXY_HOST);
+        if (!StringUtils.isBlank(host)) {
             proxyHost = host;
         }
 
-        // Retrieve parameter value from AxisConfiguration
-        Parameter portParam = messageContext.getConfigurationContext().getAxisConfiguration()
-                .getTransportOut(targetURL.getProtocol()).getParameter(HTTP_PROXY_PORT);
-        String port = (portParam != null) ? (String) portParam.getValue() : null;
-
-        // Override with system property if present
-        String portProp = System.getProperty(HTTP_PROXY_PORT);
-        if (portProp != null && !portProp.isEmpty()) {
-            port = portProp;
-        }
-        if(port != null) {
+        String port = System.getProperty(HTTP_PROXY_PORT);
+        if (!StringUtils.isBlank(port)) {
             proxyPort = Integer.parseInt(port);
         }
 
@@ -253,50 +250,14 @@ public class HTTPProxyConfigurationUtil {
      * This is not a deep check.
      *
      * @param messageContext in message context
-     * @param targetURL      URL of the edpoint which we are sending the request
+     * @param targetURL      URL of the endpoint which we are sending the request
      * @return true if proxy is enabled, false otherwise
      */
     public static boolean isProxyEnabled(MessageContext messageContext, URL targetURL) throws AxisFault {
-        boolean proxyEnabled = false;
+        boolean proxyEnabled = isProxyConfigured(messageContext, targetURL);
 
-        Parameter param = messageContext.getConfigurationContext().getAxisConfiguration()
-                .getParameter(ATTR_PROXY);
-
-        //If configuration is over ridden
-        Object obj = messageContext.getProperty(HTTPConstants.PROXY);
-
-        // Retrieve parameter value from AxisConfiguration
-        Parameter spParam = messageContext.getConfigurationContext().getAxisConfiguration()
-                .getTransportOut(targetURL.getProtocol()).getParameter(HTTP_PROXY_HOST);
-        String sp = (spParam != null) ? (String) spParam.getValue() : null;
-
-        // Override with system property if present
-        String spProp = System.getProperty(HTTP_PROXY_HOST);
-        if (spProp != null && !spProp.isEmpty()) {
-            sp = spProp;
-        }
-
-        if (param != null || obj != null || sp != null) {
-            proxyEnabled = true;
-        }
-
-        Parameter targetProxyHostsParam = messageContext.getConfigurationContext().getAxisConfiguration()
-                .getTransportOut(targetURL.getProtocol()).getParameter(HTTP_TARGET_PROXY_HOSTS);
-        String targetProxyHosts = targetProxyHostsParam != null ? (String) targetProxyHostsParam.getValue() : null;
-        // Override with system property if present
-        String targetProxyHostsProp = System.getProperty(HTTP_TARGET_PROXY_HOSTS);
-        if (targetProxyHostsProp != null && !targetProxyHostsProp.isEmpty()) {
-            targetProxyHosts = targetProxyHostsProp;
-        }
-
-        Parameter nonProxyHostsParam = messageContext.getConfigurationContext().getAxisConfiguration()
-                .getTransportOut(targetURL.getProtocol()).getParameter(HTTP_NON_PROXY_HOSTS);
-        String nonProxyHosts = nonProxyHostsParam != null ? (String) nonProxyHostsParam.getValue() : null;
-        // Override with system property if present
-        String nonProxyHostsProp = System.getProperty(HTTP_NON_PROXY_HOSTS);
-        if (nonProxyHostsProp != null && !nonProxyHostsProp.isEmpty()) {
-            nonProxyHosts = nonProxyHostsProp;
-        }
+        String targetProxyHosts = getTransportParameterValue(messageContext, targetURL, HTTP_TARGET_PROXY_HOSTS);
+        String nonProxyHosts = getTransportParameterValue(messageContext, targetURL, HTTP_NON_PROXY_HOSTS);
 
         String host = targetURL.getHost();
 
@@ -310,11 +271,54 @@ public class HTTPProxyConfigurationUtil {
         }
 
         // Proceed based on the lists
-        if (targetProxyHosts != null && !targetProxyHosts.isEmpty()) {
+        if (!StringUtils.isBlank(targetProxyHosts)) {
             return proxyEnabled && inProxyList;
         } else {
             return proxyEnabled && !inNonProxyList;
         }
+    }
+
+
+    /**
+     * Checks if proxy is configured by evaluating Axis2 configuration parameters, transport-level settings,
+     * message context properties, and system properties.
+     *
+     * @param messageContext The Axis2 message context containing configuration.
+     * @param targetURL      The target URL for the request.
+     * @return true if proxy is enabled via any configuration, false otherwise.
+     */
+    private static boolean isProxyConfigured(MessageContext messageContext, URL targetURL) {
+        Parameter param = messageContext.getConfigurationContext().getAxisConfiguration()
+                .getParameter(ATTR_PROXY);
+
+        // Retrieve parameter value from axis2 blocking mode transport sender configuration
+        Parameter proxyHostParam = messageContext.getConfigurationContext().getAxisConfiguration()
+                .getTransportOut(targetURL.getProtocol()).getParameter(HTTP_PROXY_HOST);
+
+        //If configuration is over ridden
+        Object obj = messageContext.getProperty(HTTPConstants.PROXY);
+
+        //From Java Networking Properties
+        String proxyHostSystemProperty = System.getProperty(HTTP_PROXY_HOST);
+
+        return param != null || proxyHostParam != null || obj != null || proxyHostSystemProperty != null;
+    }
+
+    /**
+     * Retrieves the effective value of a transport parameter. Prefers system property if defined;
+     * otherwise, falls back to the value configured in Axis2 transport out.
+     *
+     * @param messageContext The Axis2 message context.
+     * @param targetURL      The target URL whose protocol is used to find the transport.
+     * @param paramName      The name of the transport parameter (e.g., proxy or non-proxy hosts).
+     * @return The effective value of the parameter, considering both Axis2 config and system property.
+     */
+    private static String getTransportParameterValue(MessageContext messageContext, URL targetURL, String paramName) {
+        Parameter param = messageContext.getConfigurationContext().getAxisConfiguration()
+                .getTransportOut(targetURL.getProtocol()).getParameter(paramName);
+        String value = param != null ? (String) param.getValue() : null;
+        String systemPropertyValue = System.getProperty(paramName);
+        return !StringUtils.isBlank(systemPropertyValue) ? systemPropertyValue : value;
     }
 
     /**
