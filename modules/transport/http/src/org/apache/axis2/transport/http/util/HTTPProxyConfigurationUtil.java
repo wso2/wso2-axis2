@@ -167,6 +167,16 @@ public class HTTPProxyConfigurationUtil {
         config.setProxy(proxyHost, proxyPort);
     }
 
+    /**
+     * Configure HTTP Proxy settings of commons-httpclient HostConfiguration. Proxy settings can be get from
+     * axis2.xml, Java proxy settings or can be override through property in message context.
+     *
+     * @param messageContext message context
+     * @param httpClient     commons-httpclient instance
+     * @param config         commons-httpclient HostConfiguration
+     * @param targetURL      URL of the endpoint which we are sending the request
+     * @throws AxisFault if Proxy settings are invalid
+     */
     public static void configure(MessageContext messageContext,
                                  HttpClient httpClient,
                                  HostConfiguration config, URL targetURL) throws AxisFault {
