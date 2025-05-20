@@ -85,11 +85,94 @@ public class HTTPProxyConfigurationUtil {
      */
     public static void configure(MessageContext messageContext,
                                  HttpClient httpClient,
-                                 HostConfiguration config, URL targetURL) throws AxisFault {
+                                 HostConfiguration config) throws AxisFault {
 
         Credentials proxyCredentials = null;
         String proxyHost = null;
         String nonProxyHosts = null;
+        Integer proxyPort = -1;
+        String proxyUser = null;
+        String proxyPassword = null;
+
+        //Getting configuration values from Axis2.xml
+        Parameter proxySettingsFromAxisConfig = messageContext.getConfigurationContext().getAxisConfiguration()
+                .getParameter(ATTR_PROXY);
+        if (proxySettingsFromAxisConfig != null) {
+            OMElement proxyConfiguration = getProxyConfigurationElement(proxySettingsFromAxisConfig);
+            proxyHost = getProxyHost(proxyConfiguration);
+            proxyPort = getProxyPort(proxyConfiguration);
+            proxyUser = getProxyUser(proxyConfiguration);
+            proxyPassword = getProxyPassword(proxyConfiguration);
+            if(proxyUser != null){
+                if(proxyPassword == null){
+                    proxyPassword = "";
+                }
+                int proxyUserDomainIndex = proxyUser.indexOf("\\");
+                if( proxyUserDomainIndex > 0){
+                    String domain = proxyUser.substring(0, proxyUserDomainIndex);
+                    if(proxyUser.length() > proxyUserDomainIndex + 1) {
+                        String user = proxyUser.substring(proxyUserDomainIndex + 1);
+                        proxyCredentials = new NTCredentials(user, proxyPassword, proxyHost, domain);
+                    }
+                }
+                proxyCredentials = new UsernamePasswordCredentials(proxyUser, proxyPassword);
+            }
+
+        }
+
+        // If there is runtime proxy settings, these settings will override settings from axis2.xml
+        HttpTransportProperties.ProxyProperties proxyProperties =
+                (HttpTransportProperties.ProxyProperties) messageContext.getProperty(HTTPConstants.PROXY);
+        if(proxyProperties != null) {
+            String proxyHostProp = proxyProperties.getProxyHostName();
+            if(proxyHostProp == null || proxyHostProp.length() <= 0) {
+                throw new AxisFault("HTTP Proxy host is not available. Host is a MUST parameter");
+            } else {
+                proxyHost = proxyHostProp;
+            }
+            proxyPort = proxyProperties.getProxyPort();
+
+            // Overriding credentials
+            String userName = proxyProperties.getUserName();
+            String password = proxyProperties.getPassWord();
+            String domain = proxyProperties.getDomain();
+
+            if(userName != null && password != null && domain != null){
+                proxyCredentials = new NTCredentials(userName, password, proxyHost, domain);
+            } else if(userName != null && domain == null){
+                proxyCredentials = new UsernamePasswordCredentials(userName, password);
+            }
+
+        }
+
+        // Overriding proxy settings if proxy is available from JVM settings
+        String host = System.getProperty(HTTP_PROXY_HOST);
+        if(host != null) {
+            proxyHost = host;
+        }
+
+        String port = System.getProperty(HTTP_PROXY_PORT);
+        if(port != null) {
+            proxyPort = Integer.parseInt(port);
+        }
+
+        if(proxyCredentials != null) {
+            httpClient.getParams().setAuthenticationPreemptive(true);
+            HttpState cachedHttpState = (HttpState)messageContext.getProperty(HTTPConstants.CACHED_HTTP_STATE);
+            if(cachedHttpState != null){
+                httpClient.setState(cachedHttpState);
+            }
+            httpClient.getState().setProxyCredentials(AuthScope.ANY, proxyCredentials);
+        }
+        config.setProxy(proxyHost, proxyPort);
+    }
+
+    public static void configure(MessageContext messageContext,
+                                 HttpClient httpClient,
+                                 HostConfiguration config, URL targetURL) throws AxisFault {
+
+        Credentials proxyCredentials = null;
+        String proxyHost = null;
         Integer proxyPort = -1;
         String proxyUser = null;
         String proxyPassword = null;
@@ -254,7 +337,7 @@ public class HTTPProxyConfigurationUtil {
      * @return true if proxy is enabled, false otherwise
      */
     public static boolean isProxyEnabled(MessageContext messageContext, URL targetURL) throws AxisFault {
-        boolean proxyEnabled = isProxyConfigured(messageContext, targetURL);
+        boolean proxyEnabled = isProxySetupPresent(messageContext, targetURL);
 
         String targetProxyHosts = getTransportParameterValue(messageContext, targetURL, HTTP_TARGET_PROXY_HOSTS);
         String nonProxyHosts = getTransportParameterValue(messageContext, targetURL, HTTP_NON_PROXY_HOSTS);
@@ -287,7 +370,7 @@ public class HTTPProxyConfigurationUtil {
      * @param targetURL      The target URL for the request.
      * @return true if proxy is enabled via any configuration, false otherwise.
      */
-    private static boolean isProxyConfigured(MessageContext messageContext, URL targetURL) {
+    private static boolean isProxySetupPresent(MessageContext messageContext, URL targetURL) {
         Parameter param = messageContext.getConfigurationContext().getAxisConfiguration()
                 .getParameter(ATTR_PROXY);
 
@@ -313,12 +396,25 @@ public class HTTPProxyConfigurationUtil {
      * @param paramName      The name of the transport parameter (e.g., proxy or non-proxy hosts).
      * @return The effective value of the parameter, considering both Axis2 config and system property.
      */
-    private static String getTransportParameterValue(MessageContext messageContext, URL targetURL, String paramName) {
+    private static String getTransportParameterValue(MessageContext messageContext,
+                                                     URL targetURL, String paramName) {
         Parameter param = messageContext.getConfigurationContext().getAxisConfiguration()
                 .getTransportOut(targetURL.getProtocol()).getParameter(paramName);
         String value = param != null ? (String) param.getValue() : null;
         String systemPropertyValue = System.getProperty(paramName);
         return !StringUtils.isBlank(systemPropertyValue) ? systemPropertyValue : value;
+    }
+
+    /**
+     * Check if the specified host is in the list of non proxy hosts.
+     *
+     * @param host          host name
+     * @param nonProxyHosts string containing the list of non proxy hosts
+     * @return true/false
+     */
+    @Deprecated
+    public static boolean isHostInNonProxyList(String host, String nonProxyHosts) {
+        return isHostInPatternList(host, nonProxyHosts);
     }
 
     /**
