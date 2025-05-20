@@ -18,6 +18,9 @@
 
 package org.apache.axis2.deployment.util;
 
+import org.apache.axis2.deployment.DeploymentEngine;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -33,6 +36,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 public class CAppDescriptor {
 
+    private static final Log log = LogFactory.getLog(DeploymentEngine.class);
     private File cAppFile;
     private String cAppId;
     private List<String> cAppDependencies;
@@ -70,6 +74,10 @@ public class CAppDescriptor {
         return cAppDependencies;
     }
 
+    /**
+     * Parses the descriptor XML file associated with the current CApp file.
+     * Extracts the CApp ID and its dependencies from the descriptor
+     */
     private void parseDescriptor() {
         try {
             String descriptorXml = Utils.readDescriptorXmlFromCApp(this.cAppFile.getAbsolutePath());
@@ -93,7 +101,7 @@ public class CAppDescriptor {
                 }
             }
         } catch (Exception e) {
-            System.err.println("Error reading descriptor.xml from " + this.cAppFile.getName() + ": " + e.getMessage());
+            log.error("Error reading descriptor.xml from " + this.cAppFile.getName() + ": " + e.getMessage(), e);
         }
     }
 }
