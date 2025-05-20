@@ -2207,6 +2207,7 @@ public class Utils {
     }
 
     public static File[] getCAppProcessingOrder(File[] cAppFiles) {
+        Arrays.sort(cAppFiles, Comparator.comparing(File::getName));
         Map<String, List<String>> cAppDependencyGraph = Utils.createCAppDependencyGraph(cAppFiles);
         List<String> graphProcessingOrder = Utils.getDependencyGraphProcessingOrder(cAppDependencyGraph);
         File[] orderedFiles = new File[cAppFiles.length];
@@ -2233,7 +2234,7 @@ public class Utils {
             }
 
             if (!fileFound) {
-                throw new IllegalArgumentException("No cAppFile found for fileName: " + fileIdentifier);
+                throw new IllegalArgumentException("No cAppFile found for file identifier: " + fileIdentifier);
             }
         }
         return orderedFiles;
