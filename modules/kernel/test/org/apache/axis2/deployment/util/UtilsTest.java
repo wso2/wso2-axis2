@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
+ *
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.apache.axis2.deployment.util;
 
 import junit.framework.TestCase;
@@ -5,18 +23,20 @@ import junit.framework.TestCase;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class UtilsTest extends TestCase {
 
-    public void testGetCAppDependencies() {
+    public void testGetCAppDescriptorInfo() {
         File testCarFile = new File("test-resources/carbonapps/TestProjectCompositeExporter1_1.0.0-SNAPSHOT.car"); // Replace with a valid test CAR file path
-        List<String> cAppDependencies = Utils.getCAppDependencies(testCarFile);
-        assertNotNull(cAppDependencies);
-        assertTrue(cAppDependencies.contains("TestProjectConfigs1_1.0.0-SNAPSHOT.car")); // Replace with expected dependency names
-        assertTrue(cAppDependencies.contains("TestProjectConfigs2_1.0.0-SNAPSHOT.car")); // Replace with expected dependency names
+        DescriptorInfo cAppDescriptorInfo = Utils.getCAppDescriptorInfo(testCarFile);
+        assertTrue(cAppDescriptorInfo.getCAppId().equals("com.example_TestProjectCompositeExporter1_1.0.0-SNAPSHOT")); // Replace with expected CApp ID
+        assertNotNull(cAppDescriptorInfo.getCAppDependencies());
+        assertTrue(cAppDescriptorInfo.getCAppDependencies().contains("com.example_TestProjectConfigs1_1.0.0-SNAPSHOT")); // Replace with expected dependency names
+        assertTrue(cAppDescriptorInfo.getCAppDependencies().contains("com.example_TestProjectConfigs2_1.0.0-SNAPSHOT")); // Replace with expected dependency names
     }
 
     public void testCreateCAppDependencyGraph() {
@@ -29,13 +49,13 @@ public class UtilsTest extends TestCase {
         Map<String, List<String>> dependencyGraph = Utils.createCAppDependencyGraph(testCarFiles);
         assertNotNull(dependencyGraph);
 
-        assertTrue(dependencyGraph.containsKey("TestProjectConfigs1_1.0.0-SNAPSHOT.car"));
-        assertTrue(dependencyGraph.containsKey("TestProjectConfigs2_1.0.0-SNAPSHOT.car"));
-        assertTrue(dependencyGraph.containsKey("TestProjectCompositeExporter1_1.0.0-SNAPSHOT.car"));
-        assertTrue(dependencyGraph.get("TestProjectConfigs1_1.0.0-SNAPSHOT.car")
-                .contains("TestProjectCompositeExporter1_1.0.0-SNAPSHOT.car"));
-        assertTrue(dependencyGraph.get("TestProjectConfigs2_1.0.0-SNAPSHOT.car")
-                .contains("TestProjectCompositeExporter1_1.0.0-SNAPSHOT.car"));
+        assertTrue(dependencyGraph.containsKey("com.example_TestProjectConfigs1_1.0.0-SNAPSHOT"));
+        assertTrue(dependencyGraph.containsKey("com.example_TestProjectConfigs2_1.0.0-SNAPSHOT"));
+        assertTrue(dependencyGraph.containsKey("com.example_TestProjectCompositeExporter1_1.0.0-SNAPSHOT"));
+        assertTrue(dependencyGraph.get("com.example_TestProjectConfigs1_1.0.0-SNAPSHOT")
+                .contains("com.example_TestProjectCompositeExporter1_1.0.0-SNAPSHOT"));
+        assertTrue(dependencyGraph.get("com.example_TestProjectConfigs2_1.0.0-SNAPSHOT")
+                .contains("com.example_TestProjectCompositeExporter1_1.0.0-SNAPSHOT"));
     }
 
     public void testGetDependencyGraphProcessingOrder() {
@@ -48,9 +68,82 @@ public class UtilsTest extends TestCase {
         List<String> processingOrder = Utils.getDependencyGraphProcessingOrder(dependencyGraph);
         assertNotNull(processingOrder);
         assertEquals(3, processingOrder.size());
-        assertTrue(processingOrder.get(0).equals("TestProjectConfigs1_1.0.0-SNAPSHOT.car"));
-        assertTrue(processingOrder.get(1).equals("TestProjectConfigs2_1.0.0-SNAPSHOT.car"));
-        assertTrue(processingOrder.get(2).equals("TestProjectCompositeExporter1_1.0.0-SNAPSHOT.car"));
+        assertTrue(processingOrder.get(0).equals("com.example_TestProjectConfigs1_1.0.0-SNAPSHOT"));
+        assertTrue(processingOrder.get(1).equals("com.example_TestProjectConfigs2_1.0.0-SNAPSHOT"));
+        assertTrue(processingOrder.get(2).equals("com.example_TestProjectCompositeExporter1_1.0.0-SNAPSHOT"));
+    }
+
+    public void testGetDependentCAppProcessingOrder() {
+        File[] testCarFiles = {
+            new File("test-resources/carbonapps/TestProjectConfigs1_1.0.0-SNAPSHOT.car"),
+            new File("test-resources/carbonapps/TestProjectConfigs2_1.0.0-SNAPSHOT.car"),
+            new File("test-resources/carbonapps/TestProjectCompositeExporter1_1.0.0-SNAPSHOT.car")
+        };
+
+        File[] orderedFiles = Utils.getCAppProcessingOrder(testCarFiles);
+        assertNotNull(orderedFiles);
+        assertEquals(3, orderedFiles.length);
+        assertEquals("TestProjectConfigs1_1.0.0-SNAPSHOT.car", orderedFiles[0].getName());
+        assertEquals("TestProjectConfigs2_1.0.0-SNAPSHOT.car", orderedFiles[1].getName());
+        assertEquals("TestProjectCompositeExporter1_1.0.0-SNAPSHOT.car", orderedFiles[2].getName());
+    }
+
+    public void testGetRenamedCAppProcessingOrder() {
+        File[] testCarFiles = {
+            new File("test-resources/carbonapps/renamed/00.car"),
+            new File("test-resources/carbonapps/renamed/01.car"),
+            new File("test-resources/carbonapps/renamed/02.car")
+        };
+
+        File[] orderedFiles = Utils.getCAppProcessingOrder(testCarFiles);
+        assertNotNull(orderedFiles);
+        assertEquals(3, orderedFiles.length);
+        assertEquals("01.car", orderedFiles[0].getName());
+        assertEquals("02.car", orderedFiles[1].getName());
+        assertEquals("00.car", orderedFiles[2].getName());
+    }
+
+    public void testGetWithOutDescriptorCAppProcessingOrder() {
+        File[] testCarFiles = new File("test-resources/carbonapps/without-descriptor")
+            .listFiles((dir, name) -> name.endsWith(".car"));
+        File[] orderedFiles = Utils.getCAppProcessingOrder(testCarFiles);
+        assertNotNull(orderedFiles);
+        assertEquals(5, orderedFiles.length);
+        assertEquals("TestProjectCompositeExporter1_1.0.0-SNAPSHOT.car", orderedFiles[0].getName());
+        assertEquals("TestProjectConfigs1_1.0.0-SNAPSHOT.car", orderedFiles[1].getName());
+        assertEquals("TestProjectConfigs2_1.0.0-SNAPSHOT.car", orderedFiles[2].getName());
+        assertEquals("TestProjectConnectorExporter1_1.0.0-SNAPSHOT.car", orderedFiles[3].getName());
+        assertEquals("TestProjectRegistryResources1_1.0.0-SNAPSHOT.car", orderedFiles[4].getName());
+    }
+
+    public void testGetWithAndWithoutDescriptorCAppProcessingOrder() {
+        File[] testCarFiles = {
+            new File("test-resources/carbonapps/with-descriptor/TestProjectCompositeExporter1_1.0.0-SNAPSHOT.car"),
+            new File("test-resources/carbonapps/with-descriptor/TestProjectConfigs1_1.0.0-SNAPSHOT.car"),
+            new File("test-resources/carbonapps/with-descriptor/TestProjectConfigs2_1.0.0-SNAPSHOT.car"),
+            new File("test-resources/carbonapps/without-descriptor/TestProjectRegistryResources1_1.0.0-SNAPSHOT.car"),
+            new File("test-resources/carbonapps/without-descriptor/TestProjectConnectorExporter1_1.0.0-SNAPSHOT.car")
+        };
+
+        File[] orderedFiles = Utils.getCAppProcessingOrder(testCarFiles);
+        assertNotNull(orderedFiles);
+        assertEquals(5, orderedFiles.length);
+        assertEquals("TestProjectConfigs1_1.0.0-SNAPSHOT.car", orderedFiles[0].getName());
+        assertEquals("TestProjectConfigs2_1.0.0-SNAPSHOT.car", orderedFiles[1].getName());
+        assertEquals("TestProjectRegistryResources1_1.0.0-SNAPSHOT.car", orderedFiles[2].getName());
+        assertEquals("TestProjectConnectorExporter1_1.0.0-SNAPSHOT.car", orderedFiles[3].getName());
+        assertEquals("TestProjectCompositeExporter1_1.0.0-SNAPSHOT.car", orderedFiles[4].getName());
+    }
+
+    public void testGetCyclicCAppProcessingOrder() {
+        File[] testCarFiles = new File("test-resources/carbonapps/cyclic").listFiles((dir, name) -> name.endsWith(".car"));
+
+        try {
+            Utils.getCAppProcessingOrder(testCarFiles);
+            fail("Expected IllegalArgumentException due to cyclic dependency");
+        } catch (IllegalArgumentException e) {
+            assertEquals("Cycle detected in the dependency graph", e.getMessage());
+        }
     }
 
     public void testComplexDependencyGraphProcessingOrder() {
@@ -190,7 +283,7 @@ public class UtilsTest extends TestCase {
         try {
             Utils.getCAppProcessingOrder(testCarFiles);
         } catch (IllegalArgumentException e) {
-            assertEquals("No cAppFile found for fileName: TestProjectConfigs2_1.0.0-SNAPSHOT.car", e.getMessage());
+            assertEquals("No cAppFile found for file identifier: com.example_TestProjectConfigs2_1.0.0-SNAPSHOT", e.getMessage());
         }
     }
 
