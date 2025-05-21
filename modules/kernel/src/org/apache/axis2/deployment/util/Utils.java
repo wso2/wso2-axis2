@@ -73,6 +73,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
@@ -2336,17 +2337,19 @@ public class Utils {
             throw new FileNotFoundException("CApp file not found: " + cAppFilePath);
         }
 
-        ZipFile zip = new ZipFile(cappFile);
-        ZipEntry entry = zip.getEntry("descriptor.xml");
-        if (entry != null) {
-            InputStream stream = zip.getInputStream(entry);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-            StringBuilder content = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                content.append(line).append("\n");
+        try (ZipFile zip = new ZipFile(cappFile)) {
+            ZipEntry entry = zip.getEntry("descriptor.xml");
+            if (entry != null) {
+                try (InputStream stream = zip.getInputStream(entry)) {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
+                    StringBuilder content = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        content.append(line).append("\n");
+                    }
+                    return content.toString();
+                }
             }
-            return content.toString();
         }
         return null;
     }
