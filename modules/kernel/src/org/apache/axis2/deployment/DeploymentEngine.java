@@ -76,6 +76,7 @@ public abstract class DeploymentEngine implements DeploymentConstants {
     public static final String  DEPLOYMENT_TASK_RUNNING = "deployment.task.running";
 
     private static final String MODULE_DEPLOYER = "moduleDeployer";
+    private static final String CARBON_APPS_DIR = "carbonapps";
 
     //to keep the web resource location if any
     protected static String webLocationString = null;
@@ -844,11 +845,16 @@ public abstract class DeploymentEngine implements DeploymentConstants {
                 }
             }
             //sort artifacts belonging to each category, within the list itself.
-            Collections.sort(wsToDeploy.subList(startIndex, artifactsCount), new Comparator<DeploymentFileData>() {
-                public int compare(DeploymentFileData deploymentFileData1, DeploymentFileData deploymentFileData2) {
-                    return deploymentFileData1.getFile().getName().compareTo(deploymentFileData2.getFile().getName());
-                }
-            });
+            if (tempFilePathWithoutFileName.endsWith(CARBON_APPS_DIR)) {
+                // Skip sorting and keep the incoming order as it is
+                continue;
+            } else {
+                Collections.sort(wsToDeploy.subList(startIndex, artifactsCount), new Comparator<DeploymentFileData>() {
+                    public int compare(DeploymentFileData deploymentFileData1, DeploymentFileData deploymentFileData2) {
+                        return deploymentFileData1.getFile().getName().compareTo(deploymentFileData2.getFile().getName());
+                    }
+                });
+            }
         }
     }
 
