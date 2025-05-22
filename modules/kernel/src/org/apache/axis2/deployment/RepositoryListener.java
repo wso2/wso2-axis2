@@ -297,9 +297,9 @@ public class RepositoryListener implements DeploymentConstants {
                     wsInfoList.setServiceUnDeploymentAllowed(false);
                 } else {
                     wsInfoList.setServiceUnDeploymentAllowed(true);
-                    if (extension.equals("car")) {
+                    if (extension.equals(CAR_TYPE)) {
                         File[] cAppFiles = Arrays.stream(files)
-                                .filter(file -> file.getName().endsWith(".car"))
+                                .filter(file -> file.getName().endsWith(CAR_EXTENSION))
                                 .toArray(File[]::new);
                         files = Utils.getCAppProcessingOrder(cAppFiles);
                     }

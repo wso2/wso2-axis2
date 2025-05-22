@@ -165,4 +165,7 @@ public interface DeploymentConstants {
     
     String TAG_POLICY_ATTACHMENT = "PolicyAttachment";
     String TAG_APPLIES_TO = "AppliesTo";
+
+    String CAR_EXTENSION = ".car";
+    String CAR_TYPE = "car";
 }
