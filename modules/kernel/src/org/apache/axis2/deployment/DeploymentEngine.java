@@ -843,12 +843,18 @@ public abstract class DeploymentEngine implements DeploymentConstants {
                     break;
                 }
             }
-            //sort artifacts belonging to each category, within the list itself.
-            Collections.sort(wsToDeploy.subList(startIndex, artifactsCount), new Comparator<DeploymentFileData>() {
-                public int compare(DeploymentFileData deploymentFileData1, DeploymentFileData deploymentFileData2) {
-                    return deploymentFileData1.getFile().getName().compareTo(deploymentFileData2.getFile().getName());
-                }
-            });
+            //sort the artifacts in the category
+            Deployer tempDeployer = tempDeployableArtifact.getDeployer();
+            if (tempDeployer != null) {
+                tempDeployer.sort(wsToDeploy, startIndex, artifactsCount);
+            } else {
+                //sort artifacts belonging to each category, within the list itself.
+                Collections.sort(wsToDeploy.subList(startIndex, artifactsCount), new Comparator<DeploymentFileData>() {
+                    public int compare(DeploymentFileData deploymentFileData1, DeploymentFileData deploymentFileData2) {
+                        return deploymentFileData1.getFile().getName().compareTo(deploymentFileData2.getFile().getName());
+                    }
+                });
+            }
         }
     }
 

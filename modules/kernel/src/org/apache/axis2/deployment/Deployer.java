@@ -22,6 +22,12 @@ package org.apache.axis2.deployment;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.deployment.repository.util.DeploymentFileData;
 
+import java.io.File;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 /**
  * This interface is used to provide the custom deployment mechanism , where you
  * can write your own Deployer to process a particular type and make that to
@@ -66,4 +72,28 @@ public interface Deployer {
      * @throws DeploymentException If an error occurs during cleanup
      */
     void cleanup() throws DeploymentException;
+
+    /**
+     * Sorts a sublist of the given list of DeploymentFileData objects by file name in ascending order.
+     *
+     * @param filesToDeploy the list of DeploymentFileData
+     * @param startIndex the start index (inclusive) of the sublist to sort
+     * @param toIndex the end index (exclusive) of the sublist to sort
+     */
+    default void sort(List<DeploymentFileData> filesToDeploy, int startIndex, int toIndex) {
+        if (filesToDeploy == null || filesToDeploy.isEmpty()) {
+            return;
+        }
+        if (startIndex < 0 || toIndex > filesToDeploy.size() || startIndex >= toIndex) {
+            return;
+        }
+
+        List<DeploymentFileData> subList = filesToDeploy.subList(startIndex, toIndex);
+        Collections.sort(subList, new Comparator<DeploymentFileData>() {
+            @Override
+            public int compare(DeploymentFileData d1, DeploymentFileData d2) {
+                return d1.getFile().getName().compareTo(d2.getFile().getName());
+            }
+        });
+    }
 }
