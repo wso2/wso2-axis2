@@ -24,11 +24,11 @@
     <parent>
         <groupId>org.apache.axis2</groupId>
         <artifactId>axis2-parent</artifactId>
-        <version>1.6.1-wso2v104</version>
+        <version>1.6.1-wso2v105-SNAPSHOT</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
     <artifactId>axis2-json</artifactId>
-    <version>1.6.1-wso2v104</version>
+    <version>1.6.1-wso2v105-SNAPSHOT</version>
     <name>Apache Axis2 - JSON</name>
     <description>Axis2 JSON module</description>
     <dependencies>
@@ -174,7 +174,7 @@
     </build>
 
     <properties>
-        <version.axis2>1.6.1-wso2v104</version.axis2>
+        <version.axis2>1.6.1-wso2v105-SNAPSHOT</version.axis2>
     </properties>
 
 </project>
