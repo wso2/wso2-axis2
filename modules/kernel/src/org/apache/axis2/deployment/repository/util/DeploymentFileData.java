@@ -38,6 +38,9 @@ public class DeploymentFileData {
     private File file;
     private ClassLoader classLoader;
     private Deployer deployer;
+    private String groupId;
+    private String artifactId;
+    private String version;
 
     public DeploymentFileData(File file) {
         this.file = file;
@@ -46,6 +49,13 @@ public class DeploymentFileData {
     public DeploymentFileData(File file, Deployer deployer) {
         this(file);
         this.deployer = deployer;
+    }
+
+    public DeploymentFileData(File file, Deployer deployer, String groupId, String artifactId, String version) {
+        this(file, deployer);
+        this.groupId = groupId;
+        this.artifactId = artifactId;
+        this.version = version;
     }
 
     public String getAbsolutePath() {
@@ -134,5 +144,20 @@ public class DeploymentFileData {
 
     public void deploy() throws DeploymentException {
         deployer.deploy(this);
+    }
+
+    public String getGroupId() {
+
+        return groupId;
+    }
+
+    public String getArtifactId() {
+
+        return artifactId;
+    }
+
+    public String getVersion() {
+
+        return version;
     }
 }
