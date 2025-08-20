@@ -348,7 +348,7 @@ public abstract class AbstractHTTPSender {
             if(log.isDebugEnabled()){
                 log.debug("Configuring HTTP proxy.");
             }
-            HTTPProxyConfigurationUtil.configure(msgCtx, client, config);
+            HTTPProxyConfigurationUtil.configure(msgCtx, client, config, targetURL);
         }
 
         return config;
