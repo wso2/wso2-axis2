@@ -59,6 +59,16 @@ public class ClassReader extends ByteArrayInputStream {
     private static final int CONSTANT_Double = 6;
     private static final int CONSTANT_NameAndType = 12;
     private static final int CONSTANT_Utf8 = 1;
+
+    /*java 8 9 10 11 new tokens https://docs.oracle.com/javase/specs/jvms/se11/html/jvms-4.html*/
+    private static final int CONSTANT_MethodHandle = 15;
+    private static final int CONSTANT_MethodType = 16;
+    private static final int CONSTANT_Dynamic = 17;
+    private static final int CONSTANT_InvokeDynamic	= 18;
+    private static final int CONSTANT_Module = 19;
+    private static final int CONSTANT_Package = 20;
+    /*end of ava 8 9 10 11 new tokens*/
+
     /**
      * the constant pool.  constant pool indices in the class file
      * directly index into this array.  The value stored in this array
@@ -348,10 +358,25 @@ public class ClassReader extends ByteArrayInputStream {
                     int len = readShort();
                     skipFully(len);
                     break;
-
+                case CONSTANT_MethodHandle:
+                    read(); // reference kind
+                    readShort(); // reference index
+                    break;
+                case CONSTANT_MethodType:
+                    readShort(); // descriptor index
+                    break;
+                case CONSTANT_Dynamic:
+                    readShort(); // bootstrap method attr index
+                    readShort(); // name and type index
+                    break;
+                case CONSTANT_InvokeDynamic:
+                    readShort(); // bootstrap method attr index
+                    readShort(); // name and type index
+                    break;
                 default:
                     // corrupt class file
-                    throw new IllegalStateException("Error looking for paramter names in bytecode: unexpected bytes in file");
+                    throw new IllegalStateException(
+                            "Error looking for parameter names in bytecode: unexpected bytes in file, tag:" + c);
             }
         }
     }
