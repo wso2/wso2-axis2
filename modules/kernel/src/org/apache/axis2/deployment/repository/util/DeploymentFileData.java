@@ -29,6 +29,7 @@ import org.apache.axis2.i18n.Messages;
 
 import java.io.File;
 import java.net.URL;
+import java.util.HashMap;
 
 /**
  * DeploymentFileData represents a "thing to deploy" in Axis2.  It consists of a file,
@@ -38,9 +39,8 @@ public class DeploymentFileData {
     private File file;
     private ClassLoader classLoader;
     private Deployer deployer;
-    private String groupId;
-    private String artifactId;
-    private String version;
+    private String artifactIdentifier;
+    private HashMap<String, String> cAppDependencies;
 
     public DeploymentFileData(File file) {
         this.file = file;
@@ -51,11 +51,10 @@ public class DeploymentFileData {
         this.deployer = deployer;
     }
 
-    public DeploymentFileData(File file, Deployer deployer, String groupId, String artifactId, String version) {
+    public DeploymentFileData(File file, Deployer deployer, String artifactIdentifier, HashMap<String, String> cAppDependencies) {
         this(file, deployer);
-        this.groupId = groupId;
-        this.artifactId = artifactId;
-        this.version = version;
+        this.artifactIdentifier = artifactIdentifier;
+        this.cAppDependencies = cAppDependencies;
     }
 
     public String getAbsolutePath() {
@@ -146,18 +145,18 @@ public class DeploymentFileData {
         deployer.deploy(this);
     }
 
-    public String getGroupId() {
+    public String getArtifactIdentifier() {
 
-        return groupId;
+        return artifactIdentifier;
     }
 
-    public String getArtifactId() {
+    public HashMap<String, String> getCAppDependencies() {
 
-        return artifactId;
+        return cAppDependencies;
     }
 
-    public String getVersion() {
+    public boolean isVersionedDeployment() {
 
-        return version;
+        return artifactIdentifier != null;
     }
 }
