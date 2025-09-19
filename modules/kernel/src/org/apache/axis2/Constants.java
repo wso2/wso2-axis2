@@ -341,6 +341,10 @@ public class Constants extends org.apache.axis2.namespace.Constants {
     public static final String DYNAMIC_PROPERTY_PLACEHOLDER_PREFIX = "${";
     public static final String PLACEHOLDER_SUFFIX = "}";
 
+    public static final String CAR_EXTENSION = ".car";
+    public static final String FAT_CAR_ENABLED = "fatCarEnabled";
+    public static final String DESCRIPTOR_XML = "descriptor.xml";
+
     public static interface Configuration {
         public static final String ENABLE_REST = "enableREST";
         public static final String ENABLE_HTTP_CONTENT_NEGOTIATION = "httpContentNegotiation";

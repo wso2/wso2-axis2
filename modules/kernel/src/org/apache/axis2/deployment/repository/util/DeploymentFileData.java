@@ -41,6 +41,7 @@ public class DeploymentFileData {
     private Deployer deployer;
     private String artifactIdentifier;
     private HashMap<String, String> cAppDependencies;
+    private boolean embeddedCAR = false;
 
     public DeploymentFileData(File file) {
         this.file = file;
@@ -158,5 +159,13 @@ public class DeploymentFileData {
     public boolean isVersionedDeployment() {
 
         return artifactIdentifier != null;
+    }
+
+    public boolean isEmbeddedCAR() {
+        return embeddedCAR;
+    }
+
+    public void setEmbeddedCAR(boolean embeddedCAR) {
+        this.embeddedCAR = embeddedCAR;
     }
 }

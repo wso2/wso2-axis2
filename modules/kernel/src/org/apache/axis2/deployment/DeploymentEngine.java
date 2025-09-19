@@ -837,7 +837,8 @@ public abstract class DeploymentEngine implements DeploymentConstants {
             for (ListIterator<Object> it = wsToDeploy.listIterator(startIndex); it.hasNext(); ) {
                 DeploymentFileData deployableArtifact = (DeploymentFileData) it.next();
                 String filePathWithoutFileName = deployableArtifact.getFile().getParent();
-                if (tempFilePathWithoutFileName.equals(filePathWithoutFileName)) {
+                if (tempFilePathWithoutFileName.equals(filePathWithoutFileName) || (deployableArtifact.isEmbeddedCAR() &&
+                        filePathWithoutFileName.startsWith(tempFilePathWithoutFileName))) {
                     artifactsCount++;
                 } else {
                     break;

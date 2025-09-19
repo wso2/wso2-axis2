@@ -51,12 +51,15 @@ import org.apache.axis2.util.JavaUtils;
 import org.apache.axis2.util.Loader;
 import org.apache.axis2.util.PolicyUtil;
 import org.apache.axis2.util.FaultyServiceData;
+import org.apache.axis2.util.XMLUtils;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.axis2.wsdl.WSDLUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.PolicyComponent;
 import org.apache.ws.commons.schema.utils.NamespaceMap;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.FactoryConfigurationError;
@@ -74,6 +77,7 @@ import java.security.PrivilegedExceptionAction;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 import static org.apache.axis2.Constants.DYNAMIC_PROPERTY_PLACEHOLDER_PREFIX;
@@ -2179,5 +2183,30 @@ public class Utils {
             }
         }
         return text;
+    }
+
+    public static boolean isFatCAR(String cAppFilePath) {
+
+        if (cAppFilePath == null || !cAppFilePath.endsWith(Constants.CAR_EXTENSION)) {
+            return false;
+        }
+        try {
+            File cappFile = new File(cAppFilePath);
+            try (ZipFile zip = new ZipFile(cappFile)) {
+                ZipEntry entry = zip.getEntry(Constants.DESCRIPTOR_XML);
+                if (entry != null) {
+                    try (InputStream stream = zip.getInputStream(entry)) {
+                        Document document = XMLUtils.newDocument(stream);
+                        NodeList isFatCARElements = document.getElementsByTagName(Constants.FAT_CAR_ENABLED);
+                        return isFatCARElements.getLength() > 0 &&
+                                Boolean.parseBoolean(isFatCARElements.item(0).getTextContent());
+                    }
+                }
+                return false;
+            }
+        } catch (Exception e) {
+            log.error("Error processing the CApp file: " + cAppFilePath, e);
+            return false;
+        }
     }
 }
