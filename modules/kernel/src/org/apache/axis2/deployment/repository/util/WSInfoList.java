@@ -182,8 +182,8 @@ public class WSInfoList implements DeploymentConstants {
             DeploymentFileData fileData = new DeploymentFileData(file, deployer);
             deploymentEngine.addWSToDeploy(fileData);
             if (Utils.isFatCAR(file.getPath())) {
-                log.info("A Fat CAR file has been detected : " + file.getName() +
-                        ". All dependent CAR files will be deployed.");
+                log.info("A Fat Carbon Application has been detected : " + file.getName() +
+                        ". All dependent Carbon Applications will be deployed.");
                 // Scan for nested CARs under dependencies/
                 try (ZipFile zipFile = new ZipFile(file)) {
                     zipFile.stream()
@@ -197,6 +197,7 @@ public class WSInfoList implements DeploymentConstants {
                                 DeploymentFileData dependencyDeploymentFileData = new DeploymentFileData(dependencyFile, deployer);
                                 dependencyDeploymentFileData.setEmbeddedCAR(true);
                                 deploymentEngine.addWSToDeploy(dependencyDeploymentFileData);
+                                deploymentEngine.addParentCAppToDependency(dependencyFile.getName(), file.getName());
                             });
                 } catch (IOException exception) {
                     log.error("Error while processing Fat CAR file : " + file.getName(), exception);

@@ -2185,6 +2185,12 @@ public class Utils {
         return text;
     }
 
+    /**
+     * This method checks whether a given CApp file is a fat CApp or not by reading the descriptor.
+     *
+     * @param cAppFilePath CApp file path
+     * @return true if the CApp is a fat CApp, false otherwise
+     */
     public static boolean isFatCAR(String cAppFilePath) {
 
         if (cAppFilePath == null || !cAppFilePath.endsWith(Constants.CAR_EXTENSION)) {
