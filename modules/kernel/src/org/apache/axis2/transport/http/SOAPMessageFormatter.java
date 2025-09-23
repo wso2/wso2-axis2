@@ -48,6 +48,7 @@ import java.util.Map;
 public class SOAPMessageFormatter implements MessageFormatter {
 
     private static final Log log = LogFactory.getLog(SOAPMessageFormatter.class);
+    private static final String WRITE_XML_DECLARATION = "WRITE_XML_DECLARATION";
     
     public void writeTo(MessageContext msgCtxt, OMOutputFormat format,
                         OutputStream out, boolean preserve) throws AxisFault {
@@ -56,6 +57,10 @@ public class SOAPMessageFormatter implements MessageFormatter {
             log.debug("  preserve=" + preserve);
             log.debug("  isOptimized=" + format.isOptimized());
             log.debug("  isDoingSWA=" + format.isDoingSWA());
+        }
+        String writeXmlDeclaration = (String) msgCtxt.getProperty(WRITE_XML_DECLARATION);
+        if ("false".equalsIgnoreCase(writeXmlDeclaration)) {
+            format.setIgnoreXMLDeclaration(true);
         }
         
         if (msgCtxt.isDoingMTOM()) {        	
