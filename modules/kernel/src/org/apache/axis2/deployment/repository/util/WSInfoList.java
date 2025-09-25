@@ -20,18 +20,23 @@
 
 package org.apache.axis2.deployment.repository.util;
 
+import org.apache.axis2.Constants;
 import org.apache.axis2.deployment.Deployer;
 import org.apache.axis2.deployment.DeploymentConstants;
 import org.apache.axis2.deployment.DeploymentEngine;
+import org.apache.axis2.deployment.util.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.zip.ZipFile;
 
 public class WSInfoList implements DeploymentConstants {
 
@@ -176,6 +181,28 @@ public class WSInfoList implements DeploymentConstants {
             currentJars.put(file.getAbsolutePath(), info);
             DeploymentFileData fileData = new DeploymentFileData(file, deployer);
             deploymentEngine.addWSToDeploy(fileData);
+            if (Utils.isFatCAR(file.getPath())) {
+                log.info("A Fat Carbon Application has been detected : " + file.getName() +
+                        ". All dependent Carbon Applications will be deployed.");
+                // Scan for nested CARs under dependencies/
+                try (ZipFile zipFile = new ZipFile(file)) {
+                    zipFile.stream()
+                            .filter(entry -> !entry.isDirectory())
+                            .filter(entry -> entry.getName().startsWith("dependencies/"))
+                            .filter(entry -> entry.getName().toLowerCase(Locale.ROOT).endsWith(Constants.CAR_EXTENSION))
+                            .forEach(entry -> {
+                                File dependencyFile = new File(file.getPath(), entry.getName());
+                                WSInfo dependencyInfo = new WSInfo(dependencyFile.getAbsolutePath(), dependencyFile.lastModified(), deployer ,type);
+                                currentJars.put(dependencyFile.getAbsolutePath(), dependencyInfo);
+                                DeploymentFileData dependencyDeploymentFileData = new DeploymentFileData(dependencyFile, deployer);
+                                dependencyDeploymentFileData.setEmbeddedCAR(true);
+                                deploymentEngine.addWSToDeploy(dependencyDeploymentFileData);
+                                deploymentEngine.addParentCAppToDependency(dependencyFile.getName(), file.getName());
+                            });
+                } catch (IOException exception) {
+                    log.error("Error while processing Fat CAR file : " + file.getName(), exception);
+                }
+            }
         }
         return info;
     }

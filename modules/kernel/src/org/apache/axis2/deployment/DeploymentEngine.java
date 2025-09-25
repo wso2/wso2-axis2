@@ -130,6 +130,7 @@ public abstract class DeploymentEngine implements DeploymentConstants {
     protected ModuleDeployer moduleDeployer;
 
     private Map<String, Map<String, Deployer>> deployerMap = new ConcurrentHashMap<String, Map<String, Deployer>>();
+    private Map<String, List<String>> cAppDependencyMap = new HashMap<>();
 
     public void loadServices() {
         repoListener.checkServices();
@@ -800,6 +801,7 @@ public abstract class DeploymentEngine implements DeploymentConstants {
     public synchronized void doDeploy() {
         try {
             if (wsToDeploy.size() > 0) {
+                removeDuplicateDependentCARs();
                 sortWSToDeploy();
                 for (Object aWsToDeploy : wsToDeploy) {
                     DeploymentFileData fileToDeploy = (DeploymentFileData) aWsToDeploy;
@@ -813,6 +815,38 @@ public abstract class DeploymentEngine implements DeploymentConstants {
             }
         } finally {
             wsToDeploy.clear();
+        }
+    }
+
+    /**
+     * Check for duplicate dependent CAPPs and remove them from the deployment list.
+     */
+    private void removeDuplicateDependentCARs() {
+
+        for (Map.Entry<String, List<String>> e : cAppDependencyMap.entrySet()) {
+            final String dependency = e.getKey();
+            final List<String> parentCApps = e.getValue();
+            if (parentCApps == null || parentCApps.size() <= 1) {
+                continue;
+            }
+            log.warn("Duplicate embedded dependency " + dependency + " detected in " + parentCApps);
+
+            final List<DeploymentFileData> toRemove = new ArrayList<>();
+            for (Object obj : wsToDeploy) {
+                DeploymentFileData fileData = (DeploymentFileData) obj;
+                String name = fileData.getName();
+
+                if (dependency.equals(name)) {
+                    log.warn("Removing embedded dependency " + name
+                            + " from deployment list. Required by " + parentCApps);
+                    toRemove.add(fileData);
+                } else if (parentCApps.contains(name)) {
+                    log.warn("Removing parent Carbon Application " + name
+                            + " from deployment list since it contains duplicate dependency " + dependency);
+                    toRemove.add(fileData);
+                }
+            }
+            wsToDeploy.removeAll(toRemove);
         }
     }
 
@@ -837,7 +871,8 @@ public abstract class DeploymentEngine implements DeploymentConstants {
             for (ListIterator<Object> it = wsToDeploy.listIterator(startIndex); it.hasNext(); ) {
                 DeploymentFileData deployableArtifact = (DeploymentFileData) it.next();
                 String filePathWithoutFileName = deployableArtifact.getFile().getParent();
-                if (tempFilePathWithoutFileName.equals(filePathWithoutFileName)) {
+                if (tempFilePathWithoutFileName.equals(filePathWithoutFileName) || (deployableArtifact.isEmbeddedCAR() &&
+                        filePathWithoutFileName.startsWith(tempFilePathWithoutFileName))) {
                     artifactsCount++;
                 } else {
                     break;
@@ -1510,5 +1545,18 @@ public abstract class DeploymentEngine implements DeploymentConstants {
             }
         }
 
+    }
+
+    /**
+     * Map of dependency CApp to parent CApps.
+     *
+     * @param dependencyCApp The name of the dependency CApp
+     * @param parentCApp     The name of the parent CApp
+     */
+    public synchronized void addParentCAppToDependency(String dependencyCApp, String parentCApp) {
+
+        List<String> parentCApps = cAppDependencyMap.getOrDefault(dependencyCApp, new ArrayList<>());
+        parentCApps.add(parentCApp);
+        cAppDependencyMap.put(dependencyCApp, parentCApps);
     }
 }

@@ -29,6 +29,7 @@ import org.apache.axis2.i18n.Messages;
 
 import java.io.File;
 import java.net.URL;
+import java.util.HashMap;
 
 /**
  * DeploymentFileData represents a "thing to deploy" in Axis2.  It consists of a file,
@@ -38,6 +39,9 @@ public class DeploymentFileData {
     private File file;
     private ClassLoader classLoader;
     private Deployer deployer;
+    private String artifactIdentifier;
+    private HashMap<String, String> cAppDependencies;
+    private boolean embeddedCAR = false;
 
     public DeploymentFileData(File file) {
         this.file = file;
@@ -46,6 +50,12 @@ public class DeploymentFileData {
     public DeploymentFileData(File file, Deployer deployer) {
         this(file);
         this.deployer = deployer;
+    }
+
+    public DeploymentFileData(File file, Deployer deployer, String artifactIdentifier, HashMap<String, String> cAppDependencies) {
+        this(file, deployer);
+        this.artifactIdentifier = artifactIdentifier;
+        this.cAppDependencies = cAppDependencies;
     }
 
     public String getAbsolutePath() {
@@ -134,5 +144,28 @@ public class DeploymentFileData {
 
     public void deploy() throws DeploymentException {
         deployer.deploy(this);
+    }
+
+    public String getArtifactIdentifier() {
+
+        return artifactIdentifier;
+    }
+
+    public HashMap<String, String> getCAppDependencies() {
+
+        return cAppDependencies;
+    }
+
+    public boolean isVersionedDeployment() {
+
+        return artifactIdentifier != null;
+    }
+
+    public boolean isEmbeddedCAR() {
+        return embeddedCAR;
+    }
+
+    public void setEmbeddedCAR(boolean embeddedCAR) {
+        this.embeddedCAR = embeddedCAR;
     }
 }
