@@ -18,6 +18,9 @@
 
 package org.apache.axis2.util;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -27,6 +30,7 @@ import java.util.TimerTask;
  */
 public class GracefulShutdownTimer extends TimerTask {
 
+    private static final Log log = LogFactory.getLog(GracefulShutdownTimer.class);
     private long shutdownTimeoutMillis;
     private long startTime;
     private volatile boolean expired = false;
@@ -63,7 +67,12 @@ public class GracefulShutdownTimer extends TimerTask {
      * @param shutdownTimeoutMillis the timeout in milliseconds before shutdown is considered expired
      */
     public void start(long shutdownTimeoutMillis) {
+        if (started) {
+            log.warn("Graceful shutdown timer is already started.");
+            return;
+        }
         this.startTime = System.currentTimeMillis();
+        this.shutdownTimeoutMillis = shutdownTimeoutMillis;
         Timer timer = new Timer(GRACEFUL_SHUTDOWN_TIMEOUT_THREAD_NAME, true);
         timer.schedule(this, shutdownTimeoutMillis);
         started = true;
@@ -75,7 +84,6 @@ public class GracefulShutdownTimer extends TimerTask {
      * @return true if started, false otherwise
      */
     public boolean isStarted() {
-
         return started;
     }
 
@@ -88,13 +96,7 @@ public class GracefulShutdownTimer extends TimerTask {
         return expired;
     }
 
-    public void setShutdownTimeoutMillis(long shutdownTimeoutMillis) {
-
-        this.shutdownTimeoutMillis = shutdownTimeoutMillis;
-    }
-
     public long getShutdownTimeoutMillis() {
-
         return shutdownTimeoutMillis;
     }
 
@@ -105,7 +107,7 @@ public class GracefulShutdownTimer extends TimerTask {
      * @return remaining time in milliseconds, or 0 if expired
      */
     public long getRemainingTimeMillis() {
-        if (expired) {
+        if (expired || !started) {
             return 0;
         }
         long elapsed = System.currentTimeMillis() - startTime;
