@@ -24,7 +24,7 @@
     <parent>
         <groupId>org.apache.axis2</groupId>
         <artifactId>axis2-parent</artifactId>
-        <version>1.6.1-wso2v112-SNAPSHOT</version>
+        <version>1.6.1-wso2v112</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <artifactId>axis2-ant-plugin</artifactId>
@@ -34,7 +34,7 @@
         <connection>scm:svn:http://svn.apache.org/repos/asf/axis/axis2/java/core/branches/1_6/modules/tool/axis2-ant-plugin</connection>
         <developerConnection>scm:svn:https://svn.apache.org/repos/asf/axis/axis2/java/core/branches/1_6/modules/tool/axis2-ant-plugin</developerConnection>
         <url>http://svn.apache.org/viewvc/axis/axis2/java/core/branches/1_6/modules/tool/axis2-ant-plugin</url>
-      <tag>HEAD</tag>
+      <tag>v1.6.1-wso2v112</tag>
   </scm>
     <dependencies>
         <dependency>
