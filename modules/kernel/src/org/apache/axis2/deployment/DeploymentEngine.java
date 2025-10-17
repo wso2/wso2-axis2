@@ -983,6 +983,8 @@ public abstract class DeploymentEngine implements DeploymentConstants {
                             deployer.undeploy(wsInfo.getFileName());
                         }
                     }
+                    String wsName = new File(wsInfo.getFileName()).getName();
+                    removeParentCAppFromDependency(wsName);
                 }
             }
         } catch (Exception e) {
@@ -1558,5 +1560,18 @@ public abstract class DeploymentEngine implements DeploymentConstants {
         List<String> parentCApps = cAppDependencyMap.getOrDefault(dependencyCApp, new ArrayList<>());
         parentCApps.add(parentCApp);
         cAppDependencyMap.put(dependencyCApp, parentCApps);
+    }
+
+    public synchronized void removeParentCAppFromDependency(String parentCApp) {
+
+        Iterator<Map.Entry<String, List<String>>> iterator = cAppDependencyMap.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, List<String>> e = iterator.next();
+            List<String> parentCApps = e.getValue();
+            parentCApps.remove(parentCApp);
+            if (parentCApps.isEmpty()) {
+                iterator.remove();
+            }
+        }
     }
 }
