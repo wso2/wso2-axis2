@@ -89,6 +89,9 @@ public class WSInfoList implements DeploymentConstants {
                 deploymentEngine.addWSToUndeploy(wsInfo);           // add entry to undeploy list
                 DeploymentFileData deploymentFileData = new DeploymentFileData(file, deployer);
                 deploymentEngine.addWSToDeploy(deploymentFileData);    // add entry to deploylist
+                if (Utils.isFatCAR(file.getPath())) {
+                    addDependentCARsToDeploymentList(file, deployer, type);
+                }
             }
         } else {
             info = getFileItem(file, deployer, type);
@@ -182,29 +185,34 @@ public class WSInfoList implements DeploymentConstants {
             DeploymentFileData fileData = new DeploymentFileData(file, deployer);
             deploymentEngine.addWSToDeploy(fileData);
             if (Utils.isFatCAR(file.getPath())) {
-                log.info("A Fat Carbon Application has been detected : " + file.getName() +
-                        ". All dependent Carbon Applications will be deployed.");
-                // Scan for nested CARs under dependencies/
-                try (ZipFile zipFile = new ZipFile(file)) {
-                    zipFile.stream()
-                            .filter(entry -> !entry.isDirectory())
-                            .filter(entry -> entry.getName().startsWith("dependencies/"))
-                            .filter(entry -> entry.getName().toLowerCase(Locale.ROOT).endsWith(Constants.CAR_EXTENSION))
-                            .forEach(entry -> {
-                                File dependencyFile = new File(file.getPath(), entry.getName());
-                                WSInfo dependencyInfo = new WSInfo(dependencyFile.getAbsolutePath(), dependencyFile.lastModified(), deployer ,type);
-                                currentJars.put(dependencyFile.getAbsolutePath(), dependencyInfo);
-                                DeploymentFileData dependencyDeploymentFileData = new DeploymentFileData(dependencyFile, deployer);
-                                dependencyDeploymentFileData.setEmbeddedCAR(true);
-                                deploymentEngine.addWSToDeploy(dependencyDeploymentFileData);
-                                deploymentEngine.addParentCAppToDependency(dependencyFile.getName(), file.getName());
-                            });
-                } catch (IOException exception) {
-                    log.error("Error while processing Fat CAR file : " + file.getName(), exception);
-                }
+                addDependentCARsToDeploymentList(file, deployer, type);
             }
         }
         return info;
+    }
+
+    private void addDependentCARsToDeploymentList(File parentCAR, Deployer deployer, int type) {
+
+        log.info("A Fat Carbon Application has been detected : " + parentCAR.getName() +
+                ". All dependent Carbon Applications will be deployed.");
+        // Scan for nested CARs under dependencies/
+        try (ZipFile zipFile = new ZipFile(parentCAR)) {
+            zipFile.stream()
+                    .filter(entry -> !entry.isDirectory())
+                    .filter(entry -> entry.getName().startsWith("dependencies/"))
+                    .filter(entry -> entry.getName().toLowerCase(Locale.ROOT).endsWith(Constants.CAR_EXTENSION))
+                    .forEach(entry -> {
+                        File dependencyFile = new File(parentCAR.getPath(), entry.getName());
+                        WSInfo dependencyInfo = new WSInfo(dependencyFile.getAbsolutePath(), dependencyFile.lastModified(), deployer, type);
+                        currentJars.put(dependencyFile.getAbsolutePath(), dependencyInfo);
+                        DeploymentFileData dependencyDeploymentFileData = new DeploymentFileData(dependencyFile, deployer);
+                        dependencyDeploymentFileData.setEmbeddedCAR(true);
+                        deploymentEngine.addWSToDeploy(dependencyDeploymentFileData);
+                        deploymentEngine.addParentCAppToDependency(dependencyFile.getName(), parentCAR.getName());
+                    });
+        } catch (IOException exception) {
+            log.error("Error while processing Fat CAR file : " + parentCAR.getName(), exception);
+        }
     }
 
     /**
