@@ -986,7 +986,12 @@ public class ConverterUtil {
             }
             calendar.set(Calendar.MILLISECOND, (int)miliSecond);
             calendar.set(Calendar.ZONE_OFFSET, timeZoneOffSet);
-            calendar.set(Calendar.DST_OFFSET, 0);
+            // set the day light offset only if the time zone is present along with the system property 'dss.applyLegacyDSTOffset'
+            // to maintain backward compatibility
+            boolean applyLegacyRule = Boolean.parseBoolean(System.getProperty("dss.applyLegacyDSTOffset", "false"));
+            if (!applyLegacyRule || source.length() > 19) {
+                calendar.set(Calendar.DST_OFFSET, 0);
+            }
         } else {
             throw new NumberFormatException("date string can not be less than 19 characters");
         }
