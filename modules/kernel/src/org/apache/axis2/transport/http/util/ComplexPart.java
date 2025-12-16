@@ -108,11 +108,53 @@ public class ComplexPart extends PartBase {
     /**
      * Constructor.
      *
+     * @param name    The name of the part
+     * @param value   the string to post
+     * @param disableSendingMultipartPartCharset whether to send the charset in the Content-Type header
+     * @param charset the charset to be used to encode the string, if <code>null</code>
+     *                the {@link #DEFAULT_CHARSET default} is used
+     * @param contentType   the content type of the part
+     */
+    public ComplexPart(String name, String value, boolean disableSendingMultipartPartCharset,
+                       String charset, String contentType) {
+        this(name, value, charset, contentType);
+        super.disableSendingMultipartPartCharset = disableSendingMultipartPartCharset;
+    }
+
+
+    /**
+     * Constructor.
+     *
+     * @param name    The name of the part
+     * @param value   the string to post
+     * @param disableSendingMultipartPartCharset whether to send the charset in the Content-Type header
+     * @param charset the charset to be used to encode the string, if <code>null</code>
+     *                the {@link #DEFAULT_CHARSET default} is used
+     */
+    public ComplexPart(String name, String value, boolean disableSendingMultipartPartCharset, String charset) {
+        this(name, value, charset);
+        super.disableSendingMultipartPartCharset = disableSendingMultipartPartCharset;
+    }
+
+    /**
+     * Constructor.
+     *
      * @param name  The name of the part
      * @param value the string to post
      */
     public ComplexPart(String name, String value) {
         this(name, value, null);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param name  The name of the part
+     * @param value the string to post
+     * @param disableSendingMultipartPartCharset whether to send the charset in the Content-Type header
+     */
+    public ComplexPart(String name, String value, boolean disableSendingMultipartPartCharset) {
+        this(name, value, disableSendingMultipartPartCharset, null);
     }
 
     /**

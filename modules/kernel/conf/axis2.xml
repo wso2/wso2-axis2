@@ -96,6 +96,9 @@
     <!-- Following parameter will completely disable REST handling in Axis2-->
     <parameter name="disableREST" locked="false">false</parameter>
 
+    <!-- Configuration to disable sending charset parameter in multipart/related Content-Type header -->
+    <parameter name="disableSendingMultipartPartCharset" locked="false">true</parameter>
+
     <!-- Following parameter will suppress generation of SOAP 1.2 bindings in auto-generated WSDL files -->
     <parameter name="disableSOAP12" locked="true">false</parameter>
 
