@@ -511,5 +511,12 @@ public class Constants extends org.apache.axis2.namespace.Constants {
          * to the outgoing request
          */
         public static final String SET_CONTENT_TYPE_CHARACTER_ENCODING = "setCharacterEncoding";
+
+        /**
+         * This parameter prevents the charset from being added to the Content-Type header of individual parts in
+         * multipart data.
+         */
+        public static final String DISABLE_SENDING_MULTIPART_PART_CHARSET =
+                "disableSendingMultipartPartCharset";
     }
 }

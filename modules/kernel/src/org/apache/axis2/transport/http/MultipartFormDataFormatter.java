@@ -27,13 +27,15 @@ import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.builder.BuilderUtil;
 import org.apache.axis2.Constants;
+import org.apache.axis2.builder.BuilderUtil;
 import org.apache.axis2.builder.DiskFileDataSource;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.http.util.ComplexPart;
 import org.apache.axis2.transport.http.util.URLTemplatingUtil;
+import org.apache.axis2.util.JavaUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
@@ -250,6 +252,13 @@ public class MultipartFormDataFormatter implements MessageFormatter {
         String soapVersion = (String) messageContext.getProperty("soapVersion");
         if (dataOut != null) {
             Iterator<?> iter1 = dataOut.getChildElements();
+            Parameter disableSendingMultipartPartCharset =
+                    messageContext.getParameter(Constants.Configuration.DISABLE_SENDING_MULTIPART_PART_CHARSET);
+            boolean disableSendingMultipartPartCharsetValue = false;
+            if (disableSendingMultipartPartCharset != null) {
+                disableSendingMultipartPartCharsetValue =
+                        JavaUtils.isTrueExplicitly(disableSendingMultipartPartCharset.getValue());
+            }
             OMFactory omFactory = null;
             if (soapVersion != null) {
                 if (soapVersion.equals(Constants.SOAP_11)) {
@@ -275,16 +284,22 @@ public class MultipartFormDataFormatter implements MessageFormatter {
                                 DEFAULT_CONTENT_TYPE);
                         String charset = BuilderUtil.extractCharSetValue(contentType);
                         if (soapVersion.equals(Constants.SOAP_11)) {
-                            part = new ComplexPart(ele.getQName().getLocalPart(), omElement.toString(), charset,
-                                    "text/xml");
+                            part = new ComplexPart(ele.getQName().getLocalPart(), omElement.toString(),
+                                    disableSendingMultipartPartCharsetValue, charset, "text/xml");
                         } else if (soapVersion.equals(Constants.SOAP_12)) {
-                            part = new ComplexPart(ele.getQName().getLocalPart(), omElement.toString(), charset,
-                                    "application/soap+xml");
+                            part = new ComplexPart(ele.getQName().getLocalPart(), omElement.toString(),
+                                    disableSendingMultipartPartCharsetValue, charset, "application/soap+xml");
                         } else {
-                            part = new ComplexPart(ele.getQName().getLocalPart(), omElement.toString());
+                            part = new ComplexPart(ele.getQName().getLocalPart(), omElement.toString(),
+                                    disableSendingMultipartPartCharsetValue);
                         }
                     } else {
-                        part = new ComplexPart(ele.getQName().getLocalPart(), omElement.toString());
+                        part = new ComplexPart(ele.getQName().getLocalPart(), omElement.toString(),
+                                disableSendingMultipartPartCharsetValue);
+                    }
+                    if (disableSendingMultipartPartCharsetValue) {
+                        ((ComplexPart) part).setContentType(getAttributeValue(
+                                ele.getAttribute(CONTENT_TYPE_ATTRIBUTE_QNAME), ComplexPart.DEFAULT_CONTENT_TYPE));
                     }
                 } else if (FILE_FIELD_QNAME.equals(ele.getQName())) {
 
@@ -297,7 +312,11 @@ public class MultipartFormDataFormatter implements MessageFormatter {
 
                     part = new FilePart(fieldName,
                             new ByteArrayPartSource(filename, Base64.decodeBase64(ele.getText().getBytes())),
-                            contentType, charset);
+                            contentType, disableSendingMultipartPartCharsetValue, charset);
+                    if (disableSendingMultipartPartCharsetValue) {
+                        ((FilePart) part).setContentType(getAttributeValue(
+                                ele.getAttribute(CONTENT_TYPE_ATTRIBUTE_QNAME), FilePart.DEFAULT_CONTENT_TYPE));
+                    }
                 } else if ((ele.getAttribute(FILENAME_ATTRIBUTE_QNAME) != null)) {
                     String fieldName = getAttributeValue(ele.getAttribute(FILE_FIELD_NAME_ATTRIBUTE_QNAME),
                             ele.getLocalName());
@@ -320,10 +339,14 @@ public class MultipartFormDataFormatter implements MessageFormatter {
                     if (decodeMultipartData != null && decodeMultipartData) {
                         part = new FilePart(fieldName,
                                 new ByteArrayPartSource(filename, Base64.decodeBase64(ele.getText().getBytes())),
-                                contentType, charset);
+                                contentType, disableSendingMultipartPartCharsetValue, charset);
                     } else {
                         part = new FilePart(fieldName, new ByteArrayPartSource(filename, ele.getText().getBytes()),
-                                contentType, charset);
+                                contentType, disableSendingMultipartPartCharsetValue, charset);
+                    }
+                    if (disableSendingMultipartPartCharsetValue) {
+                        ((FilePart) part).setContentType(getAttributeValue(
+                                ele.getAttribute(CONTENT_TYPE_ATTRIBUTE_QNAME), FilePart.DEFAULT_CONTENT_TYPE));
                     }
                 } else {
                     // Gets the first child object
@@ -343,20 +366,24 @@ public class MultipartFormDataFormatter implements MessageFormatter {
                                 contentType = fileDataSource.getContentType();
                                 // Creates the FilePart
                                 part = new FilePart(ele.getQName().getLocalPart(),
-                                        new ByteArrayPartSource(fileName, ele.getText().getBytes()), contentType, null);
+                                        new ByteArrayPartSource(fileName, ele.getText().getBytes()), contentType,
+                                        disableSendingMultipartPartCharsetValue, null);
                             }
                         }
                     }
                     if (part == null) {
                         String charset = getCharSet(messageContext, ele);
                         if (ele.getQName().getPrefix() != null && !ele.getQName().getPrefix().isEmpty()) {
-                            part = new StringPart(ele.getQName().getPrefix() + ":" + ele.getQName().getLocalPart(),
-                                    ele.getText(), charset);
+                            part = new StringPart(ele.getQName().getPrefix() + ":" +
+                                    ele.getQName().getLocalPart(),
+                                    ele.getText(), disableSendingMultipartPartCharsetValue, charset);
                         } else {
-                            part = new StringPart(ele.getQName().getLocalPart(), ele.getText(), charset);
-                            if (ele.getAttributeValue(CONTENT_TYPE_ATTRIBUTE_QNAME) != null) {
-                                ((StringPart) part).setContentType(ele.getAttributeValue(CONTENT_TYPE_ATTRIBUTE_QNAME));
-                            }
+                            part = new StringPart(ele.getQName().getLocalPart(), ele.getText(),
+                                    disableSendingMultipartPartCharsetValue, charset);
+                        }
+                        if (disableSendingMultipartPartCharsetValue) {
+                            ((StringPart) part).setContentType(getAttributeValue(
+                                    ele.getAttribute(CONTENT_TYPE_ATTRIBUTE_QNAME), StringPart.DEFAULT_CONTENT_TYPE));
                         }
                     }
                 }
