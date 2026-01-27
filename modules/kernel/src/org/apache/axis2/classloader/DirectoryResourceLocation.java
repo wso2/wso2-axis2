@@ -52,8 +52,7 @@ public class DirectoryResourceLocation extends AbstractUrlResourceLocation {
     private boolean isLocal(File file) {
         try {
             String base = baseDir.getCanonicalPath();
-            String relative = file.getCanonicalPath();
-            return (relative.startsWith(base));
+            return (file.getCanonicalFile().toPath().startsWith(base));
         } catch (IOException e) {
             return false;
         }
