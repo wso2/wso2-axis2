@@ -30,6 +30,9 @@ import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.params.HttpClientParams;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,33 +40,28 @@ import java.net.URL;
 
 /**
  * Deploys an AAR to the Axis2 server.
- * 
- * @goal deployaar
- * @phase install
  */
+@Mojo(name = "deployaar", defaultPhase = LifecyclePhase.INSTALL)
 public class DeployAarMojo extends AbstractAarMojo {
 
     private final static String LOGIN_FAILED_ERROR_MESSAGE = "Invalid auth credentials!";
 
     /**
      * The URL of the Axis2 administration console.
-     *
-     * @parameter default-value="http://localhost:8080/axis2/axis2-admin" expression="${axis2.aar.axis2AdminConsoleURL}"
      */
+    @Parameter(property = "axis2.aar.axis2AdminConsoleURL", defaultValue = "http://localhost:8080/axis2/axis2-admin")
     private URL axis2AdminConsoleURL;
 
     /**
      * The administrator user name for the Axis2 administration console.
-     *
-     * @parameter expression="${axis2.aar.axis2AdminUser}"
      */
+    @Parameter(property = "axis2.aar.axis2AdminUser")
     private String axis2AdminUser;
 
     /**
      * The administrator password for the Axis2 administration console.
-     *
-     * @parameter expression="${axis2.aar.axis2AdminPassword}"
      */
+    @Parameter(property = "axis2.aar.axis2AdminPassword")
     private String axis2AdminPassword;
 
     /**

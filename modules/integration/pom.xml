@@ -155,57 +155,6 @@
         </dependency>
     </dependencies>
     <profiles>
-	<profile>
-            <id>java-1.7-and-1.8</id>
-            <activation>
-                <jdk>[1.7,1.9)</jdk>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <inherited>true</inherited>
-                        <configuration>
-                            <!-- The pertest forkMode is not ideal but seems to be necessary
-                       because the test server doesn't shut down properly :-(
-                       Should be removed if possible -->
-                            <forkMode>pertest</forkMode>
-                            <argLine>-Xms256m -Xmx512m</argLine>
-                            <!-- Enable the next 2 lines if you want to attach a debugger -->
-                            <!--<argLine>-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005</argLine>-->
-                            <includes>
-                                <include>**/*Test.java</include>
-                            </includes>
-                            <excludes>
-                                <exclude>**/*Abstract*.java</exclude>
-                                <exclude>**/*Util*.java</exclude>
-                                <exclude>**/*InteropStubTest.java</exclude>
-                                <exclude>**/*ServiceGroupContextTest.java</exclude>
-                                <exclude>**/*EchoRawSwAFileInputTest.java</exclude>
-                                <exclude>**org/apache/axis2/soap12testing/soap12testsuite/*.java</exclude>
-                                <exclude>**/ScenarioST1Test.java</exclude>
-                                <exclude>**/samples/wsdl/perf2/*.java</exclude>
-                                <exclude>**/ComplexDataTypesDocLitBareTest.java</exclude>
-                                <exclude>**/ComplexDataTypesTest.java</exclude>
-                            </excludes>
-                            <systemProperties>
-                                <property>
-                                    <name>build.repository</name>
-                                    <value>./target/test-classes</value>
-                                </property>
-                                <!-- Prevent Mac OS X from showing an icon in the dock during the test run -->
-                                <property>
-                                    <name>java.awt.headless</name>
-                                    <value>true</value>
-                                </property>
-                            </systemProperties>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-
         <profile>
             <id>enterprise</id>
             <build>
@@ -283,6 +232,36 @@
             </testResource>
         </testResources>
         <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <inherited>true</inherited>
+                <configuration>
+                    <!-- pertest forkMode is necessary because the test server
+                         doesn't shut down cleanly, leaving port 6060 occupied -->
+                    <forkMode>pertest</forkMode>
+                    <argLine>-Xms256m -Xmx512m</argLine>
+                    <includes>
+                        <include>**/*Test.java</include>
+                    </includes>
+                    <excludes>
+                        <exclude>**/*Abstract*.java</exclude>
+                        <exclude>**/*Util*.java</exclude>
+                        <exclude>**/*InteropStubTest.java</exclude>
+                        <exclude>**/*ServiceGroupContextTest.java</exclude>
+                        <exclude>**/*EchoRawSwAFileInputTest.java</exclude>
+                        <exclude>**org/apache/axis2/soap12testing/soap12testsuite/*.java</exclude>
+                        <exclude>**/ScenarioST1Test.java</exclude>
+                        <exclude>**/samples/wsdl/perf2/*.java</exclude>
+                        <exclude>**/ComplexDataTypesDocLitBareTest.java</exclude>
+                        <exclude>**/ComplexDataTypesTest.java</exclude>
+                    </excludes>
+                    <systemPropertyVariables>
+                        <org.apache.axis2.transport.http.server.fastShutdown>true</org.apache.axis2.transport.http.server.fastShutdown>
+                        <build.repository>./target/test-classes</build.repository>
+                        <java.awt.headless>true</java.awt.headless>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <inherited>true</inherited>

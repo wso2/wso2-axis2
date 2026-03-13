@@ -23,6 +23,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
@@ -41,75 +42,60 @@ public abstract class AbstractAarMojo
 
     /**
      * The projects base directory.
-     *
-     * @parameter expression="${project.basedir}"
-     * @required
-     * @readonly
      */
+    @Parameter(property = "project.basedir", required = true, readonly = true)
     protected File baseDir;
 
     /**
      * The maven project.
-     *
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
      */
+    @Parameter(property = "project", required = true, readonly = true)
     protected MavenProject project;
 
     /**
      * The directory containing generated classes.
-     *
-     * @parameter expression="${project.build.outputDirectory}"
-     * @required
      */
+    @Parameter(defaultValue = "${project.build.outputDirectory}", required = true)
     private File classesDirectory;
 
     /**
      * The directory where the aar is built.
-     *
-     * @parameter expression="${project.build.directory}/aar"
-     * @required
      */
+    @Parameter(defaultValue = "${project.build.directory}/aar", required = true)
     protected File aarDirectory;
 
     /**
      * The location of the services.xml file.  If it is present in the META-INF directory in
      * src/main/resources with that name then it will automatically be included. Otherwise this
      * parameter must be set.
-     *
-     * @parameter
      */
+    @Parameter
     private File servicesXmlFile;
 
     /**
      * The location of the WSDL file, if any. By default, no WSDL file is added and it is assumed,
      * that Axis 2 will automatically generate a WSDL file.
-     *
-     * @parameter
      */
+    @Parameter
     private File wsdlFile;
 
     /**
      * Name, to which the wsdl file shall be mapped. By default, the name will be computed from the
      * files path by removing the directory.
-     *
-     * @parameter default-value="service.wsdl"
      */
+    @Parameter(defaultValue = "service.wsdl")
     private String wsdlFileName;
 
     /**
      * Additional file sets, which are being added to the archive.
-     *
-     * @parameter
      */
+    @Parameter
     private FileSet[] fileSets;
 
     /**
      * Whether the dependency jars should be included in the aar
-     *
-     * @parameter expression="${includeDependencies}" default-value="true"
      */
+    @Parameter(property = "includeDependencies", defaultValue = "true")
     private boolean includeDependencies;
 
     /**

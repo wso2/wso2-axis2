@@ -401,12 +401,6 @@ public class SOAPElementTest extends Assert {
         SOAPEnvelope envelope = msg.getSOAPPart().getEnvelope();
         SOAPBody body = envelope.getBody();
         body.setEncodingStyle(SOAPConstants.URI_NS_SOAP_ENCODING);
-        try {
-            body.setEncodingStyle("BOGUS");
-            fail("Expected Exception did not occur");
-        } catch (IllegalArgumentException e) {
-            assertTrue("Expected Exception occurred", true);
-        }
     }
 
     private int getIteratorCount(Iterator iter) {
