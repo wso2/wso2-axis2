@@ -20,13 +20,13 @@
 package org.apache.axis2.maven2.aar;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 
 /**
  * Generates aar in the source directory
- *
- * @goal inplace
- * @requiresDependencyResolution runtime
  */
+@Mojo(name = "inplace", requiresDependencyResolution = ResolutionScope.RUNTIME)
 public class AarInPlaceMojo
         extends AbstractAarMojo {
 

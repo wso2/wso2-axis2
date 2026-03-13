@@ -68,7 +68,7 @@
     <properties>
         <neethi.version>2.0.4</neethi.version>
         <woden.version>1.0M9</woden.version>
-        <axiom.version>1.2.11-wso2v20</axiom.version>
+        <axiom.version>1.2.11-wso2v36</axiom.version>
         <xmlschema.version>1.4.7.wso2v6</xmlschema.version>
         <ant.version>1.7.0</ant.version>
         <antlr.version>2.7.7</antlr.version>
@@ -1128,7 +1128,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-plugin-plugin</artifactId>
-                    <version>2.6</version>
+                    <version>3.6.4</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-rar-plugin</artifactId>

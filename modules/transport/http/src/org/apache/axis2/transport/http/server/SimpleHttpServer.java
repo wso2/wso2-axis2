@@ -84,7 +84,10 @@ public class SimpleHttpServer {
         // Attempt to terminate the active processors nicely
         LOG.info("Shut down HTTP processors");
         this.requestExecutor.shutdownNow();
-        this.requestExecutor.awaitTermination(SHUTDOWN_GRACE_PERIOD, TimeUnit.MILLISECONDS);
+        if (!Boolean.parseBoolean(System.getProperty(
+                "org.apache.axis2.transport.http.server.fastShutdown", "false"))) {
+            this.requestExecutor.awaitTermination(SHUTDOWN_GRACE_PERIOD, TimeUnit.MILLISECONDS);
+        }
         if (!this.requestExecutor.isTerminated()) {
             // Terminate the active processors forcibly
             LOG.info("Force shut down HTTP processors");

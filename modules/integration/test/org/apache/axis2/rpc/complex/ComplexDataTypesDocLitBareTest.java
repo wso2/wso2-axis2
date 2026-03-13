@@ -77,7 +77,6 @@ public class ComplexDataTypesDocLitBareTest extends
                         + "/axis2/services/ComplexDataTypesDocLitBare");
         stub = new org.tempuri.complex.ComplexDataTypesDocLitBareStub(null, targetEPR.getAddress());
         String className = "org.tempuri.complex.ComplexDataTypesDocLitBare";
-        UtilServer.start();
         Parameter generateBare = new Parameter();
         generateBare.setName(Java2WSDLConstants.DOC_LIT_BARE_PARAMETER);
         generateBare.setValue("true");

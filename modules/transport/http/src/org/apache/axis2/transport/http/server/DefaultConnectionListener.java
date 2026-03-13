@@ -71,14 +71,15 @@ public class DefaultConnectionListener implements IOProcessor {
 
     public void run() {
         try {
-            while (!Thread.interrupted()) {
+            while (!Thread.interrupted() && !destroyed) {
                 try {
                     if (serversocket == null || serversocket.isClosed()) {
                         if (LOG.isInfoEnabled()) {
                             LOG.info("Listening on port " + port);
                         }
-                        serversocket = new ServerSocket(port);
+                        serversocket = new ServerSocket();
                         serversocket.setReuseAddress(true);
+                        serversocket.bind(new java.net.InetSocketAddress(port));
                     }
                     LOG.debug("Waiting for incoming HTTP connection");
                     Socket socket = this.serversocket.accept();
@@ -96,7 +97,7 @@ public class DefaultConnectionListener implements IOProcessor {
                 } catch(java.io.InterruptedIOException ie) {
                     break;
                 } catch (Throwable ex) {
-                    if (Thread.interrupted()) {
+                    if (Thread.interrupted() || destroyed) {
                         break;
                     }
                     if (!failureHandler.failed(this, ex)) {
