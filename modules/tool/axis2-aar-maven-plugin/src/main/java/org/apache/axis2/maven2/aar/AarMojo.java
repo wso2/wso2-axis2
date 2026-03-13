@@ -24,6 +24,11 @@ import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
@@ -34,60 +39,48 @@ import java.io.IOException;
 
 /**
  * Build a aar.
- *
- * @goal aar
- * @phase package
- * @requiresDependencyResolution runtime
  */
+@Mojo(name = "aar", defaultPhase = LifecyclePhase.PACKAGE, requiresDependencyResolution = ResolutionScope.RUNTIME)
 public class AarMojo extends AbstractAarMojo {
     /**
      * The directory for the generated aar.
-     *
-     * @parameter expression="${project.build.directory}"
-     * @required
      */
+    @Parameter(defaultValue = "${project.build.directory}", required = true)
     private String outputDirectory;
 
     /**
      * The name of the generated aar.
-     *
-     * @parameter expression="${project.build.finalName}"
-     * @required
      */
+    @Parameter(defaultValue = "${project.build.finalName}", required = true)
     private String aarName;
 
     /**
      * The Jar archiver.
-     *
-     * @component role="org.codehaus.plexus.archiver.Archiver" roleHint="jar"
-     * @required
      */
+    @Component(role = org.codehaus.plexus.archiver.Archiver.class, hint = "jar")
     private JarArchiver jarArchiver;
 
     /**
      * The maven archive configuration to use.
-     *
-     * @parameter
      */
+    @Parameter
     private MavenArchiveConfiguration archive = new MavenArchiveConfiguration();
 
     /**
      * Classifier to add to the artifact generated. If given, the artifact will be an attachment
      * instead.
-     *
-     * @parameter
      */
+    @Parameter
     private String classifier;
 
     /**
      * Whether this is the main artifact being built. Set to <code>false</code> if you don't want to
      * install or deploy it to the local repository instead of the default one in an execution.
-     *
-     * @parameter expression="${primaryArtifact}" default-value="true"
      */
+    @Parameter(property = "primaryArtifact", defaultValue = "true")
     private boolean primaryArtifact;
 
-    /** @component */
+    @Component
     private MavenProjectHelper projectHelper;
 
     /**

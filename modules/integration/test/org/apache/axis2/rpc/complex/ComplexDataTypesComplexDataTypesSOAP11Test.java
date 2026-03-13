@@ -84,7 +84,6 @@ public class ComplexDataTypesComplexDataTypesSOAP11Test extends UtilServerBasedT
 
     protected void setUp() throws Exception {
         String className = "org.tempuri.complex.ComplexDataTypes";
-        UtilServer.start();
         AxisService   service = AxisService.createService(
                 className, UtilServer.getConfigurationContext().getAxisConfiguration());
         service.setElementFormDefault(true);
