@@ -544,7 +544,7 @@
                         <Export-Package>
                             org.apache.axis2.*; version="${exp.pkg.version.axis2}";-split-package:=merge-last,
                             org.apache.ws.java2wsdl.*; version="${exp.pkg.version.axis2}",
-                            org.apache.xmlbeans.*; version=${xmlbeans.version},
+                            org.apache.xmlbeans.*; version=${xmlbeans.version};resolution:=optional,
                         </Export-Package>
                         <Import-Package>
                             !org.apache.axis2.*; version="${exp.pkg.version.axis2}",

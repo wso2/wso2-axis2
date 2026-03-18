@@ -189,7 +189,7 @@
                             org.apache.axis2.*; version="${project.version}",
                             org.apache.ws.java2wsdl.*; version="${project.version}",
                             javax.xml.ws.*; version=1.0.0,
-                            org.apache.xmlbeans.*; version=${xmlbeans.version},
+                            org.apache.xmlbeans.*; version=${xmlbeans.version};resolution:=optional,
                         </Export-Package>
                         <Import-Package>
                             !org.apache.axis2.*; version="${project.version}",
