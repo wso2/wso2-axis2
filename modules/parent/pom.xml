@@ -68,7 +68,7 @@
     <properties>
         <neethi.version>2.0.4</neethi.version>
         <woden.version>1.0M9</woden.version>
-        <axiom.version>1.2.11-wso2v20</axiom.version>
+        <axiom.version>1.2.11-wso2v36</axiom.version>
         <xmlschema.version>1.4.7.wso2v6</xmlschema.version>
         <ant.version>1.7.0</ant.version>
         <antlr.version>2.7.7</antlr.version>
@@ -119,6 +119,10 @@
         <commons.lang.version>2.3</commons.lang.version>
         <javax.mail.version>1.4</javax.mail.version>
         <commons.cli.version>1.2</commons.cli.version>
+        <gmavenplus.plugin.version>3.0.2</gmavenplus.plugin.version>
+        <groovy.version>4.0.21</groovy.version>
+        <maven.plugin.plugin.version>3.6.4</maven.plugin.plugin.version>
+        <saaj.impl.version>1.5.3</saaj.impl.version>
         <!-- The build failing if tests are skipped is very annoying -->
         <failIfNoTests>false</failIfNoTests>
         <m2Repository>'${settings.localRepository}'</m2Repository>
@@ -1128,7 +1132,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-plugin-plugin</artifactId>
-                    <version>2.6</version>
+                    <version>${maven.plugin.plugin.version}</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-rar-plugin</artifactId>

@@ -64,6 +64,12 @@
             <groupId>org.wso2.commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.maven.plugin-tools</groupId>
+            <artifactId>maven-plugin-annotations</artifactId>
+            <version>3.6.4</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
     <scm>
         <connection>scm:svn:http://svn.apache.org/repos/asf/axis/axis2/java/core/branches/1_6/modules/tool/axis2-aar-maven-plugin</connection>

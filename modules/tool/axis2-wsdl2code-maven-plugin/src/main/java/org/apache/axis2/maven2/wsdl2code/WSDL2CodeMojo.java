@@ -157,72 +157,100 @@ public class WSDL2CodeMojo extends AbstractMojo {
     private boolean generateServerSideInterface = false;
 
     /**
+     * The repository path to use for code generation.
+     *
      * @parameter expression="${axis2.wsdl2code.repositoryPath}"
      */
     private String repositoryPath = null;
 
     /**
+     * External mapping file for namespace-to-package mapping.
+     *
      * @parameter expression="${axis2.wsdl2code.externalMapping}"
      */
     private String externalMapping = null;
 
     /**
+     * The WSDL version to use (e.g. "1.1" or "2.0").
+     *
      * @parameter expression="${axis2.wsdl2code.wsdlVersion}"
      */
     private String wsdlVersion = null;
 
     /**
+     * The target source folder location relative to the output directory.
+     *
      * @parameter expression="${axis2.wsdl2code.targetSourceFolderLocation}"
      */
     private String targetSourceFolderLocation = null;
 
     /**
+     * The target resources folder location relative to the output directory.
+     *
      * @parameter expression="${axis2.wsdl2code.targetResourcesFolderLocation}"
      */
     private String targetResourcesFolderLocation = null;
 
     /**
-     * @parameter expression="${axis2.wsdl2code.unwrap}" default-value="false" *
+     * Whether to unwrap parameters.
+     *
+     * @parameter expression="${axis2.wsdl2code.unwrap}" default-value="false"
      */
     private boolean unwrap = false;
 
     /**
-     * @parameter expression="${axis2.wsdl2code.allPorts}" default-value="false" *
+     * Whether to generate code for all ports.
+     *
+     * @parameter expression="${axis2.wsdl2code.allPorts}" default-value="false"
      */
     private boolean allPorts = false;
 
     /**
-     * @parameter expression="${axis2.wsdl2code.backwardCompatible}" default-value="false" *
+     * Whether to generate backward compatible code.
+     *
+     * @parameter expression="${axis2.wsdl2code.backwardCompatible}" default-value="false"
      */
     private boolean backwardCompatible = false;
 
     /**
-     * @parameter expression="${axis2.wsdl2code.flattenFiles}" default-value="false" *
+     * Whether to flatten generated files into a single directory.
+     *
+     * @parameter expression="${axis2.wsdl2code.flattenFiles}" default-value="false"
      */
     private boolean flattenFiles = false;
 
     /**
-     * @parameter expression="${axis2.wsdl2code.skipMessageReceiver}" default-value="false" *
+     * Whether to skip generating a message receiver.
+     *
+     * @parameter expression="${axis2.wsdl2code.skipMessageReceiver}" default-value="false"
      */
     private boolean skipMessageReceiver = false;
 
     /**
-     * @parameter expression="${axis2.wsdl2code.skipBuildXML}" default-value="false" *
+     * Whether to skip generating the build.xml file.
+     *
+     * @parameter expression="${axis2.wsdl2code.skipBuildXML}" default-value="false"
      */
     private boolean skipBuildXML = false;
 
     /**
-     * @parameter expression="${axis2.wsdl2code.skipWSDL}" default-value="false" *
+     * Whether to skip copying the WSDL file to the output directory.
+     *
+     * @parameter expression="${axis2.wsdl2code.skipWSDL}" default-value="false"
      */
     private boolean skipWSDL = false;
 
     /**
-     * @parameter expression="${axis2.wsdl2code.overWrite}" default-value="false" *
+     * Whether to overwrite existing generated files.
+     *
+     * @parameter expression="${axis2.wsdl2code.overWrite}" default-value="false"
      */
     private boolean overWrite = false;
 
     /**
-     * @parameter expression="${axis2.wsdl2code.suppressPrefixes}" default-value="false" *
+     * Whether to suppress generation of prefixes in element names.
+     *
+     * @parameter expression="${axis2.wsdl2code.suppressPrefixes}" default-value="false"
      */
     private boolean suppressPrefixes = false;
 
@@ -233,10 +261,18 @@ public class WSDL2CodeMojo extends AbstractMojo {
      */
     private Properties options;
 
-    /** @parameter expression="${axis2.wsdl2code.namespaceToPackages}" */
+    /**
+     * Namespace to package mapping in the format ns1=pkg1,ns2=pkg2.
+     *
+     * @parameter expression="${axis2.wsdl2code.namespaceToPackages}"
+     */
     private String namespaceToPackages = null;
 
-    /** @parameter */
+    /**
+     * Namespace URI mappings for code generation.
+     *
+     * @parameter
+     */
     private NamespaceURIMapping[] namespaceURIs = null;
 
     /** Fills the option map. This map is passed onto the code generation API to generate the code. */

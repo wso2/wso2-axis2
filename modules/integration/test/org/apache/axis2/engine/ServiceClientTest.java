@@ -72,6 +72,7 @@ public class ServiceClientTest extends UtilServerBasedTestCase implements TestCo
     protected void tearDown() throws Exception {
         UtilServer.unDeployService(new QName("Echo"));
         UtilServer.unDeployClientService();
+        UtilServer.stop();
     }
 
     public static OMElement createDummyOMElement() {

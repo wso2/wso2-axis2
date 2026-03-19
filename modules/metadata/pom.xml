@@ -177,12 +177,6 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <inherited>true</inherited>
-                <configuration>
-                    <compilerArgument>
-                        -Xbootclasspath/p:${project.build.directory}/endorsed/geronimo-jaxws_2.2_spec.jar   
-                    </compilerArgument>
-                    <compilerVersion>1.7</compilerVersion>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.axis2</groupId>
@@ -277,9 +271,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <inherited>true</inherited>
                 <configuration>
-                    <argLine>
-                        -Xbootclasspath/p:${project.build.directory}/endorsed/geronimo-jaxws_2.2_spec.jar   
-                    </argLine>
+                    <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
                     <includes>
                         <include>**/*Tests.java</include>
                     </includes>

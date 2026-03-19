@@ -159,8 +159,23 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.codehaus.gmaven</groupId>
-                <artifactId>gmaven-plugin</artifactId>
+                <groupId>org.codehaus.gmavenplus</groupId>
+                <artifactId>gmavenplus-plugin</artifactId>
+                <version>${gmavenplus.plugin.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.groovy</groupId>
+                        <artifactId>groovy</artifactId>
+                        <version>${groovy.version}</version>
+                        <scope>runtime</scope>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.groovy</groupId>
+                        <artifactId>groovy-xml</artifactId>
+                        <version>${groovy.version}</version>
+                        <scope>runtime</scope>
+                    </dependency>
+                </dependencies>
                 <executions>
                     <execution>
                         <phase>test</phase>
@@ -168,25 +183,27 @@
                             <goal>execute</goal>
                         </goals>
                         <configuration>
-                            <source>
-                                import groovy.xml.*
-                                
-                                if (project.properties['maven.test.skip']) {
-                                    println 'Tests are skipped'
-                                    return
-                                }
-                                
-                                def parser = new XmlParser()
-                                def wsdl = new Namespace('http://schemas.xmlsoap.org/wsdl/')
-                                def xs = new Namespace('http://www.w3.org/2001/XMLSchema')
+                            <scripts>
+                                <script>
+                                    import groovy.xml.*
 
-                                println 'Checking p2n.wsdl'
-                                
-                                def wsdlDoc = parser.parse(new File(project.build.directory, "java2wsdl/p2n.wsdl"))
-                                def namespaces = wsdlDoc[wsdl.types][xs.schema].'@targetNamespace'
-                                assert namespaces.contains('http://www.example.org/calculator')
-                                assert namespaces.contains('http://www.example.org/calculator-service')
-                            </source>
+                                    if (System.properties['maven.test.skip']) {
+                                        println 'Tests are skipped'
+                                        return
+                                    }
+
+                                    def parser = new XmlParser()
+                                    def wsdl = new Namespace('http://schemas.xmlsoap.org/wsdl/')
+                                    def xs = new Namespace('http://www.w3.org/2001/XMLSchema')
+
+                                    println 'Checking p2n.wsdl'
+
+                                    def wsdlDoc = parser.parse(new File(project.build.directory, "java2wsdl/p2n.wsdl"))
+                                    def namespaces = wsdlDoc[wsdl.types][xs.schema].'@targetNamespace'
+                                    assert namespaces.contains('http://www.example.org/calculator')
+                                    assert namespaces.contains('http://www.example.org/calculator-service')
+                                </script>
+                            </scripts>
                         </configuration>
                     </execution>
                 </executions>

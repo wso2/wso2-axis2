@@ -20,14 +20,14 @@
 package org.apache.axis2.maven2.aar;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 
 /**
  * Generate the exploded aar
- *
- * @goal exploded
- * @phase package
- * @requiresDependencyResolution runtime
  */
+@Mojo(name = "exploded", defaultPhase = LifecyclePhase.PACKAGE, requiresDependencyResolution = ResolutionScope.RUNTIME)
 public class AarExplodedMojo
         extends AbstractAarMojo {
     public void execute()
