@@ -119,6 +119,10 @@
         <commons.lang.version>2.3</commons.lang.version>
         <javax.mail.version>1.4</javax.mail.version>
         <commons.cli.version>1.2</commons.cli.version>
+        <gmavenplus.plugin.version>3.0.2</gmavenplus.plugin.version>
+        <groovy.version>4.0.21</groovy.version>
+        <maven.plugin.plugin.version>3.6.4</maven.plugin.plugin.version>
+        <saaj.impl.version>1.5.3</saaj.impl.version>
         <!-- The build failing if tests are skipped is very annoying -->
         <failIfNoTests>false</failIfNoTests>
         <m2Repository>'${settings.localRepository}'</m2Repository>
@@ -1128,7 +1132,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-plugin-plugin</artifactId>
-                    <version>3.6.4</version>
+                    <version>${maven.plugin.plugin.version}</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-rar-plugin</artifactId>
