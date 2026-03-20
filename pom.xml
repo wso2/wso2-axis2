@@ -595,6 +595,7 @@
              http://maven.apache.org/plugins/maven-site-plugin/examples/creating-content.html -->
         <axis2_version>${project.version}</axis2_version>
         <project.scm.id>scm-server</project.scm.id>
+        <maven.javadoc.plugin.version>3.6.3</maven.javadoc.plugin.version>
     </properties>
     <build>
         <!-- Note: the pluginManagement in axis2-parent doesn't apply here; we
@@ -622,6 +623,11 @@
                         </links>
                     </configuration>
                 </plugin-->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>${maven.javadoc.plugin.version}</version>
+                </plugin>
                 <plugin>
                     <artifactId>maven-assembly-plugin</artifactId>
                     <version>2.2</version>
