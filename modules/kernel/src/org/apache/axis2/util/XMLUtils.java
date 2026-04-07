@@ -509,18 +509,33 @@ public class XMLUtils {
      * @throws Exception
      */
     public static OMElement toOM(Element element) throws Exception {
-        return toOM(element, true);
+        return toOM(element, true, false);
     }
-    
+
+    /**
+     * Convert DOM Element into an OMElement
+     *
+     * @param element  dom Element
+     * @param buildAll if true, full OM tree is immediately built. if false, caller is responsible
+     *                 for building the tree and closing the parser.
+     * @return OMElement
+     * @throws Exception
+     */
+    public static OMElement toOM(Element element, boolean buildAll) throws Exception {
+        return toOM(element, buildAll, false);
+    }
+
     /**
      * Convert DOM Element into a fully built OMElement
      * @param element
      * @param buildAll if true, full OM tree is immediately built. if false, caller is responsible 
      * for building the tree and closing the parser.
+     * @param withSecRestrictions if true, DTD disabled XML builder is used.
      * @return
      * @throws Exception
      */
-    public static OMElement toOM(Element element, boolean buildAll) throws Exception {
+    public static OMElement toOM(Element element, boolean buildAll,
+        boolean withSecRestrictions) throws Exception {
 
         Source source = new DOMSource(element);
 
@@ -532,7 +547,12 @@ public class XMLUtils {
 
         ByteArrayInputStream is = new ByteArrayInputStream(baos.toByteArray());
 
-        OMXMLParserWrapper builder = OMXMLBuilderFactory.createOMBuilder(is);
+        OMXMLParserWrapper builder;
+        if (withSecRestrictions) {
+            builder = OMXMLBuilderFactory.createOMBuilderWithSec(is);
+        } else {
+            builder = OMXMLBuilderFactory.createOMBuilder(is);
+        }
         builder.setCache(true);
 
         OMElement omElement = builder.getDocumentElement();
