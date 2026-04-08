@@ -99,6 +99,9 @@
     <!-- Configuration to disable sending charset parameter in multipart/related Content-Type header -->
     <parameter name="disableSendingMultipartPartCharset" locked="false">true</parameter>
 
+    <!-- Configuration to preserve Content-Transfer-Encoding header in each part of multipart form data -->
+    <parameter name="preserveMultipartPartContentTransferEncoding" locked="false">true</parameter>
+
     <!-- Following parameter will suppress generation of SOAP 1.2 bindings in auto-generated WSDL files -->
     <parameter name="disableSOAP12" locked="true">false</parameter>
 

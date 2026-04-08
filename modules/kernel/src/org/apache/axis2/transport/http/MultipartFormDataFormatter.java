@@ -117,6 +117,12 @@ public class MultipartFormDataFormatter implements MessageFormatter {
     private static final QName CONTENT_TYPE_ATTRIBUTE_QNAME = new QName("content-type");
 
     /**
+     * QName of the reserved XML attribute for content-transfer-encoding
+     */
+    private static final QName CONTENT_TRANSFER_ENCODING_ATTRIBUTE_QNAME = new QName(
+            "content-transfer-encoding");
+
+    /**
      * QName of the reserved XML attribute for charset
      */
     private static final QName CHARSET_ATTRIBUTE_QNAME = new QName("charset");
@@ -259,6 +265,13 @@ public class MultipartFormDataFormatter implements MessageFormatter {
                 disableSendingMultipartPartCharsetValue =
                         JavaUtils.isTrueExplicitly(disableSendingMultipartPartCharset.getValue());
             }
+            Parameter preserveMultipartPartContentTransferEncoding =
+                    messageContext.getParameter(Constants.Configuration.PRESERVE_CONTENT_TRANSFER_ENCODING);
+            boolean preserveMultipartPartContentTransferEncodingValue = true;
+            if (preserveMultipartPartContentTransferEncoding != null) {
+                preserveMultipartPartContentTransferEncodingValue =
+                        JavaUtils.isTrueExplicitly(preserveMultipartPartContentTransferEncoding.getValue());
+            }
             OMFactory omFactory = null;
             if (soapVersion != null) {
                 if (soapVersion.equals(Constants.SOAP_11)) {
@@ -285,21 +298,31 @@ public class MultipartFormDataFormatter implements MessageFormatter {
                         String charset = BuilderUtil.extractCharSetValue(contentType);
                         if (soapVersion.equals(Constants.SOAP_11)) {
                             part = new ComplexPart(ele.getQName().getLocalPart(), omElement.toString(),
-                                    disableSendingMultipartPartCharsetValue, charset, "text/xml");
+                                    disableSendingMultipartPartCharsetValue,
+                                    preserveMultipartPartContentTransferEncodingValue, charset, "text/xml");
                         } else if (soapVersion.equals(Constants.SOAP_12)) {
                             part = new ComplexPart(ele.getQName().getLocalPart(), omElement.toString(),
-                                    disableSendingMultipartPartCharsetValue, charset, "application/soap+xml");
+                                    disableSendingMultipartPartCharsetValue,
+                                    preserveMultipartPartContentTransferEncodingValue, charset,
+                                    "application/soap+xml");
                         } else {
                             part = new ComplexPart(ele.getQName().getLocalPart(), omElement.toString(),
-                                    disableSendingMultipartPartCharsetValue);
+                                    disableSendingMultipartPartCharsetValue,
+                                    preserveMultipartPartContentTransferEncodingValue);
                         }
                     } else {
                         part = new ComplexPart(ele.getQName().getLocalPart(), omElement.toString(),
-                                disableSendingMultipartPartCharsetValue);
+                                disableSendingMultipartPartCharsetValue,
+                                preserveMultipartPartContentTransferEncodingValue);
                     }
                     if (disableSendingMultipartPartCharsetValue) {
                         ((ComplexPart) part).setContentType(getAttributeValue(
                                 ele.getAttribute(CONTENT_TYPE_ATTRIBUTE_QNAME), ComplexPart.DEFAULT_CONTENT_TYPE));
+                    }
+                    if (preserveMultipartPartContentTransferEncodingValue) {
+                        ((ComplexPart) part).setContentType(getAttributeValue(
+                                ele.getAttribute(CONTENT_TRANSFER_ENCODING_ATTRIBUTE_QNAME),
+                                ComplexPart.DEFAULT_TRANSFER_ENCODING));
                     }
                 } else if (FILE_FIELD_QNAME.equals(ele.getQName())) {
 
@@ -312,10 +335,16 @@ public class MultipartFormDataFormatter implements MessageFormatter {
 
                     part = new FilePart(fieldName,
                             new ByteArrayPartSource(filename, Base64.decodeBase64(ele.getText().getBytes())),
-                            contentType, disableSendingMultipartPartCharsetValue, charset);
+                            contentType, disableSendingMultipartPartCharsetValue,
+                            preserveMultipartPartContentTransferEncodingValue, charset);
                     if (disableSendingMultipartPartCharsetValue) {
                         ((FilePart) part).setContentType(getAttributeValue(
                                 ele.getAttribute(CONTENT_TYPE_ATTRIBUTE_QNAME), FilePart.DEFAULT_CONTENT_TYPE));
+                    }
+                    if (preserveMultipartPartContentTransferEncodingValue) {
+                        ((FilePart) part).setContentType(getAttributeValue(
+                                ele.getAttribute(CONTENT_TRANSFER_ENCODING_ATTRIBUTE_QNAME),
+                                FilePart.DEFAULT_TRANSFER_ENCODING));
                     }
                 } else if ((ele.getAttribute(FILENAME_ATTRIBUTE_QNAME) != null)) {
                     String fieldName = getAttributeValue(ele.getAttribute(FILE_FIELD_NAME_ATTRIBUTE_QNAME),
@@ -339,14 +368,21 @@ public class MultipartFormDataFormatter implements MessageFormatter {
                     if (decodeMultipartData != null && decodeMultipartData) {
                         part = new FilePart(fieldName,
                                 new ByteArrayPartSource(filename, Base64.decodeBase64(ele.getText().getBytes())),
-                                contentType, disableSendingMultipartPartCharsetValue, charset);
+                                contentType, disableSendingMultipartPartCharsetValue,
+                                preserveMultipartPartContentTransferEncodingValue, charset);
                     } else {
                         part = new FilePart(fieldName, new ByteArrayPartSource(filename, ele.getText().getBytes()),
-                                contentType, disableSendingMultipartPartCharsetValue, charset);
+                                contentType, disableSendingMultipartPartCharsetValue,
+                                preserveMultipartPartContentTransferEncodingValue, charset);
                     }
                     if (disableSendingMultipartPartCharsetValue) {
                         ((FilePart) part).setContentType(getAttributeValue(
                                 ele.getAttribute(CONTENT_TYPE_ATTRIBUTE_QNAME), FilePart.DEFAULT_CONTENT_TYPE));
+                    }
+                    if (preserveMultipartPartContentTransferEncodingValue) {
+                        ((FilePart) part).setContentType(getAttributeValue(
+                                ele.getAttribute(CONTENT_TRANSFER_ENCODING_ATTRIBUTE_QNAME),
+                                FilePart.DEFAULT_TRANSFER_ENCODING));
                     }
                 } else {
                     // Gets the first child object
@@ -367,7 +403,8 @@ public class MultipartFormDataFormatter implements MessageFormatter {
                                 // Creates the FilePart
                                 part = new FilePart(ele.getQName().getLocalPart(),
                                         new ByteArrayPartSource(fileName, ele.getText().getBytes()), contentType,
-                                        disableSendingMultipartPartCharsetValue, null);
+                                        disableSendingMultipartPartCharsetValue,
+                                        preserveMultipartPartContentTransferEncodingValue, null);
                             }
                         }
                     }
@@ -376,14 +413,21 @@ public class MultipartFormDataFormatter implements MessageFormatter {
                         if (ele.getQName().getPrefix() != null && !ele.getQName().getPrefix().isEmpty()) {
                             part = new StringPart(ele.getQName().getPrefix() + ":" +
                                     ele.getQName().getLocalPart(),
-                                    ele.getText(), disableSendingMultipartPartCharsetValue, charset);
+                                    ele.getText(), disableSendingMultipartPartCharsetValue,
+                                    preserveMultipartPartContentTransferEncodingValue, charset);
                         } else {
                             part = new StringPart(ele.getQName().getLocalPart(), ele.getText(),
-                                    disableSendingMultipartPartCharsetValue, charset);
+                                    disableSendingMultipartPartCharsetValue,
+                                    preserveMultipartPartContentTransferEncodingValue, charset);
                         }
                         if (disableSendingMultipartPartCharsetValue) {
                             ((StringPart) part).setContentType(getAttributeValue(
                                     ele.getAttribute(CONTENT_TYPE_ATTRIBUTE_QNAME), StringPart.DEFAULT_CONTENT_TYPE));
+                        }
+                        if (preserveMultipartPartContentTransferEncodingValue) {
+                            ((StringPart) part).setContentType(getAttributeValue(
+                                    ele.getAttribute(CONTENT_TRANSFER_ENCODING_ATTRIBUTE_QNAME),
+                                    StringPart.DEFAULT_TRANSFER_ENCODING));
                         }
                     }
                 }

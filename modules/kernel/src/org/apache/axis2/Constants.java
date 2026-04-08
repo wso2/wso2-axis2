@@ -518,5 +518,14 @@ public class Constants extends org.apache.axis2.namespace.Constants {
          */
         public static final String DISABLE_SENDING_MULTIPART_PART_CHARSET =
                 "disableSendingMultipartPartCharset";
+
+        /**
+         * This parameter preserves the Content-Transfer-Encoding header in individual parts in multipart data.
+         * If this is set to false the Content-Transfer-Encoding header is added to individual parts in multipart data.
+         * If this is set to true the existing Content-Transfer-Encoding header is preserved in individual parts
+         * in multipart data.
+         */
+        public static final String PRESERVE_CONTENT_TRANSFER_ENCODING =
+                "preserveMultipartPartContentTransferEncoding";
     }
 }
