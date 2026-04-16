@@ -120,7 +120,7 @@ public class MultipartFormDataFormatter implements MessageFormatter {
      * QName of the reserved XML attribute for content-transfer-encoding
      */
     private static final QName CONTENT_TRANSFER_ENCODING_ATTRIBUTE_QNAME = new QName(
-            "content-transfer-encoding");
+            Constants.CONTENT_TRANSFER_ENCODING);
 
     /**
      * QName of the reserved XML attribute for charset
@@ -320,9 +320,9 @@ public class MultipartFormDataFormatter implements MessageFormatter {
                                 ele.getAttribute(CONTENT_TYPE_ATTRIBUTE_QNAME), ComplexPart.DEFAULT_CONTENT_TYPE));
                     }
                     if (preserveMultipartPartContentTransferEncodingValue) {
-                        ((ComplexPart) part).setContentType(getAttributeValue(
-                                ele.getAttribute(CONTENT_TRANSFER_ENCODING_ATTRIBUTE_QNAME),
-                                ComplexPart.DEFAULT_TRANSFER_ENCODING));
+                        OMAttribute transferEncodingAttr = ele.getAttribute(CONTENT_TRANSFER_ENCODING_ATTRIBUTE_QNAME);
+                        ((ComplexPart) part).setTransferEncoding(
+                                transferEncodingAttr != null ? transferEncodingAttr.getAttributeValue() : null);
                     }
                 } else if (FILE_FIELD_QNAME.equals(ele.getQName())) {
 
@@ -342,9 +342,9 @@ public class MultipartFormDataFormatter implements MessageFormatter {
                                 ele.getAttribute(CONTENT_TYPE_ATTRIBUTE_QNAME), FilePart.DEFAULT_CONTENT_TYPE));
                     }
                     if (preserveMultipartPartContentTransferEncodingValue) {
-                        ((FilePart) part).setContentType(getAttributeValue(
-                                ele.getAttribute(CONTENT_TRANSFER_ENCODING_ATTRIBUTE_QNAME),
-                                FilePart.DEFAULT_TRANSFER_ENCODING));
+                        OMAttribute transferEncodingAttr = ele.getAttribute(CONTENT_TRANSFER_ENCODING_ATTRIBUTE_QNAME);
+                        ((FilePart) part).setTransferEncoding(
+                                transferEncodingAttr != null ? transferEncodingAttr.getAttributeValue() : null);
                     }
                 } else if ((ele.getAttribute(FILENAME_ATTRIBUTE_QNAME) != null)) {
                     String fieldName = getAttributeValue(ele.getAttribute(FILE_FIELD_NAME_ATTRIBUTE_QNAME),
@@ -380,9 +380,9 @@ public class MultipartFormDataFormatter implements MessageFormatter {
                                 ele.getAttribute(CONTENT_TYPE_ATTRIBUTE_QNAME), FilePart.DEFAULT_CONTENT_TYPE));
                     }
                     if (preserveMultipartPartContentTransferEncodingValue) {
-                        ((FilePart) part).setContentType(getAttributeValue(
-                                ele.getAttribute(CONTENT_TRANSFER_ENCODING_ATTRIBUTE_QNAME),
-                                FilePart.DEFAULT_TRANSFER_ENCODING));
+                        OMAttribute transferEncodingAttr = ele.getAttribute(CONTENT_TRANSFER_ENCODING_ATTRIBUTE_QNAME);
+                        ((FilePart) part).setTransferEncoding(
+                                transferEncodingAttr != null ? transferEncodingAttr.getAttributeValue() : null);
                     }
                 } else {
                     // Gets the first child object
@@ -425,9 +425,10 @@ public class MultipartFormDataFormatter implements MessageFormatter {
                                     ele.getAttribute(CONTENT_TYPE_ATTRIBUTE_QNAME), StringPart.DEFAULT_CONTENT_TYPE));
                         }
                         if (preserveMultipartPartContentTransferEncodingValue) {
-                            ((StringPart) part).setContentType(getAttributeValue(
-                                    ele.getAttribute(CONTENT_TRANSFER_ENCODING_ATTRIBUTE_QNAME),
-                                    StringPart.DEFAULT_TRANSFER_ENCODING));
+                            OMAttribute transferEncodingAttr = ele.getAttribute(
+                                    CONTENT_TRANSFER_ENCODING_ATTRIBUTE_QNAME);
+                            ((StringPart) part).setTransferEncoding(
+                                    transferEncodingAttr != null ? transferEncodingAttr.getAttributeValue() : null);
                         }
                     }
                 }

@@ -160,6 +160,8 @@ public class MultipartFormDataBuilder implements Builder {
         textParameterMap.put("value", textValue);
         textParameterMap.put("charset", encoding);
         textParameterMap.put("contentType", partContentType);
+        String contentTransferEncoding = getContentTransferEncoding(diskFileItem);
+        textParameterMap.put("contentTransferEncoding", contentTransferEncoding);
         return textParameterMap;
     }
 
@@ -170,5 +172,12 @@ public class MultipartFormDataBuilder implements Builder {
         DataHandler dataHandler = new DataHandler(dataSource);
 
         return dataHandler;
+    }
+
+    private String getContentTransferEncoding(DiskFileItem diskFileItem) {
+        if (diskFileItem == null || diskFileItem.getHeaders() == null) {
+            return null;
+        }
+        return diskFileItem.getHeaders().getHeader(Constants.CONTENT_TRANSFER_ENCODING);
     }
 }

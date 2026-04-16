@@ -101,6 +101,14 @@ public class BuilderUtil {
                                                 MultipleEntryHashMap requestParameterMap,
                                                 SOAPFactory soapFactory) throws AxisFault {
 
+        Parameter preserveMultipartPartContentTransferEncoding = messageContext.getParameter(
+                Constants.Configuration.PRESERVE_CONTENT_TRANSFER_ENCODING);
+        boolean preserveMultipartPartContentTransferEncodingValue = false;
+        if (preserveMultipartPartContentTransferEncoding != null) {
+            preserveMultipartPartContentTransferEncodingValue =
+                    JavaUtils.isTrueExplicitly(preserveMultipartPartContentTransferEncoding.getValue());
+        }
+
         SOAPEnvelope soapEnvelope = soapFactory.getDefaultEnvelope();
         SOAPBody body = soapEnvelope.getBody();
         XmlSchemaElement xmlSchemaElement;
@@ -118,7 +126,8 @@ public class BuilderUtil {
                 // if there is no schema its piece of cake !! add these to the soap body in any order you like.
                 // Note : if there are parameters in the path of the URL, there is no way this can add them
                 // to the message.
-                createSOAPMessageWithoutSchema(soapFactory, bodyFirstChild, requestParameterMap);
+                createSOAPMessageWithoutSchemaWithContentTransferEncoding(soapFactory, bodyFirstChild,
+                        requestParameterMap, preserveMultipartPartContentTransferEncodingValue);
             } else {
 
                 // first get the target namespace from the schema and the wrapping element.
@@ -155,8 +164,9 @@ public class BuilderUtil {
                             
                             if (qName == null && innerElement.getSchemaTypeName()
                                     .equals(org.apache.ws.commons.schema.constants.Constants.XSD_ANYTYPE)) {
-                                createSOAPMessageWithoutSchema(soapFactory, bodyFirstChild,
-                                                               requestParameterMap);
+                                createSOAPMessageWithoutSchemaWithContentTransferEncoding(soapFactory, bodyFirstChild,
+                                        requestParameterMap,
+                                        preserveMultipartPartContentTransferEncodingValue);
                                 break;
                             }
                             long minOccurs = innerElement.getMinOccurs();
@@ -173,7 +183,8 @@ public class BuilderUtil {
                             // FIXME changed
                             while ((value = requestParameterMap.get(name)) != null) {
                                 addRequestParameter(soapFactory,
-                                                    bodyFirstChild, ns, name, value);
+                                        bodyFirstChild, ns, name, value,
+                                        preserveMultipartPartContentTransferEncodingValue);
                                 minOccurs--;
                             }
                             if (minOccurs > 0) {
@@ -202,9 +213,40 @@ public class BuilderUtil {
         return soapEnvelope;
     }
 
+    /**
+     * This method is used to create a SOAP message without schema information and does not add the content
+     * transfer encoding value of the multipart form data parameters to the SOAP message.
+     * @param soapFactory soap factory to create the SOAP message
+     * @param bodyFirstChild first child of the SOAP body to which the parameters will be added as children
+     * @param requestParameterMap request parameter map containing the parameters to be added to the SOAP message.
+     *
+     * @deprecated use {@link #createSOAPMessageWithoutSchemaWithContentTransferEncoding(SOAPFactory, OMElement,
+     * MultipleEntryHashMap, boolean)} instead
+     */
+    @Deprecated
     public static void createSOAPMessageWithoutSchema(SOAPFactory soapFactory,
                                                        OMElement bodyFirstChild,
                                                        MultipleEntryHashMap requestParameterMap) {
+
+        createSOAPMessageWithoutSchemaWithContentTransferEncoding(soapFactory, bodyFirstChild,
+                requestParameterMap, false);
+    }
+
+    /**
+     * This method is used to create a SOAP message without schema information.
+     * Adds the content transfer encoding value of the multipart form data parameters to the SOAP Message if the
+     * preserveMultipartPartContentTransferEncodingValue parameter is set to true.
+     * @param soapFactory soap factory to create the SOAP message
+     * @param bodyFirstChild first child of the SOAP body to which the parameters will be added as children
+     * @param requestParameterMap request parameter map containing the parameters to be added to the SOAP message.
+     * @param preserveMultipartPartContentTransferEncodingValue whether to add the content transfer encoding value
+     *                                                         of the multipart form data parameters to the SOAP message
+     */
+    public static void createSOAPMessageWithoutSchemaWithContentTransferEncoding(
+            SOAPFactory soapFactory,
+            OMElement bodyFirstChild,
+            MultipleEntryHashMap requestParameterMap,
+            boolean preserveMultipartPartContentTransferEncodingValue) {
 
         // first add the parameters in the URL
         if (requestParameterMap != null) {
@@ -212,7 +254,8 @@ public class BuilderUtil {
                 String key = (String) o;
                 Object value;
                 while ((value = requestParameterMap.get(key)) != null) {
-                    addRequestParameter(soapFactory, bodyFirstChild, null, key, value);
+                    addRequestParameter(soapFactory, bodyFirstChild, null, key, value,
+                            preserveMultipartPartContentTransferEncodingValue);
                 }
             }
         }
@@ -222,7 +265,8 @@ public class BuilderUtil {
                                             OMElement bodyFirstChild,
                                             OMNamespace ns,
                                             String key,
-                                            Object parameter) {
+                                            Object parameter,
+                                            boolean preserveMultipartPartContentTransferEncodingValue) {
         if (parameter instanceof DataHandler) {
             DataHandler dataHandler = (DataHandler)parameter;
             OMText dataText = bodyFirstChild.getOMFactory().createOMText(
@@ -237,16 +281,24 @@ public class BuilderUtil {
                 omElement.addAttribute(CONTENT_TYPE, DEFAULT_CONTENT_TYPE, ns);
             }
             omElement.addAttribute("filename", ((DataHandler) parameter).getDataSource().getName(), ns);
+            String partContentTransferEncoding = getContentTransferEncoding(dataSource);
+            if (preserveMultipartPartContentTransferEncodingValue && partContentTransferEncoding != null) {
+                omElement.addAttribute(Constants.CONTENT_TRANSFER_ENCODING, partContentTransferEncoding, ns);
+            }
         } else if (parameter instanceof Map) {
             HashMap textParameterObj = (HashMap) parameter;
             String testVal = (String) textParameterObj.get("value");
             String charsetVal = (String) textParameterObj.get("charset");
             String partContentType = (String) textParameterObj.get("contentType");
+            String partContentTransferEncoding = (String) textParameterObj.get("contentTransferEncoding");
             OMElement omElement = soapFactory.createOMElement(key, ns, bodyFirstChild);
             omElement.setText(testVal);
             omElement.addAttribute("charset", charsetVal, ns);
             if (partContentType != null) {
                 omElement.addAttribute(CONTENT_TYPE, partContentType, ns);
+            }
+            if (preserveMultipartPartContentTransferEncodingValue && partContentTransferEncoding != null) {
+                omElement.addAttribute(Constants.CONTENT_TRANSFER_ENCODING, partContentTransferEncoding, ns);
             }
         } else {
             String textValue = parameter.toString();
@@ -859,5 +911,19 @@ public class BuilderUtil {
             enc2 = enc2.substring(0, enc2.length() - 2);
         }
         return enc1.equals(enc2);
+    }
+
+    /**
+     * Extracts the content transfer encoding from the given DataSource if possible.
+     * This is required to support multipart form data where the content transfer encoding is specified in the headers
+     * of the part.
+     * @param dataSource the DataSource to extract the content transfer encoding from
+     * @return the content transfer encoding if it can be extracted, or null otherwise
+     */
+    private static String getContentTransferEncoding(DataSource dataSource) {
+        if (dataSource instanceof DiskFileDataSource) {
+            return ((DiskFileDataSource) dataSource).getContentTransferEncoding();
+        }
+        return null;
     }
 }
