@@ -33,7 +33,7 @@ import java.util.List;
 
 public class CustomDeployerTest extends TestCase {
 
-    private static final Deployer DEFAULT_SORT_DEPLOYER = new Deployer() {
+    private static final Deployer TEST_DEPLOYER = new Deployer() {
         public void init(ConfigurationContext configCtx) {}
         public void deploy(DeploymentFileData deploymentFileData) throws DeploymentException {}
         public void setDirectory(String directory) {}
@@ -67,7 +67,7 @@ public class CustomDeployerTest extends TestCase {
         files.add(new DeploymentFileData(new File("alpha.svc"), null));
         files.add(new DeploymentFileData(new File("beta.svc"), null));
 
-        DEFAULT_SORT_DEPLOYER.sort(files, 0, files.size());
+        TEST_DEPLOYER.sort(files, 0, files.size());
 
         assertEquals("alpha.svc", files.get(0).getFile().getName());
         assertEquals("beta.svc", files.get(1).getFile().getName());
@@ -76,14 +76,14 @@ public class CustomDeployerTest extends TestCase {
 
     public void testSortEmptyList() {
         List<DeploymentFileData> files = new ArrayList<>();
-        DEFAULT_SORT_DEPLOYER.sort(files, 0, files.size());
+        TEST_DEPLOYER.sort(files, 0, files.size());
         assertTrue(files.isEmpty());
     }
 
     public void testSortSingleElement() {
         List<DeploymentFileData> files = new ArrayList<>();
         files.add(new DeploymentFileData(new File("single.svc"), null));
-        DEFAULT_SORT_DEPLOYER.sort(files, 0, files.size());
+        TEST_DEPLOYER.sort(files, 0, files.size());
         assertEquals("single.svc", files.get(0).getFile().getName());
     }
 
@@ -92,7 +92,7 @@ public class CustomDeployerTest extends TestCase {
         files.add(new DeploymentFileData(new File("alpha.svc"), null));
         files.add(new DeploymentFileData(new File("beta.svc"), null));
         files.add(new DeploymentFileData(new File("zeta.svc"), null));
-        DEFAULT_SORT_DEPLOYER.sort(files, 0, files.size());
+        TEST_DEPLOYER.sort(files, 0, files.size());
         assertEquals("alpha.svc", files.get(0).getFile().getName());
         assertEquals("beta.svc", files.get(1).getFile().getName());
         assertEquals("zeta.svc", files.get(2).getFile().getName());
@@ -103,7 +103,7 @@ public class CustomDeployerTest extends TestCase {
         files.add(new DeploymentFileData(new File("zeta.svc"), null));
         files.add(new DeploymentFileData(new File("beta.svc"), null));
         files.add(new DeploymentFileData(new File("alpha.svc"), null));
-        DEFAULT_SORT_DEPLOYER.sort(files, 0, files.size());
+        TEST_DEPLOYER.sort(files, 0, files.size());
         assertEquals("alpha.svc", files.get(0).getFile().getName());
         assertEquals("beta.svc", files.get(1).getFile().getName());
         assertEquals("zeta.svc", files.get(2).getFile().getName());
@@ -118,7 +118,7 @@ public class CustomDeployerTest extends TestCase {
         files.add(new DeploymentFileData(new File("omega.svc"), null));
 
         // Sort only the middle three elements (indices 1 to 3)
-        DEFAULT_SORT_DEPLOYER.sort(files, 1, 4);
+        TEST_DEPLOYER.sort(files, 1, 4);
 
         assertEquals("gamma.svc", files.get(0).getFile().getName());
         assertEquals("alpha.svc", files.get(1).getFile().getName());
@@ -135,7 +135,7 @@ public class CustomDeployerTest extends TestCase {
         files.add(new DeploymentFileData(new File("omega.svc"), null));
 
         // Sort only the first three elements (indices 0 to 2)
-        DEFAULT_SORT_DEPLOYER.sort(files, 0, 3);
+        TEST_DEPLOYER.sort(files, 0, 3);
 
         assertEquals("alpha.svc", files.get(0).getFile().getName());
         assertEquals("beta.svc", files.get(1).getFile().getName());
@@ -152,7 +152,7 @@ public class CustomDeployerTest extends TestCase {
         files.add(new DeploymentFileData(new File("beta.svc"), null));
 
         // Sort only the last three elements (indices 2 to 4)
-        DEFAULT_SORT_DEPLOYER.sort(files, 2, 5);
+        TEST_DEPLOYER.sort(files, 2, 5);
 
         assertEquals("gamma.svc", files.get(0).getFile().getName());
         assertEquals("omega.svc", files.get(1).getFile().getName());
