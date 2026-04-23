@@ -883,7 +883,7 @@ public abstract class DeploymentEngine implements DeploymentConstants {
             if (tempDeployer != null) {
                 tempDeployer.sort(wsToDeploy, startIndex, artifactsCount);
             } else {
-                Collections.sort((List<DeploymentFileData>) wsToDeploy.subList(startIndex, artifactsCount), Deployer.DEFAULT_FILENAME_COMPARATOR);
+                Collections.sort(wsToDeploy.subList(startIndex, artifactsCount), Deployer.DEFAULT_FILENAME_COMPARATOR);
             }
         }
     }
