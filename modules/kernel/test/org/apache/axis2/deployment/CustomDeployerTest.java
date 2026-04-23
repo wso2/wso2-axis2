@@ -21,6 +21,7 @@ package org.apache.axis2.deployment;
 
 import junit.framework.TestCase;
 import org.apache.axis2.AbstractTestCase;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.deployment.deployers.CustomDeployer;
 import org.apache.axis2.deployment.repository.util.DeploymentFileData;
@@ -31,6 +32,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CustomDeployerTest extends TestCase {
+
+    private static final Deployer DEFAULT_SORT_DEPLOYER = new Deployer() {
+        public void init(ConfigurationContext configCtx) {}
+        public void deploy(DeploymentFileData deploymentFileData) throws DeploymentException {}
+        public void setDirectory(String directory) {}
+        public void setExtension(String extension) {}
+        public void undeploy(String fileName) throws DeploymentException {}
+        public void cleanup() throws DeploymentException {}
+    };
+
     public void testCustomDeployer() throws Exception {
         String filename =
                 AbstractTestCase.basedir + "/test-resources/deployment/CustomDeployerRepo";
@@ -51,13 +62,12 @@ public class CustomDeployerTest extends TestCase {
     }
 
     public void testSortCompleteList() {
-        Deployer deployer = new CustomDeployer();
         List<DeploymentFileData> files = new ArrayList<>();
         files.add(new DeploymentFileData(new File("zeta.svc"), null));
         files.add(new DeploymentFileData(new File("alpha.svc"), null));
         files.add(new DeploymentFileData(new File("beta.svc"), null));
 
-        deployer.sort(files, 0, files.size());
+        DEFAULT_SORT_DEPLOYER.sort(files, 0, files.size());
 
         assertEquals("alpha.svc", files.get(0).getFile().getName());
         assertEquals("beta.svc", files.get(1).getFile().getName());
@@ -65,46 +75,41 @@ public class CustomDeployerTest extends TestCase {
     }
 
     public void testSortEmptyList() {
-        Deployer deployer = new CustomDeployer();
         List<DeploymentFileData> files = new ArrayList<>();
-        deployer.sort(files, 0, files.size());
+        DEFAULT_SORT_DEPLOYER.sort(files, 0, files.size());
         assertTrue(files.isEmpty());
     }
 
     public void testSortSingleElement() {
-        Deployer deployer = new CustomDeployer();
         List<DeploymentFileData> files = new ArrayList<>();
         files.add(new DeploymentFileData(new File("single.svc"), null));
-        deployer.sort(files, 0, files.size());
+        DEFAULT_SORT_DEPLOYER.sort(files, 0, files.size());
         assertEquals("single.svc", files.get(0).getFile().getName());
     }
 
     public void testSortAlreadySorted() {
-        Deployer deployer = new CustomDeployer();
         List<DeploymentFileData> files = new ArrayList<>();
         files.add(new DeploymentFileData(new File("alpha.svc"), null));
         files.add(new DeploymentFileData(new File("beta.svc"), null));
         files.add(new DeploymentFileData(new File("zeta.svc"), null));
-        deployer.sort(files, 0, files.size());
+        DEFAULT_SORT_DEPLOYER.sort(files, 0, files.size());
         assertEquals("alpha.svc", files.get(0).getFile().getName());
         assertEquals("beta.svc", files.get(1).getFile().getName());
         assertEquals("zeta.svc", files.get(2).getFile().getName());
     }
 
     public void testSortReverseOrder() {
-        Deployer deployer = new CustomDeployer();
         List<DeploymentFileData> files = new ArrayList<>();
         files.add(new DeploymentFileData(new File("zeta.svc"), null));
         files.add(new DeploymentFileData(new File("beta.svc"), null));
         files.add(new DeploymentFileData(new File("alpha.svc"), null));
-        deployer.sort(files, 0, files.size());
+        DEFAULT_SORT_DEPLOYER.sort(files, 0, files.size());
         assertEquals("alpha.svc", files.get(0).getFile().getName());
         assertEquals("beta.svc", files.get(1).getFile().getName());
         assertEquals("zeta.svc", files.get(2).getFile().getName());
     }
 
     public void testSortMiddleSublist() {
-        Deployer deployer = new CustomDeployer();
         List<DeploymentFileData> files = new ArrayList<>();
         files.add(new DeploymentFileData(new File("gamma.svc"), null));
         files.add(new DeploymentFileData(new File("zeta.svc"), null));
@@ -113,7 +118,7 @@ public class CustomDeployerTest extends TestCase {
         files.add(new DeploymentFileData(new File("omega.svc"), null));
 
         // Sort only the middle three elements (indices 1 to 3)
-        deployer.sort(files, 1, 4);
+        DEFAULT_SORT_DEPLOYER.sort(files, 1, 4);
 
         assertEquals("gamma.svc", files.get(0).getFile().getName());
         assertEquals("alpha.svc", files.get(1).getFile().getName());
@@ -123,7 +128,6 @@ public class CustomDeployerTest extends TestCase {
     }
 
     public void testSortSublistAtStart() {
-        Deployer deployer = new CustomDeployer();
         List<DeploymentFileData> files = new ArrayList<>();
         files.add(new DeploymentFileData(new File("zeta.svc"), null));
         files.add(new DeploymentFileData(new File("alpha.svc"), null));
@@ -131,7 +135,7 @@ public class CustomDeployerTest extends TestCase {
         files.add(new DeploymentFileData(new File("omega.svc"), null));
 
         // Sort only the first three elements (indices 0 to 2)
-        deployer.sort(files, 0, 3);
+        DEFAULT_SORT_DEPLOYER.sort(files, 0, 3);
 
         assertEquals("alpha.svc", files.get(0).getFile().getName());
         assertEquals("beta.svc", files.get(1).getFile().getName());
@@ -140,7 +144,6 @@ public class CustomDeployerTest extends TestCase {
     }
 
     public void testSortSublistAtEnd() {
-        Deployer deployer = new CustomDeployer();
         List<DeploymentFileData> files = new ArrayList<>();
         files.add(new DeploymentFileData(new File("gamma.svc"), null));
         files.add(new DeploymentFileData(new File("omega.svc"), null));
@@ -149,7 +152,7 @@ public class CustomDeployerTest extends TestCase {
         files.add(new DeploymentFileData(new File("beta.svc"), null));
 
         // Sort only the last three elements (indices 2 to 4)
-        deployer.sort(files, 2, 5);
+        DEFAULT_SORT_DEPLOYER.sort(files, 2, 5);
 
         assertEquals("gamma.svc", files.get(0).getFile().getName());
         assertEquals("omega.svc", files.get(1).getFile().getName());
