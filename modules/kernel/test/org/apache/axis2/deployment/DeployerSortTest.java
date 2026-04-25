@@ -30,12 +30,12 @@ import java.util.List;
 public class DeployerSortTest extends TestCase {
 
     private static final Deployer TEST_DEPLOYER = new Deployer() {
-        public void init(ConfigurationContext configCtx) {}
-        public void deploy(DeploymentFileData deploymentFileData) throws DeploymentException {}
-        public void setDirectory(String directory) {}
-        public void setExtension(String extension) {}
-        public void undeploy(String fileName) throws DeploymentException {}
-        public void cleanup() throws DeploymentException {}
+        @Override public void init(ConfigurationContext configCtx) {}
+        @Override public void deploy(DeploymentFileData deploymentFileData) throws DeploymentException {}
+        @Override public void setDirectory(String directory) {}
+        @Override public void setExtension(String extension) {}
+        @Override public void undeploy(String fileName) throws DeploymentException {}
+        @Override public void cleanup() throws DeploymentException {}
     };
 
     private static List<DeploymentFileData> fileList(String... names) {

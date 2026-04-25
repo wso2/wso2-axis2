@@ -76,14 +76,12 @@ public interface Deployer {
      * Used by the default {@link #sort} implementation and as the fallback in DeploymentEngine.
      */
     Comparator<DeploymentFileData> DEFAULT_FILENAME_COMPARATOR =
-            new Comparator<DeploymentFileData>() {
-                public int compare(DeploymentFileData d1, DeploymentFileData d2) {
-                    return d1.getFile().getName().compareTo(d2.getFile().getName());
-                }
-            };
+            (d1, d2) -> d1.getFile().getName().compareTo(d2.getFile().getName());
 
     /**
-     * Sorts a sublist of the given list of DeploymentFileData objects by file name in ascending order.
+     * Sorts the sublist of deployment artifacts within [{@code startIndex}, {@code toIndex}).
+     * Deployers may override this to apply custom ordering within the subrange.
+     * The default implementation sorts by file name in ascending order.
      *
      * @param filesToDeploy the list of DeploymentFileData
      * @param startIndex the start index (inclusive) of the sublist to sort
