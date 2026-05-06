@@ -24,6 +24,7 @@ import java.io.OutputStream;
 
 import javax.activation.DataSource;
 
+import org.apache.axis2.Constants;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 
 public class DiskFileDataSource implements DataSource {
@@ -52,6 +53,17 @@ public class DiskFileDataSource implements DataSource {
 
     public void delete() {
         this.diskFileItem.delete();
+    }
+
+    /**
+     * Get the content transfer encoding of the file item.
+     * @return the content transfer encoding, or <code>null</code> if not specified.
+     */
+    public String getContentTransferEncoding() {
+        if (this.diskFileItem == null || this.diskFileItem.getHeaders() == null) {
+            return null;
+        }
+        return this.diskFileItem.getHeaders().getHeader(Constants.CONTENT_TRANSFER_ENCODING);
     }
 
 }

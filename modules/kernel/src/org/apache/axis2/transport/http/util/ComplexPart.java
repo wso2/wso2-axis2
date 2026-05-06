@@ -139,6 +139,44 @@ public class ComplexPart extends PartBase {
     /**
      * Constructor.
      *
+     * @param name                                         the name of the part
+     * @param value                                        the string to post
+     * @param disableSendingMultipartPartCharset           whether to send the charset in the Content-Type header
+     * @param preserveMultipartPartContentTransferEncoding whether to preserve the Content-Transfer-Encoding header
+     * @param charset                                      the charset to be used to encode the string,
+     *                                                     if <code>null</code> the {@link #DEFAULT_CHARSET default}
+     *                                                     is used
+     * @param contentType                                  the content type of the part
+     */
+    public ComplexPart(String name, String value, boolean disableSendingMultipartPartCharset,
+                       boolean preserveMultipartPartContentTransferEncoding, String charset, String contentType) {
+        this(name, value, charset, contentType);
+        super.disableSendingMultipartPartCharset = disableSendingMultipartPartCharset;
+        super.preserveMultipartPartContentTransferEncoding = preserveMultipartPartContentTransferEncoding;
+    }
+
+
+    /**
+     * Constructor.
+     *
+     * @param name                                         the name of the part
+     * @param value                                        the string to post
+     * @param disableSendingMultipartPartCharset           whether to send the charset in the Content-Type header
+     * @param preserveMultipartPartContentTransferEncoding whether to preserve the Content-Transfer-Encoding header
+     * @param charset                                      the charset to be used to encode the string,
+     *                                                     if <code>null</code> the {@link #DEFAULT_CHARSET default}
+     *                                                     is used
+     */
+    public ComplexPart(String name, String value, boolean disableSendingMultipartPartCharset,
+                       boolean preserveMultipartPartContentTransferEncoding, String charset) {
+        this(name, value, charset);
+        super.disableSendingMultipartPartCharset = disableSendingMultipartPartCharset;
+        super.preserveMultipartPartContentTransferEncoding = preserveMultipartPartContentTransferEncoding;
+    }
+
+    /**
+     * Constructor.
+     *
      * @param name  The name of the part
      * @param value the string to post
      */
@@ -155,6 +193,20 @@ public class ComplexPart extends PartBase {
      */
     public ComplexPart(String name, String value, boolean disableSendingMultipartPartCharset) {
         this(name, value, disableSendingMultipartPartCharset, null);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param name                                         the name of the part
+     * @param value                                        the string to post
+     * @param disableSendingMultipartPartCharset           whether to send the charset in the Content-Type header
+     * @param preserveMultipartPartContentTransferEncoding whether to preserve the Content-Transfer-Encoding header
+     */
+    public ComplexPart(String name, String value, boolean disableSendingMultipartPartCharset,
+                       boolean preserveMultipartPartContentTransferEncoding) {
+        this(name, value, disableSendingMultipartPartCharset, preserveMultipartPartContentTransferEncoding,
+                null);
     }
 
     /**
