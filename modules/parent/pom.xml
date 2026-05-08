@@ -66,7 +66,7 @@
         <url>http://issues.apache.org/jira/browse/AXIS2</url>
     </issueManagement-->
     <properties>
-        <neethi.version>2.0.4</neethi.version>
+        <neethi.version>3.2.2</neethi.version>
         <woden.version>1.0M9</woden.version>
         <axiom.version>1.2.11-wso2v36</axiom.version>
         <xmlschema.version>1.4.7.wso2v6</xmlschema.version>
