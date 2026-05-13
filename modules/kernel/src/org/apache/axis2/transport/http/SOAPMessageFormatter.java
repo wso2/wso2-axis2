@@ -26,7 +26,10 @@ import org.apache.axiom.om.impl.OMMultipartWriter;
 import org.apache.axiom.util.UIDGenerator;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.description.Parameter;
+import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.http.util.URLTemplatingUtil;
 import org.apache.axis2.util.JavaUtils;
@@ -49,6 +52,7 @@ public class SOAPMessageFormatter implements MessageFormatter {
 
     private static final Log log = LogFactory.getLog(SOAPMessageFormatter.class);
     private static final String WRITE_XML_DECLARATION = "WRITE_XML_DECLARATION";
+    private static final String DROP_ATTACHMENT_HEADERS = "drop_attachment_headers";
     
     public void writeTo(MessageContext msgCtxt, OMOutputFormat format,
                         OutputStream out, boolean preserve) throws AxisFault {
@@ -245,17 +249,51 @@ public class SOAPMessageFormatter implements MessageFormatter {
             
             Attachments attachments = msgCtxt.getAttachmentMap();
             Map headersMap = attachments.getHeaders();
+
+            // Server wide opt in (axis2.xml <parameter name="drop_attachment_headers">true</parameter>):
+            // restore pre EI-5440 / ESB 4.9.0 behavior by skipping all attachment MIME headers.
+            // Default false — headers are still preserved per EI-5440, but sanitized to drop any
+            // single header whose name/value contains non-ASCII chars that would trip
+            // axiom's MultipartWriterImpl.writeAscii(). Read directly from AxisConfiguration
+            // because msgCtxt.getParameter() may not resolve transport level parameters reliably.
+            boolean dropAllHeaders = false;
+            ConfigurationContext configurationContext = msgCtxt.getConfigurationContext();
+            if (configurationContext != null) {
+                AxisConfiguration axisConfig = configurationContext.getAxisConfiguration();
+                if (axisConfig != null) {
+                    Parameter dropHeadersParam = axisConfig.getParameter(DROP_ATTACHMENT_HEADERS);
+                    if (dropHeadersParam != null) {
+                        dropAllHeaders = JavaUtils.isTrueExplicitly(dropHeadersParam.getValue());
+                    }
+                }
+            }
+
             for (String contentID : attachments.getAllContentIDs()) {
                 if (!contentID.equalsIgnoreCase(attachments.getSOAPPartContentID())) {
                     List<String> headersList = new ArrayList<>();
-                    Object o = headersMap.get(contentID);
-                    if (o instanceof List) {
-                        List currentHeaders = (List) o;
-                        for (Object currentHeader : currentHeaders) {
-                            if (currentHeader instanceof Header) {
+                    if (!dropAllHeaders) {
+                        Object o = headersMap.get(contentID);
+                        if (o instanceof List) {
+                            for (Object currentHeader : (List) o) {
+                                if (!(currentHeader instanceof Header)) {
+                                    continue;
+                                }
                                 Header header = (Header) currentHeader;
-                                headersList.add(header.getName() + ": " + header.getValue());
-
+                                String name = header.getName();
+                                String value = header.getValue();
+                                // Axiom's MultipartWriterImpl emits Content-Type,
+                                // Content-Transfer-Encoding and Content-ID itself. Forwarding
+                                // them again would produce duplicate MIME headers (RFC 2045 §3).
+                                if (isStructuralMimeHeader(name)) {
+                                    continue;
+                                }
+                                if (isAscii(name) && isAscii(value)) {
+                                    headersList.add(name + ": " + value);
+                                } else if (log.isWarnEnabled()) {
+                                    log.warn("Dropping non-ASCII MIME header '" + name
+                                            + "' on attachment " + contentID
+                                            + "; header names and values must be ASCII per RFC 2045.");
+                                }
                             }
                         }
                     }
@@ -282,6 +320,42 @@ public class SOAPMessageFormatter implements MessageFormatter {
         if (log.isDebugEnabled()) {
             log.debug("end writeSwAMessage()");
         }
+    }
+
+    /**
+     * Checks whether the header is a structural MIME header emitted by the multipart writer.
+     *
+     * @param name the MIME header name to check
+     * @return {@code true} if the header is managed by the multipart writer
+     */
+    private static boolean isStructuralMimeHeader(String name) {
+        return "Content-Type".equalsIgnoreCase(name)
+                || "Content-Transfer-Encoding".equalsIgnoreCase(name)
+                || "Content-ID".equalsIgnoreCase(name);
+    }
+
+    /**
+     * Checks if a string contains only ASCII characters (code points 0-127).
+     * <p>
+     * This method is used to validate MIME header names and values before writing them
+     * to ensure they don't contain non-ASCII characters that would cause issues with
+     * the multipart writer implementation.
+     * </p>
+     *
+     * @param headerValue the string to check; may be null
+     * @return {@code true} if the string is null or contains only ASCII characters;
+     *         {@code false} if any character has a code point >= 128
+     */
+    private static boolean isAscii(String headerValue) {
+        if (headerValue == null) {
+            return true;
+        }
+        for (int i = 0, len = headerValue.length(); i < len; i++) {
+            if (headerValue.charAt(i) >= 128) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }
