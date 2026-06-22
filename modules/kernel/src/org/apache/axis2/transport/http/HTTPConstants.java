@@ -442,7 +442,7 @@ public class HTTPConstants {
     /**
      * Field CACHED_HTTP_CLIENT
      */
-    public static final String CACHED_HTTP_CLIENT = "CACHED_HTTP_CLIENT";
+    public static final String CACHED_HTTP_CLIENT = "CACHED_HTTP_CLIENT_";
 
     /**
      * The name of the property that sets a HTTP state to be cached. 
