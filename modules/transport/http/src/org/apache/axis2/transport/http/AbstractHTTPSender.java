@@ -612,11 +612,18 @@ public abstract class AbstractHTTPSender {
     protected HttpClient getHttpClient(MessageContext msgContext) {
         ConfigurationContext configContext = msgContext.getConfigurationContext();
 
-        HttpClient httpClient = (HttpClient) msgContext.getProperty(
-                HTTPConstants.CACHED_HTTP_CLIENT);
+        TransportOutDescription transportOut = msgContext.getTransportOut();
+        // To preserve previous functionality use 'https' as the default transport name if transportOut is null
+        String transportName = "https";
+        if (transportOut != null && transportOut.getName() != null) {
+            transportName = transportOut.getName();
+        }
+        String cacheKey = HTTPConstants.CACHED_HTTP_CLIENT + transportName;
+
+        HttpClient httpClient = (HttpClient) msgContext.getProperty(cacheKey);
 
         if (httpClient == null) {
-            httpClient = (HttpClient) configContext.getProperty(HTTPConstants.CACHED_HTTP_CLIENT);
+            httpClient = (HttpClient) configContext.getProperty(cacheKey);
         }
 
         if (httpClient != null) {
@@ -626,11 +633,10 @@ public abstract class AbstractHTTPSender {
         }
 
         synchronized (this) {
-            httpClient = (HttpClient) msgContext.getProperty(HTTPConstants.CACHED_HTTP_CLIENT);
+            httpClient = (HttpClient) msgContext.getProperty(cacheKey);
 
             if (httpClient == null) {
-                httpClient = (HttpClient) configContext.getProperty(
-                        HTTPConstants.CACHED_HTTP_CLIENT);
+                httpClient = (HttpClient) configContext.getProperty(cacheKey);
             }
 
             if (httpClient != null) {

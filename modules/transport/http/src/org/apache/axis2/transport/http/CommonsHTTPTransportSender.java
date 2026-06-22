@@ -188,9 +188,9 @@ public class CommonsHTTPTransportSender extends AbstractHandler implements
             }
 
             HttpClient httpClient = new HttpClient(connectionManager);
-
+            String cacheKey = HTTPConstants.CACHED_HTTP_CLIENT + transportOut.getName();
             confContext.setProperty(HTTPConstants.REUSE_HTTP_CLIENT, "true");
-            confContext.setProperty(HTTPConstants.CACHED_HTTP_CLIENT, httpClient);
+            confContext.setProperty(cacheKey, httpClient);
         }
     }
 
