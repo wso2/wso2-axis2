@@ -388,6 +388,11 @@ public class HTTPConstants {
     public static final String SO_TIMEOUT = "SO_TIMEOUT";
 
     /**
+     * Field CONNECTION_IDLE_TIMEOUT
+     */
+    public static final String CONNECTION_IDLE_TIMEOUT = "CONNECTION_IDLE_TIMEOUT";
+
+    /**
      * Field NO_KEEPALIVE
      */
     public static final String NO_KEEPALIVE = "NO_KEEPALIVE";
@@ -428,6 +433,13 @@ public class HTTPConstants {
      * Field DEFAULT_SO_TIMEOUT
      */
     public static final int DEFAULT_SO_TIMEOUT = 60000;
+
+    /**
+     * Field DEFAULT_CONNECTION_IDLE_TIMEOUT
+     * Setting this to 0 because in commons-httpclient if idle time out is 0 it'll fallback to previous behavior
+     */
+    public static final int DEFAULT_CONNECTION_IDLE_TIMEOUT = 0;
+
 
     /**
      * Field DEFAULT_CONNECTION_TIMEOUT

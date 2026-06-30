@@ -78,6 +78,8 @@ public class CommonsHTTPTransportSender extends AbstractHandler implements
 
     private int connectionTimeout = HTTPConstants.DEFAULT_CONNECTION_TIMEOUT;
 
+    private int connectionIdleTimeout = HTTPConstants.DEFAULT_CONNECTION_IDLE_TIMEOUT;
+
     public void cleanup(MessageContext msgContext) throws AxisFault {
         HttpMethod httpMethod = (HttpMethod) msgContext.getProperty(HTTPConstants.HTTP_METHOD);
 
@@ -127,6 +129,8 @@ public class CommonsHTTPTransportSender extends AbstractHandler implements
                     .getParameter(HTTPConstants.SO_TIMEOUT);
             Parameter tempConnTimeoutParam = transportOut
                     .getParameter(HTTPConstants.CONNECTION_TIMEOUT);
+            Parameter tempConnIdleTimeout = transportOut
+                    .getParameter(HTTPConstants.CONNECTION_IDLE_TIMEOUT);
 
             if (tempSoTimeoutParam != null) {
                 soTimeout = Integer.parseInt((String) tempSoTimeoutParam
@@ -136,6 +140,11 @@ public class CommonsHTTPTransportSender extends AbstractHandler implements
             if (tempConnTimeoutParam != null) {
                 connectionTimeout = Integer
                         .parseInt((String) tempConnTimeoutParam.getValue());
+            }
+
+            if (tempConnIdleTimeout != null) {
+                connectionIdleTimeout = Integer
+                        .parseInt((String) tempConnIdleTimeout.getValue());
             }
         } catch (NumberFormatException nfe) {
 
@@ -156,6 +165,7 @@ public class CommonsHTTPTransportSender extends AbstractHandler implements
             
             connectionManager.getParams().setSoTimeout(soTimeout);
             connectionManager.getParams().setConnectionTimeout(connectionTimeout);
+            connectionManager.getParams().setConnectionIdleTimeout(connectionIdleTimeout);
 
             if (defaultMaxConnectionsPerHostParam != null &&
                     defaultMaxConnectionsPerHostParam.getValue() != null) {
