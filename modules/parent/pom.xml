@@ -110,7 +110,7 @@
         <stax.impl.artifact>wstx-asl</stax.impl.artifact>
         <stax.impl.groupid>org.codehaus.woodstox</stax.impl.groupid>
         <stax.impl.version>3.2.9</stax.impl.version>
-        <tomcat.version>7.0.8</tomcat.version>
+        <tomcat.version>9.0.117</tomcat.version>
         <wsdl4j.version>1.6.2</wsdl4j.version>
         <xalan.version>2.7.2</xalan.version>
         <xmlbeans.version>3.1.0</xmlbeans.version>
