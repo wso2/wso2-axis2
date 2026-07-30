@@ -104,7 +104,7 @@
         <dependency>
             <groupId>org.wso2.orbit.commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
-            <version>3.1.0-wso2v6.17</version>
+            <version>3.1.0-wso2v10</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-httpclient</groupId>
