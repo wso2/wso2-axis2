@@ -424,6 +424,12 @@ public class MultipartFormDataFormatter implements MessageFormatter {
                             ((StringPart) part).setContentType(getAttributeValue(
                                     ele.getAttribute(CONTENT_TYPE_ATTRIBUTE_QNAME), StringPart.DEFAULT_CONTENT_TYPE));
                         }
+                        // Retain the content-type of the incoming part when the parameter is not defined
+                        if (disableSendingMultipartPartCharset == null
+                                && ele.getAttributeValue(CONTENT_TYPE_ATTRIBUTE_QNAME) != null) {
+                            ((StringPart) part).setContentType(
+                                    ele.getAttributeValue(CONTENT_TYPE_ATTRIBUTE_QNAME));
+                        }
                         if (preserveMultipartPartContentTransferEncodingValue) {
                             OMAttribute transferEncodingAttr = ele.getAttribute(
                                     CONTENT_TRANSFER_ENCODING_ATTRIBUTE_QNAME);
